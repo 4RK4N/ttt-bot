@@ -3,12 +3,27 @@ import { config } from './config.js';
 import { loadModules } from './core/moduleLoader.js';
 
 async function main(): Promise<void> {
-  // Only the Guilds intent is needed: we send messages/attachments in response to
-  // interactions, which requires no privileged (message content / members) intents.
-  const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+  // Guilds: interaction handling. GuildMessages + MessageContent: the auto-thread
+  // module needs to read message text/attachments to detect posts. MessageContent
+  // is a privileged intent and must be enabled in the Discord Developer Portal.
+  const client = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.MessageContent,
+    ],
+  });
 
-  const { handlers } = await loadModules();
+  const { handlers, inits } = await loadModules();
   console.log(`Registered ${handlers.size} command handler(s).`);
+
+  for (const init of inits) {
+    try {
+      await init(client);
+    } catch (err) {
+      console.error('Failed to initialize a module:', err);
+    }
+  }
 
   client.once(Events.ClientReady, (c) => {
     console.log(`Logged in as ${c.user.tag}.`);

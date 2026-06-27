@@ -25,7 +25,9 @@ so you do not need to open any firewall ports or set up a reverse proxy.
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
    and click **New Application**. Give it a name (e.g. `ttt-bot`).
 2. Open **Bot** in the sidebar -> **Reset Token** -> copy the token. This is your
-   `DISCORD_TOKEN`. Keep it secret.
+   `DISCORD_TOKEN`. Keep it secret. While on this page, enable the
+   **Message Content** intent under **Privileged Gateway Intents** - the
+   auto-thread feature needs it to read message links/attachments.
 3. Open **General Information** -> copy the **Application ID**. This is your
    `CLIENT_ID`.
 4. Invite the bot to your server. Open this URL in a browser, replacing
@@ -82,9 +84,12 @@ docker compose version
    DISCORD_TOKEN=your-bot-token
    CLIENT_ID=your-application-id
    GUILD_ID=your-server-id      # optional but recommended
+   PIC_CHANNEL_IDS=123,456      # channels to auto-thread (comma-separated IDs)
    ```
 
-   The `.env` file stays only on the server and is git-ignored - never commit it.
+   `PIC_CHANNEL_IDS` lists the channels where the bot auto-creates comment threads
+   on qualifying posts; leave it empty to disable that module. The `.env` file
+   stays only on the server and is git-ignored - never commit it.
 
 ---
 

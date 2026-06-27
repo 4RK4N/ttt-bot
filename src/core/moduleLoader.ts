@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type {
   ChatInputCommandInteraction,
+  Client,
   RESTPostAPIApplicationCommandsJSONBody,
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
@@ -19,14 +20,22 @@ export interface Command {
   execute: CommandExecutor;
 }
 
+/**
+ * Called once after the client is created so a module can register event
+ * listeners (e.g. MessageCreate). Modules may export `commands`, `init`, or both.
+ */
+export type ModuleInit = (client: Client) => void | Promise<void>;
+
 export interface CommandModule {
   name?: string;
-  commands: Command[];
+  commands?: Command[];
+  init?: ModuleInit;
 }
 
 export interface LoadedModules {
   commandData: RESTPostAPIApplicationCommandsJSONBody[];
   handlers: Map<string, CommandExecutor>;
+  inits: ModuleInit[];
 }
 
 /**
@@ -41,9 +50,10 @@ export interface LoadedModules {
 export async function loadModules(): Promise<LoadedModules> {
   const commandData: RESTPostAPIApplicationCommandsJSONBody[] = [];
   const handlers = new Map<string, CommandExecutor>();
+  const inits: ModuleInit[] = [];
 
   if (!existsSync(MODULES_DIR)) {
-    return { commandData, handlers };
+    return { commandData, handlers, inits };
   }
 
   const entries = await readdir(MODULES_DIR, { withFileTypes: true });
@@ -59,30 +69,41 @@ export async function loadModules(): Promise<LoadedModules> {
     const imported = await import(pathToFileURL(modulePath).href);
     const mod: CommandModule = imported.default ?? imported.module ?? imported;
 
-    if (!Array.isArray(mod?.commands)) {
-      console.warn(`[moduleLoader] Module "${entry.name}" exports no commands array; skipping.`);
+    const hasCommands = Array.isArray(mod?.commands);
+    const hasInit = typeof mod?.init === 'function';
+
+    if (!hasCommands && !hasInit) {
+      console.warn(
+        `[moduleLoader] Module "${entry.name}" exports no commands array or init function; skipping.`
+      );
       continue;
     }
 
-    for (const command of mod.commands) {
-      if (!command?.data?.name || typeof command.execute !== 'function') {
-        console.warn(`[moduleLoader] Invalid command in module "${entry.name}"; skipping.`);
-        continue;
-      }
+    if (hasCommands) {
+      for (const command of mod.commands!) {
+        if (!command?.data?.name || typeof command.execute !== 'function') {
+          console.warn(`[moduleLoader] Invalid command in module "${entry.name}"; skipping.`);
+          continue;
+        }
 
-      if (handlers.has(command.data.name)) {
-        console.warn(
-          `[moduleLoader] Duplicate command name "${command.data.name}" found in module "${entry.name}"; skipping duplicate.`
-        );
-        continue;
-      }
+        if (handlers.has(command.data.name)) {
+          console.warn(
+            `[moduleLoader] Duplicate command name "${command.data.name}" found in module "${entry.name}"; skipping duplicate.`
+          );
+          continue;
+        }
 
-      commandData.push(command.data.toJSON());
-      handlers.set(command.data.name, command.execute);
+        commandData.push(command.data.toJSON());
+        handlers.set(command.data.name, command.execute);
+      }
+    }
+
+    if (hasInit) {
+      inits.push(mod.init!);
     }
 
     console.log(`[moduleLoader] Loaded module "${mod.name ?? entry.name}".`);
   }
 
-  return { commandData, handlers };
+  return { commandData, handlers, inits };
 }

@@ -16,10 +16,20 @@ function optional(name: string): string | undefined {
   return value && value.trim() !== '' ? value.trim() : undefined;
 }
 
+function optionalList(name: string): string[] {
+  const value = optional(name);
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter((part) => part !== '');
+}
+
 export interface Config {
   token: string;
   clientId: string;
   guildId: string | undefined;
+  picChannelIds: string[];
 }
 
 export const config: Config = {
@@ -27,4 +37,6 @@ export const config: Config = {
   clientId: required('CLIENT_ID'),
   // Optional: when set, slash commands register to this guild instantly (great for dev).
   guildId: optional('GUILD_ID'),
+  // Channels where the bot auto-creates a comments thread on qualifying posts.
+  picChannelIds: optionalList('PIC_CHANNEL_IDS'),
 };

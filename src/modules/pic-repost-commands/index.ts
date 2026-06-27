@@ -7,33 +7,13 @@ import {
   type SlashCommandOptionsOnlyBuilder,
 } from 'discord.js';
 import type { CommandModule } from '../../core/moduleLoader.js';
+import {
+  buildThreadName,
+  THREAD_AUTO_ARCHIVE_MINUTES,
+  THREAD_FIRST_MESSAGE,
+} from '../../core/threads.js';
 
 const MAX_IMAGES = 10; // Discord allows up to 10 attachments per message.
-
-const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.
-const THREAD_FIRST_MESSAGE =
-  'Please comment here in the thread to not clutter the channel.\n\n' +
-  'Bitte hier im Thread kommentieren um nicht den Channel zu überlasten.';
-const THREAD_AUTO_ARCHIVE_MINUTES = 10080; // 7 days
-
-// Custom (server) emoji are sent as "<:name:id>" or "<a:name:id>". They render as
-// literal text in thread names, so we strip them. Standard unicode emoji are kept.
-const CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
-
-/**
- * Derives a thread name in the form "@name - message": strips custom emoji,
- * collapses whitespace to a single line, and truncates to Discord's limit,
- * appending "..." when truncated.
- * Note: thread names are plain text, so "@name" is literal (not a real mention).
- */
-function buildThreadName(authorName: string, message: string): string {
-  const oneLine = `@${authorName} - ${message}`
-    .replace(CUSTOM_EMOJI_REGEX, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (oneLine.length <= THREAD_NAME_MAX) return oneLine;
-  return oneLine.slice(0, THREAD_NAME_MAX - 3) + '...';
-}
 
 /**
  * Builds a slash command with a required `message` and image1..image10 options.
@@ -179,12 +159,12 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
   );
 }
 
-const picModule: CommandModule = {
-  name: 'pic',
+const picRepostModule: CommandModule = {
+  name: 'pic-repost-commands',
   commands: [
     { data: buildCommand('pic'), execute },
     { data: buildCommand('post'), execute }, // alias of /pic
   ],
 };
 
-export default picModule;
+export default picRepostModule;

@@ -20,12 +20,33 @@ channel, and adds `by @you` attribution. Your command invocation is answered wit
 a private (ephemeral) confirmation, so only the bot's post is publicly visible.
 
 It also starts a thread on the post to keep discussion out of the main channel.
-The thread is titled `@name - message` (your display name plus the message,
+The thread is titled `name - message` (your display name plus the message,
 collapsed to one line and truncated to 100 characters with `...` if longer), and
 its first message is a short bilingual note asking people to comment in the thread. This requires the bot to have the
 **Create Public Threads** and **Send Messages in Threads** permissions in that
 channel; if it can't, the images are still posted and you get a note in the
 ephemeral confirmation.
+
+### pic-auto-thread (automatic threads)
+
+Replicates the old Mee6 behavior in the pics channels: when a (non-bot) user posts
+a message, the bot automatically opens a comments thread on it if the message
+either:
+
+- contains a link to a single **post** on a supported site (X/Twitter, Bluesky,
+  or Aethy) - profile, group, and site-root links are ignored; or
+- has at least one image or video attachment.
+
+The thread uses the same pattern as `/pic`: titled `name - text` with the URL
+removed from the text, or just `name` when the message has no text beyond the
+link. The first message is the same bilingual note, and the thread auto-archives
+after 7 days.
+
+Configure which channels are watched with `PIC_CHANNEL_IDS` (comma-separated
+channel IDs) in your `.env`. This module reads message content, so the bot needs
+the privileged **Message Content** intent enabled in the Developer Portal
+(Bot -> Privileged Gateway Intents). If `PIC_CHANNEL_IDS` is empty, the module
+stays disabled.
 
 ## Project layout
 
@@ -35,15 +56,18 @@ src/
   config.js             # loads & validates environment variables
   core/
     moduleLoader.js     # auto-discovers modules under src/modules/*
+    threads.js          # shared thread title/first-message helpers
   modules/
-    pic/index.js        # the /pic + /post module
+    pic-repost-commands/index.js  # the /pic + /post module
+    pic-auto-thread/index.js      # auto comments threads on posts
 scripts/
   deploy-commands.js    # registers slash commands with Discord
 ```
 
 To add a new feature later, create `src/modules/<name>/index.js` that exports
-`{ name, commands: [{ data, execute }] }`. The loader and deploy script pick it
-up automatically - no core changes needed.
+either `{ name, commands: [{ data, execute }] }` for slash commands, or
+`{ name, init(client) }` to register event listeners (or both). The loader and
+deploy script pick it up automatically - no core changes needed.
 
 ## Setup
 
