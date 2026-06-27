@@ -1,5 +1,5 @@
 services:
-  bot:
+  ttt-discord-bot:
     build: .
     image: ttt-bot
     container_name: ttt-bot

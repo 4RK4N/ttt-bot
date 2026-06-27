@@ -102,7 +102,7 @@ Slash commands must be registered with Discord before they appear. Run the deplo
 script **inside a one-off container** that uses your `.env`:
 
 ```bash
-docker compose run --rm bot npm run deploy
+docker compose run --rm ttt-discord-bot npm run deploy
 ```
 
 - With `GUILD_ID` set, the `/pic` and `/post` commands appear in that server within
@@ -125,7 +125,7 @@ alive across crashes and server reboots.
 Check it connected:
 
 ```bash
-docker compose logs -f bot
+docker compose logs -f ttt-discord-bot
 ```
 
 You should see `Logged in as <bot>#0000.` Press `Ctrl+C` to stop following logs
@@ -139,12 +139,12 @@ Now go to your Discord server and try `/pic` or `/post`.
 
 | Action                         | Command                                  |
 | ------------------------------ | ---------------------------------------- |
-| View logs                      | `docker compose logs -f bot`             |
+| View logs                      | `docker compose logs -f ttt-discord-bot` |
 | Stop the bot                   | `docker compose down`                    |
 | Start the bot                  | `docker compose up -d`                   |
-| Restart the bot                | `docker compose restart bot`             |
+| Restart the bot                | `docker compose restart ttt-discord-bot` |
 | Rebuild after code changes     | `docker compose up -d --build`           |
-| Re-register commands           | `docker compose run --rm bot npm run deploy` |
+| Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
 
 ### Updating to new code
 
@@ -152,7 +152,7 @@ Now go to your Discord server and try `/pic` or `/post`.
 git pull                       # or copy new files over
 docker compose up -d --build   # rebuild + restart
 # only if commands changed:
-docker compose run --rm bot npm run deploy
+docker compose run --rm ttt-discord-bot npm run deploy
 ```
 
 ---
