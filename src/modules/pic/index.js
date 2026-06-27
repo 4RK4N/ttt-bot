@@ -2,6 +2,22 @@ import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
 const MAX_IMAGES = 10; // Discord allows up to 10 attachments per message.
 
+const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.
+const THREAD_FIRST_MESSAGE =
+  'Please comment here in the thread to not clutter the channel.\n\n' +
+  'Bitte hier im Thread kommentieren um nicht den Channel zu überlasten.';
+const THREAD_AUTO_ARCHIVE_MINUTES = 10080; // 7 days
+
+/**
+ * Derives a thread name from the post message: collapses whitespace to a single
+ * line and truncates to Discord's limit, appending "..." when truncated.
+ */
+function buildThreadName(message) {
+  const oneLine = message.replace(/\s+/g, ' ').trim();
+  if (oneLine.length <= THREAD_NAME_MAX) return oneLine;
+  return oneLine.slice(0, THREAD_NAME_MAX - 3) + '...';
+}
+
 /**
  * Builds a slash command with a required `message` and image1..image10 options.
  * Used to create both `/pic` and its `/post` alias from one definition.
@@ -83,8 +99,9 @@ async function execute(interaction) {
 
   const content = `${message}\n\nby <@${interaction.user.id}>`;
 
+  let sent;
   try {
-    await interaction.channel.send({
+    sent = await interaction.channel.send({
       content,
       files,
       // Render the mention as the username without sending a ping.
@@ -99,8 +116,27 @@ async function execute(interaction) {
     return;
   }
 
+  // Start a comments thread on the post. Non-fatal: the images are already
+  // posted, so a thread failure (e.g. missing thread permissions) shouldn't
+  // fail the whole command.
+  let threadFailed = false;
+  try {
+    const thread = await sent.startThread({
+      name: buildThreadName(message),
+      autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
+    });
+    await thread.send(THREAD_FIRST_MESSAGE);
+  } catch (err) {
+    threadFailed = true;
+    console.error('Failed to create comments thread:', err);
+  }
+
   await interaction.editReply(
-    `Posted ${files.length} image${files.length === 1 ? '' : 's'} to this channel.`
+    `Posted ${files.length} image${files.length === 1 ? '' : 's'} to this channel.` +
+    (threadFailed
+      ? '\n\nNote: I could not create the comments thread. I may be missing the ' +
+      '"Create Public Threads" / "Send Messages in Threads" permission in this channel.'
+      : '')
   );
 }
 

@@ -19,6 +19,14 @@ The bot downloads the attachments, re-uploads them as its own message in the sam
 channel, and adds `by @you` attribution. Your command invocation is answered with
 a private (ephemeral) confirmation, so only the bot's post is publicly visible.
 
+It also starts a thread on the post to keep discussion out of the main channel.
+The thread is titled with your `message` (collapsed to one line and truncated to
+100 characters with `...` if longer), and its first message is a short bilingual
+note asking people to comment in the thread. This requires the bot to have the
+**Create Public Threads** and **Send Messages in Threads** permissions in that
+channel; if it can't, the images are still posted and you get a note in the
+ephemeral confirmation.
+
 ## Project layout
 
 ```

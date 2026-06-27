@@ -32,10 +32,12 @@ so you do not need to open any firewall ports or set up a reverse proxy.
    `YOUR_CLIENT_ID`:
 
    ```
-   https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot%20applications.commands&permissions=51200
+   https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot%20applications.commands&permissions=309237696512
    ```
 
-   Permissions `51200` = **Send Messages** + **Attach Files** + **Embed Links**.
+   Permissions `309237696512` = **Send Messages** + **Attach Files** + **Embed Links**
+   + **Create Public Threads** + **Send Messages in Threads** (the thread perms are
+   needed for the comments thread created on each post).
    Pick your server and authorize.
 5. (Recommended for fast command updates) Enable Developer Mode in Discord
    (User Settings -> Advanced -> Developer Mode), then right-click your server icon
