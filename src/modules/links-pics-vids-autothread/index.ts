@@ -94,6 +94,15 @@ async function handleMessage(message: Message): Promise<void> {
       name,
       autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
     });
+
+    // Add the poster to the thread first so they follow the discussion.
+    // Isolated so a failure here doesn't abort the (already created) thread.
+    try {
+      await thread.members.add(message.author.id);
+    } catch (err) {
+      console.error('Failed to add author to auto comments thread:', err);
+    }
+
     await thread.send(THREAD_FIRST_MESSAGE);
   } catch (err) {
     // Non-fatal: usually missing "Create Public Threads" / "Send Messages in
