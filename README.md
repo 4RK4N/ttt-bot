@@ -5,6 +5,30 @@ module system so new features can be added without refactoring the core.
 
 ## Modules
 
+### welcome-message (member join welcome)
+
+When a new member joins, the bot posts a MEE6-style welcome card in the configured
+welcome channel and sends the server rules to the member.
+
+- **Welcome card**: a generated PNG built from `data/welcome-message/media/background.png`,
+  with the member's avatar in a circle (light-purple ring), their display name as
+  `<name> just joined`, and a subtitle, both rendered in the Dancing Script font
+  (`data/welcome-message/fonts/DancingScript.ttf`). It's posted with a
+  `Welcome @member` message.
+- **Rules message**: a bilingual (EN/DE) note is sent to the member by **DM**. If
+  the member has DMs closed, the bot falls back to posting it in the welcome
+  channel, mentioning them. The welcome card post is unaffected if the rules
+  message fails.
+
+Configure the target channel with `WELCOME_CHANNEL_ID` in your `.env`. If it's
+empty, the module stays disabled. This module uses the `guildMemberAdd` event, so
+the bot needs the privileged **Server Members** intent enabled in the Developer
+Portal (Bot -> Privileged Gateway Intents).
+
+The welcome/rules text is editable in `data/welcome-message/texts.json`, and the
+background image and font can be swapped in the `media/` and `fonts/` subfolders
+(see [Editing texts and assets](#editing-texts-and-assets)).
+
 ### pic (`/pic`, alias `/post`)
 
 Lets users re-post images through the bot instead of uploading directly to an
@@ -107,8 +131,14 @@ npm install
 ```
 DISCORD_TOKEN=your-bot-token
 CLIENT_ID=your-application-id
-GUILD_ID=your-test-server-id   # optional; instant registration during dev
+GUILD_ID=your-test-server-id        # optional; instant registration during dev
+AUTOTHREAD_CHANNEL_IDS=123,456      # optional; channels for auto comments threads
+WELCOME_CHANNEL_ID=789              # optional; channel for the join welcome card
 ```
+
+The two privileged modules need their intents enabled in the Developer Portal
+(Bot -> Privileged Gateway Intents): **Message Content** for auto-threading and
+**Server Members** for the welcome card.
 
 ## Deploy slash commands
 
