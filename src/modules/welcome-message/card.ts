@@ -102,7 +102,7 @@ export async function renderWelcomeCard({
 
   const maxTextWidth = width * 0.9;
 
-  const nameLine = `${displayName} just joined the server`;
+  const nameLine = `${displayName} just joined`;
   const nameSize = fitFontSize(ctx, nameLine, 700, height * 0.14, height * 0.06, maxTextWidth);
   ctx.font = `700 ${nameSize}px "${FONT_FAMILY}"`;
   ctx.fillStyle = '#e9d8f7';
