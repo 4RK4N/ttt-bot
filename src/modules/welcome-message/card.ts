@@ -91,8 +91,8 @@ export async function renderWelcomeCard({
   ctx.strokeStyle = 'rgba(216, 191, 240, 0.95)';
   ctx.stroke();
 
-  // Shared text styling: centered with a slight shadow for legibility over the
-  // brighter parts of the background (kept subtle so it doesn't darken the card).
+  // Shared text styling: centered with a strong drop shadow so the text stays
+  // readable over both the bright (logo) and busy parts of the background.
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
