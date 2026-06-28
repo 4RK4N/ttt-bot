@@ -95,10 +95,10 @@ export async function renderWelcomeCard({
   // brighter parts of the background (kept subtle so it doesn't darken the card).
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.82)';
-  ctx.shadowBlur = height * 0.026;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+  ctx.shadowBlur = height * 0.038;
   ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = height * 0.007;
+  ctx.shadowOffsetY = height * 0.009;
 
   const maxTextWidth = width * 0.9;
 
