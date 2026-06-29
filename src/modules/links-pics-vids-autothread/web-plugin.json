@@ -1,6 +1,6 @@
 {
   "title": "Auto-Thread (Links / Pics / Vids)",
-  "description": "Text used when the bot auto-creates a comments thread on qualifying posts.",
+  "description": "Auto-creates a comments thread on posts with images, videos, or supported social links in the watched channels.",
   "fields": [
     {
       "key": "channelIds",

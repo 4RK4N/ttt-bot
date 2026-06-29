@@ -1,6 +1,6 @@
 {
   "title": "Pic Repost Commands",
-  "description": "Replies and messages for the /pic and /post image re-upload commands.",
+  "description": "Adds /pic and /post commands that re-upload attached images with attribution and a comments thread.",
   "fields": [
     {
       "key": "noImages",

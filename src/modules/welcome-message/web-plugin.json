@@ -1,6 +1,6 @@
 {
   "title": "Welcome Message",
-  "description": "Texts sent to new members when they join.",
+  "description": "Greets new members with a welcome card and sends them the server rules via DM.",
   "fields": [
     {
       "key": "channelId",
