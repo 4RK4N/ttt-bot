@@ -288,6 +288,16 @@ export async function getCsrfToken(c: Context, cfg: WebConfig): Promise<string |
   return typeof token === 'string' ? token : null;
 }
 
+/** Returns a CSRF token, minting a signed cookie when missing (e.g. pre-CSRF sessions). */
+export async function ensureCsrfToken(c: Context, cfg: WebConfig): Promise<string> {
+  const existing = await getCsrfToken(c, cfg);
+  if (existing) return existing;
+
+  const token = randomBytes(32).toString('hex');
+  await setSignedCookie(c, CSRF_COOKIE, token, cfg.sessionSecret, cookieOptions(cfg, SESSION_MAX_AGE));
+  return token;
+}
+
 /**
  * Middleware that requires a valid session. API requests get a 401 JSON; page
  * requests are redirected to /login. The authenticated user is stored on the
@@ -327,7 +337,7 @@ export function requireCsrf(cfg: WebConfig): MiddlewareHandler {
 
     const cookieToken = await getSignedCookie(c, cfg.sessionSecret, CSRF_COOKIE);
     const headerToken = c.req.header('X-CSRF-Token');
-    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    if (typeof cookieToken !== 'string' || !headerToken || cookieToken !== headerToken) {
       return c.json({ error: 'Invalid CSRF token.' }, 403);
     }
 

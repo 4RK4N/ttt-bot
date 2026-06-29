@@ -2,7 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { loadWebConfig } from './config.js';
 import {
-  getCsrfToken,
+  ensureCsrfToken,
   getSessionUser,
   handleCallback,
   logout,
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
   app.get('/', async (c) => {
     const user = await getSessionUser(c, cfg);
     if (!user) return c.html(loginPage(cfg.botName));
-    const csrfToken = (await getCsrfToken(c, cfg)) ?? '';
+    const csrfToken = await ensureCsrfToken(c, cfg);
     return c.html(editorPage(cfg.botName, user, csrfToken));
   });
 
