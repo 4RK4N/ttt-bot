@@ -1,13 +1,9 @@
 import { PermissionFlagsBits, type Guild, type ThreadChannel } from 'discord.js';
 
-/**
- * Non-bot guild admins plus members of the configured staff roles (deduped).
- * Uses the in-memory member cache only — no full guild member fetch per ticket.
- */
+/** Non-bot guild admins plus all members of the configured staff roles (deduped). */
 export function collectStaffUserIds(guild: Guild, staffRoleIds: string[]): string[] {
   const ids = new Set<string>();
 
-  // Roles that grant Administrator (typically one small Admin role).
   for (const role of guild.roles.cache.values()) {
     if (!role.permissions.has(PermissionFlagsBits.Administrator)) continue;
     for (const member of role.members.values()) {

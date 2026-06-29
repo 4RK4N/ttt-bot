@@ -10,11 +10,8 @@ const COMPONENT_ERROR_MESSAGE =
   'Something went wrong while handling that interaction. Please try again.';
 
 async function main(): Promise<void> {
-  // Guilds: interaction handling. GuildMessages + MessageContent: the auto-thread
-  // module needs to read message text/attachments to detect posts. GuildMembers:
-  // the welcome module needs the guildMemberAdd event. MessageContent and
-  // GuildMembers are privileged intents and must be enabled in the Discord
-  // Developer Portal.
+  // GuildMembers: welcome module + ticket staff cache. MessageContent and
+  // GuildMembers are privileged intents — enable them in the Developer Portal.
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
