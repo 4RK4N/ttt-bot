@@ -13,6 +13,7 @@ import { format, isModuleEnabled } from '../../core/texts.js';
 import { THREAD_AUTO_ARCHIVE_MINUTES } from '../../core/threads.js';
 import { buildTicketThreadName } from './names.js';
 import { CLOSE_PREFIX } from './panel.js';
+import { addMembersToThread, collectStaffUserIds } from './thread-members.js';
 import { resolveTicketType, texts, NAMESPACE } from './types.js';
 
 function threadLink(guildId: string, threadId: string): string {
@@ -72,11 +73,14 @@ export async function handleOpenTicket(interaction: ButtonInteraction): Promise<
       autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES as ThreadAutoArchiveDuration,
     });
 
-    try {
-      await thread.members.add(interaction.user.id);
-    } catch (err) {
-      console.error('[tickets] Failed to add opener to thread:', err);
+    const guild = interaction.guild;
+    if (guild) {
+      const staffUserIds = collectStaffUserIds(guild, ticketType.staffRoleIds);
+      const staffFirst = staffUserIds.filter((id) => id !== interaction.user.id);
+      await addMembersToThread(thread, staffFirst);
     }
+
+    await addMembersToThread(thread, [interaction.user.id]);
 
     const closeButton = new ButtonBuilder()
       .setCustomId(`${CLOSE_PREFIX}${thread.id}:${typeId}`)
