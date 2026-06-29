@@ -6,9 +6,9 @@
   "categoryUnpublished": "This ticket category is not available right now.",
   "types": {
     "support": {
-      "openButtonLabel": "Open Support Ticket",
+      "openButtonLabel": "Open ticket",
       "panelTitle": "Support",
-      "panelDescription": "Click the button below to open a private support ticket.",
+      "panelDescription": "Click the button below to open a private ticket.",
       "ticketWelcome": "Hi {mention}, describe your issue and staff will assist you.",
       "closeButtonLabel": "Close ticket",
       "confirmClosePrompt": "Are you sure you want to close this ticket?",

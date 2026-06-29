@@ -80,9 +80,9 @@ docker compose version
    nano data/config.json
    ```
 
-All `config.json` files stay only on the server and are git-ignored - never
-commit them. The `*.example.json` templates are safe to commit. See the
-**Configuration reference** below for every field.
+All `config.json` and `texts.json` files stay only on the server and are
+git-ignored - never commit them. The `*.example.json` templates are safe to
+commit. See the **Configuration reference** below for every field.
 
 ---
 
@@ -91,7 +91,7 @@ commit them. The `*.example.json` templates are safe to commit. See the
 The bot reads all configuration from JSON files under `data/`. There are no
 environment variables to set (only the optional `DATA_DIR`, which relocates the
 `data/` directory itself). Each file has a committed `*.example.json` template;
-copy it to `config.json` and edit.
+copy it to `config.json` or `texts.json` and edit.
 
 ### `data/config.json` - core bot + web editor
 

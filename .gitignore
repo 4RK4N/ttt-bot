@@ -5,6 +5,7 @@ dist/
 # templates tracked, but never commit the real config.json files.
 data/config.json
 data/*/config.json
+data/*/texts.json
 
 *.log
 npm-debug.log*
