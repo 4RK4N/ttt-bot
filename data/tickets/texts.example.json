@@ -5,7 +5,7 @@
   "deleteNotClosed": "Only closed tickets can be deleted.",
   "categoryUnpublished": "This ticket category is not available right now.",
   "types": {
-    "support": {
+    "nsfw-yes": {
       "openButtonLabel": "Open ticket",
       "panelTitle": "Support",
       "panelDescription": "Click the button below to open a private ticket.",

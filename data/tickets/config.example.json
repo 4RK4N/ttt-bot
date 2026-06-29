@@ -2,7 +2,7 @@
   "enabled": true,
   "ticketTypes": [
     {
-      "id": "support",
+      "id": "nsfw-yes",
       "published": false,
       "emoji": "",
       "channelId": "",
