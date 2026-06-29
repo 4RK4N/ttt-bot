@@ -281,6 +281,25 @@ docker logs -f ttt-discord-bot
 - **Bot is online but `/pic` fails to post**: the bot needs **Send Messages** and
   **Attach Files** permissions in that channel. Re-check the channel's permission
   overrides for the bot's role.
+- **Web editor "Failed to save changes" (`EACCES` in `ttt-web-editor` logs)**: the
+  editor container runs as the non-root `node` user (uid 1000) but can't write to
+  the bind-mounted `./data`. Make the host data dir owned by that uid once:
+
+  ```bash
+  sudo chown -R 1000:1000 ./data
+  ```
+
+  (Confirm the image's uid with `docker run --rm ttt-discord-bot id node` if unsure.)
+
+  Caveat: with `./data` owned by uid 1000, your own user can no longer edit those
+  files directly. Prefer the web editor for changes. If you must hand-edit a file,
+  use `sudo` and then re-chown it back to 1000 afterwards (nano's save can rewrite
+  it as root):
+
+  ```bash
+  sudo nano ./data/welcome-message/config.json
+  sudo chown 1000:1000 ./data/welcome-message/config.json
+  ```
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The
   bot reports this back to the user privately.
 
