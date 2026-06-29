@@ -21,7 +21,8 @@ welcome channel and sends the server rules to the member.
   message fails.
 
 Configure the target channel with `channelId` in
-`data/welcome-message/config.json`. If it's empty, the module stays disabled.
+`data/welcome-message/config.json`, or pick it from a channel dropdown in the
+[Web editor](#web-editor). If it's empty, the module stays disabled.
 This module uses the `guildMemberAdd` event, so
 the bot needs the privileged **Server Members** intent enabled in the Developer
 Portal (Bot -> Privileged Gateway Intents).
@@ -68,10 +69,11 @@ link. The first message is the same bilingual note, and the thread auto-archives
 after 7 days.
 
 Configure which channels are watched with `channelIds` (an array of channel IDs)
-in `data/links-pics-vids-autothread/config.json`. This module reads message
-content, so the bot needs the privileged **Message Content** intent enabled in
-the Developer Portal (Bot -> Privileged Gateway Intents). If `channelIds` is
-empty, the module stays disabled.
+in `data/links-pics-vids-autothread/config.json`, or tick them in a channel
+picker in the [Web editor](#web-editor). This module reads message content, so
+the bot needs the privileged **Message Content** intent enabled in the Developer
+Portal (Bot -> Privileged Gateway Intents). If `channelIds` is empty, the module
+stays disabled.
 
 ## Project layout
 
@@ -86,20 +88,21 @@ src/
   modules/
     welcome-message/
       index.ts          # welcome card + rules on member join
-      web-plugin.json   # editor manifest: which texts are editable
+      web-plugin.json   # editor manifest: which texts/config are editable
     pic-repost-commands/
       index.ts          # the /pic + /post module
       web-plugin.json
     links-pics-vids-autothread/
       index.ts          # auto comments threads on posts
       web-plugin.json
-  web/                  # the web text editor (separate process/container)
+  web/                  # the web editor (separate process/container)
     server.ts           # entry point: Hono HTTP server + routes
-    config.ts           # validates the editor's own env vars
+    config.ts           # validates the editor's own config
     auth.ts             # Discord OAuth login + guild-admin check + session
     plugins.ts          # scans modules for web-plugin.json manifests
-    store.ts            # validated, atomic read/write of texts.json
-    ui.ts               # the editor's HTML page
+    store.ts            # validated, atomic read/write of texts.json + config.json
+    channels.ts         # lists the guild's channels for the channel pickers
+    ui.ts               # the editor's HTML page (side-tabs per module)
 data/                   # runtime config + editable content (git-ignored secrets)
   config.json           # bot config (token, IDs, web editor) - from config.example.json
   welcome-message/
@@ -120,8 +123,8 @@ To add a new feature later, create `src/modules/<name>/index.ts` that exports
 either `{ name, commands: [{ data, execute }] }` for slash commands, or
 `{ name, init(client) }` to register event listeners (or both). The loader and
 deploy script pick it up automatically - no core changes needed. To make its
-texts editable in the web editor, drop a `web-plugin.json` in the same folder
-(see [Web text editor](#web-text-editor)); the editor discovers it automatically.
+texts or config editable in the web editor, drop a `web-plugin.json` in the same
+folder (see [Web editor](#web-editor)); the editor discovers it automatically.
 
 ### Editing texts and assets
 
@@ -134,30 +137,38 @@ bot. Slash command names/descriptions stay in code (they require `npm run deploy
 to change).
 
 You can edit `texts.json` files by hand, or through the built-in
-[Web text editor](#web-text-editor), which writes the same files.
+[Web editor](#web-editor), which writes the same files.
 
-## Web text editor
+## Web editor
 
-A small browser UI for editing each module's `texts.json` without touching the
-server. It runs as a **separate process/container** that shares the bot's `data/`
-directory, so saved edits take effect on the bot's next event - no restart.
+A small browser UI for editing each module's `texts.json` and `config.json`
+without touching the server. Modules are organized into **side-tabs** (one per
+module). It runs as a **separate process/container** that shares the bot's
+`data/` directory, so saved edits take effect on the bot's next event - no
+restart.
 
 - **What's editable** is declared per module by a `web-plugin.json` manifest next
-  to the module's `index.js`. Each manifest lists fields (`key`, `label`,
-  `type: text | textarea`, optional `help`). The editor scans modules at startup,
-  so adding/removing editable fields is just editing that JSON - no code changes.
+  to the module's `index.js`. Each manifest lists fields with a `key`, `label`,
+  optional `help`, a `type` (`text`, `textarea`, `channel`, or `channel-multi`),
+  and a `store` (`texts` for `texts.json`, `config` for `config.json`; defaults
+  to `texts`). The editor scans modules at startup, so adding/removing editable
+  fields is just editing that JSON - no code changes.
+- **Channel pickers**: `channel`/`channel-multi` fields render as dropdowns
+  populated with the server's channels, fetched live via the bot token, so you
+  set channel IDs by picking from a list instead of copying IDs by hand.
 - **Access** is restricted to **administrators of `guildId`**. Login is via
   Discord OAuth: the editor checks that your account has the Administrator
   permission on that server before letting you in.
-- **Safety**: writes are validated against the manifest (only known keys, string
-  values) and written atomically, so a half-saved or malformed file can't reach
-  the bot.
+- **Safety**: writes are validated against the manifest (only known keys, correct
+  value types) and written atomically, so a half-saved or malformed file can't
+  reach the bot.
 
 ### Configuration
 
 The editor reads `clientSecret`, `sessionSecret`, `oauthRedirectUri`, `webPort`,
-and `guildId` from `data/config.json`. These are only needed by the editor; the
-bot ignores them. See the
+and `guildId` from `data/config.json`, and uses the bot's `discordToken` to list
+the server's channels for the channel pickers. These are only needed by the
+editor; the bot ignores the OAuth/web ones. See the
 [Configuration reference](INSTALL.md#configuration-reference) in `INSTALL.md`
 for each field, how to generate a session secret, and the exact
 `oauthRedirectUri` you must register under **Developer Portal -> OAuth2 ->

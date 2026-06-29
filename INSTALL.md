@@ -120,8 +120,10 @@ copy it to `config.json` and edit.
 | `webPort` | No | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too. |
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
-`webPort`) plus `guildId` are only needed if you run the browser-based text
-editor; the bot process ignores them. See [Web text editor](README.md#web-text-editor).
+`webPort`) plus `guildId` are only needed if you run the browser-based editor;
+the bot process ignores them. The editor also uses `discordToken` (the bot
+token) to list the server's channels for its channel pickers. See
+[Web editor](README.md#web-editor).
 
 ### `data/links-pics-vids-autothread/config.json` - auto-threading
 
@@ -131,9 +133,10 @@ editor; the bot process ignores them. See [Web text editor](README.md#web-text-e
 
 `channelIds` lists the channels where the bot auto-creates a comments thread on
 qualifying posts (X/Twitter, Bluesky, Aethy links, or direct image/video).
-Leave it empty (`[]`) to disable the module. This module needs the privileged
-**Message Content** intent (Developer Portal -> Bot -> Privileged Gateway
-Intents).
+Leave it empty (`[]`) to disable the module. You can also set this in the
+[Web editor](README.md#web-editor) with a channel picker instead of editing the
+file. This module needs the privileged **Message Content** intent (Developer
+Portal -> Bot -> Privileged Gateway Intents).
 
 ### `data/welcome-message/config.json` - join welcome card
 
@@ -142,9 +145,10 @@ Intents).
 ```
 
 `channelId` is the channel where the welcome card is posted when a member joins.
-Leave it blank (`""`) to disable the module. This module needs the privileged
-**Server Members** intent (Developer Portal -> Bot -> Privileged Gateway
-Intents).
+Leave it blank (`""`) to disable the module. You can also set this in the
+[Web editor](README.md#web-editor) with a channel dropdown instead of editing the
+file. This module needs the privileged **Server Members** intent (Developer
+Portal -> Bot -> Privileged Gateway Intents).
 
 ---
 
