@@ -1,7 +1,3 @@
-﻿# Environment / secrets
-.env
-.env.*
-
-# Runtime config holds secrets; templates (*.example.json) stay visible.
+﻿# Runtime config holds secrets; templates (*.example.json) stay visible.
 data/config.json
 data/*/config.json
