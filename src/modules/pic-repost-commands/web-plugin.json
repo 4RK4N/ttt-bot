@@ -3,6 +3,12 @@
   "description": "Adds /pic and /post commands that re-upload attached images with attribution and a comments thread.",
   "fields": [
     {
+      "key": "disabled",
+      "label": "Disabled reply",
+      "type": "text",
+      "help": "Shown when someone uses /pic or /post while this module is turned off."
+    },
+    {
       "key": "noImages",
       "label": "No images attached",
       "type": "text",

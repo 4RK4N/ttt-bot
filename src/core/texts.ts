@@ -76,3 +76,13 @@ export function getTexts<T extends object>(namespace: string, defaults: T): T {
 export function getConfig<T extends object>(namespace: string, defaults: T): T {
   return loadJson(moduleDataPath(namespace, 'config.json'), defaults);
 }
+
+/**
+ * Master on/off switch for a module, read from config.json's `enabled` key.
+ * Only an explicit `false` disables; a missing key (or any other value) means
+ * enabled, so existing modules without the key keep working. Hot-reloads with
+ * the rest of the config, so the web editor's toggle takes effect without a restart.
+ */
+export function isModuleEnabled(namespace: string): boolean {
+  return getConfig(namespace, { enabled: true } as { enabled?: boolean }).enabled !== false;
+}

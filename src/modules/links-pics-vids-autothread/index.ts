@@ -5,7 +5,7 @@ import {
   DEFAULT_THREAD_FIRST_MESSAGE,
   THREAD_AUTO_ARCHIVE_MINUTES,
 } from '../../core/threads.js';
-import { getConfig, getTexts } from '../../core/texts.js';
+import { getConfig, getTexts, isModuleEnabled } from '../../core/texts.js';
 
 const NAMESPACE = 'links-pics-vids-autothread';
 
@@ -100,6 +100,9 @@ async function handleMessage(message: Message): Promise<void> {
   // Ignore bots/webhooks (incl. our own /pic reposts, which thread themselves)
   // and system messages.
   if (message.author.bot || message.system) return;
+
+  // Master switch (web editor toggle); disabled means do nothing.
+  if (!isModuleEnabled(NAMESPACE)) return;
 
   // Only the configured pics channels.
   if (!channelIds().includes(message.channelId)) return;

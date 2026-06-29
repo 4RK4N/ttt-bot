@@ -12,11 +12,14 @@ import {
   DEFAULT_THREAD_FIRST_MESSAGE,
   THREAD_AUTO_ARCHIVE_MINUTES,
 } from '../../core/threads.js';
-import { format, getTexts } from '../../core/texts.js';
+import { format, getTexts, isModuleEnabled } from '../../core/texts.js';
+
+const NAMESPACE = 'pic-repost-commands';
 
 const MAX_IMAGES = 10; // Discord allows up to 10 attachments per message.
 
 interface PicTexts {
+  disabled: string;
   noImages: string;
   notImages: string;
   downloadFailed: string;
@@ -30,6 +33,7 @@ interface PicTexts {
 
 // Code defaults; data/pic-repost-commands/texts.json overrides these.
 const DEFAULTS: PicTexts = {
+  disabled: 'This command is currently disabled.',
   noImages: 'You need to attach at least one image.',
   notImages: 'These attachments are not images: {names}. Please attach image files only.',
   downloadFailed:
@@ -47,7 +51,7 @@ const DEFAULTS: PicTexts = {
 };
 
 function texts(): PicTexts {
-  return getTexts('pic-repost-commands', DEFAULTS);
+  return getTexts(NAMESPACE, DEFAULTS);
 }
 
 /**
@@ -82,6 +86,13 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
   await interaction.deferReply({ ephemeral: true });
 
   const t = texts();
+
+  // Master switch (web editor toggle); disabled means reply and stop.
+  if (!isModuleEnabled(NAMESPACE)) {
+    await interaction.editReply(t.disabled);
+    return;
+  }
+
   const message = interaction.options.getString('message', true);
 
   // Prefer the user's server nickname, then their global display name, then the

@@ -36,6 +36,36 @@ function toStringArray(value: unknown): string[] {
 }
 
 /**
+ * Writes `data` as pretty JSON to a module's data file via a temp file + rename,
+ * so a reader never sees a half-written file and the bot's mtime-based hot reload
+ * picks up the change.
+ */
+async function writeJsonAtomic(file: string, data: Record<string, unknown>): Promise<void> {
+  await mkdir(dirname(file), { recursive: true });
+  const json = JSON.stringify(data, null, 2) + '\n';
+  const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
+  writeFileSync(tmp, json, 'utf8');
+  renameSync(tmp, file);
+}
+
+/**
+ * Reads a module's master on/off switch from config.json's `enabled` key.
+ * Mirrors the bot's `isModuleEnabled`: only an explicit `false` is disabled, so a
+ * missing key (legacy config) reads as enabled.
+ */
+export function readEnabled(namespace: string): boolean {
+  return readFile(namespace, 'config').enabled !== false;
+}
+
+/** Writes a module's master on/off switch to config.json, preserving other keys. */
+export async function writeEnabled(namespace: string, enabled: boolean): Promise<boolean> {
+  const existing = readFile(namespace, 'config');
+  const merged = { ...existing, enabled };
+  await writeJsonAtomic(moduleDataPath(namespace, STORE_FILES.config), merged);
+  return enabled;
+}
+
+/**
  * Reads the current saved values for every field in the manifest from the
  * appropriate file (texts.json or config.json). Missing keys come back as empty
  * (string '' or []) so the form always renders. Never throws.
@@ -108,14 +138,7 @@ export async function writeValues(
   for (const store of Object.keys(updatesByStore) as WebFieldStore[]) {
     const existing = readFile(plugin.namespace, store);
     const merged = { ...existing, ...updatesByStore[store] };
-
-    const file = moduleDataPath(plugin.namespace, STORE_FILES[store]);
-    await mkdir(dirname(file), { recursive: true });
-
-    const json = JSON.stringify(merged, null, 2) + '\n';
-    const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
-    writeFileSync(tmp, json, 'utf8');
-    renameSync(tmp, file);
+    await writeJsonAtomic(moduleDataPath(plugin.namespace, STORE_FILES[store]), merged);
   }
 
   return readValues(plugin);

@@ -10,7 +10,7 @@ import {
   type SessionUser,
 } from './auth.js';
 import { loadWebPlugins, type WebPlugin } from './plugins.js';
-import { readValues, ValidationError, writeValues } from './store.js';
+import { readEnabled, readValues, ValidationError, writeEnabled, writeValues } from './store.js';
 import { listGuildChannels } from './channels.js';
 import { editorPage, loginPage } from './ui.js';
 
@@ -57,6 +57,7 @@ async function main(): Promise<void> {
       description: p.description,
       fields: p.fields,
       values: readValues(p),
+      enabled: readEnabled(p.namespace),
     }));
     return c.json(payload);
   });
@@ -92,6 +93,36 @@ async function main(): Promise<void> {
         return c.json({ error: err.message }, 400);
       }
       console.error(`[web] Failed to write settings for "${namespace}":`, err);
+      return c.json({ error: 'Failed to save changes.' }, 500);
+    }
+  });
+
+  api.put('/modules/:namespace/enabled', async (c) => {
+    const namespace = c.req.param('namespace');
+    if (!byNamespace.has(namespace)) {
+      return c.json({ error: `Unknown module "${namespace}".` }, 404);
+    }
+
+    let body: unknown;
+    try {
+      body = await c.req.json();
+    } catch {
+      return c.json({ error: 'Request body must be valid JSON.' }, 400);
+    }
+
+    const enabled = (body as { enabled?: unknown })?.enabled;
+    if (typeof enabled !== 'boolean') {
+      return c.json({ error: 'Field "enabled" must be a boolean.' }, 400);
+    }
+
+    try {
+      const saved = await writeEnabled(namespace, enabled);
+      console.log(
+        `[web] ${c.get('user').username} ${saved ? 'enabled' : 'disabled'} module "${namespace}".`
+      );
+      return c.json({ ok: true, enabled: saved });
+    } catch (err) {
+      console.error(`[web] Failed to set enabled for "${namespace}":`, err);
       return c.json({ error: 'Failed to save changes.' }, 500);
     }
   });

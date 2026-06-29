@@ -6,7 +6,7 @@ import {
   type GuildMember,
 } from 'discord.js';
 import type { CommandModule } from '../../core/moduleLoader.js';
-import { format, getConfig, getTexts } from '../../core/texts.js';
+import { format, getConfig, getTexts, isModuleEnabled } from '../../core/texts.js';
 import { renderWelcomeCard } from './card.js';
 
 const NAMESPACE = 'welcome-message';
@@ -72,6 +72,9 @@ async function sendRulesDM(member: GuildMember, fallbackToChannel: () => Promise
 }
 
 async function handleMemberAdd(member: GuildMember): Promise<void> {
+  // Master switch (web editor toggle); disabled means do nothing.
+  if (!isModuleEnabled(NAMESPACE)) return;
+
   const channelId = welcomeChannelId();
   if (!channelId) return;
 

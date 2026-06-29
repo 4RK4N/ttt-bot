@@ -39,9 +39,33 @@ const STYLES = `
   }
   .tab:hover { background: var(--panel-2); }
   .tab.active { background: var(--panel-2); border-color: var(--accent); }
+  .tab .tab-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ok); margin-right: 8px; vertical-align: middle;
+  }
+  .tab.off .tab-dot { background: var(--muted); }
+  .tab.off .tab-text { color: var(--muted); }
   .content { flex: 1; min-width: 0; padding: 24px; max-width: 820px; }
-  .module h2 { margin: 0 0 4px; font-size: 19px; }
+  .module-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+  .module-head h2 { margin: 0; }
+  .module h2 { font-size: 19px; }
   .module .desc { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; flex: 0 0 auto; }
+  .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch .track {
+    width: 42px; height: 24px; background: var(--border); border-radius: 999px;
+    transition: background .15s; position: relative; flex: 0 0 auto;
+  }
+  .switch .track::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+    border-radius: 50%; background: #fff; transition: transform .15s;
+  }
+  .switch input:checked + .track { background: var(--ok); }
+  .switch input:checked + .track::after { transform: translateX(18px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .switch .switch-label { font-size: 13px; color: var(--muted); min-width: 24px; }
+  .switch.busy { opacity: .6; }
+  .switch-err { color: var(--err); font-size: 12px; margin: -8px 0 16px; }
   .panel { display: none; }
   .panel.active { display: block; }
   .field { margin-bottom: 16px; }
@@ -284,13 +308,64 @@ const CLIENT_JS = `
     };
   }
 
-  function buildPanel(mod) {
+  // Renders the on/off switch for a module. Instant-apply: each change PUTs the
+  // new state and updates the sidebar tab; on failure it reverts the checkbox.
+  function buildSwitch(mod, tab) {
+    var enabled = mod.enabled !== false;
+    var label = el('label', 'switch');
+    var input = el('input');
+    input.type = 'checkbox';
+    input.checked = enabled;
+    var track = el('span', 'track');
+    var text = el('span', 'switch-label');
+    text.textContent = enabled ? 'On' : 'Off';
+    label.appendChild(input);
+    label.appendChild(track);
+    label.appendChild(text);
+
+    function reflect(on) {
+      text.textContent = on ? 'On' : 'Off';
+      tab.classList.toggle('off', !on);
+    }
+
+    input.addEventListener('change', async function () {
+      var on = input.checked;
+      label.classList.add('busy');
+      input.disabled = true;
+      try {
+        var res = await fetch('/api/modules/' + encodeURIComponent(mod.namespace) + '/enabled', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: on }),
+        });
+        if (!res.ok) {
+          var err = await res.json().catch(function () { return {}; });
+          throw new Error(err.error || ('HTTP ' + res.status));
+        }
+        reflect(on);
+      } catch (e) {
+        input.checked = !on;
+        reflect(!on);
+        alert('Could not change module state: ' + e.message);
+      } finally {
+        label.classList.remove('busy');
+        input.disabled = false;
+      }
+    });
+
+    return label;
+  }
+
+  function buildPanel(mod, tab) {
     var panel = el('section', 'panel');
     panel.dataset.ns = mod.namespace;
     var inner = el('div', 'module');
+    var head = el('div', 'module-head');
     var h = el('h2');
     h.textContent = mod.title;
-    inner.appendChild(h);
+    head.appendChild(h);
+    head.appendChild(buildSwitch(mod, tab));
+    inner.appendChild(head);
     if (mod.description) {
       var d = el('p', 'desc');
       d.textContent = mod.description;
@@ -369,12 +444,17 @@ const CLIENT_JS = `
     mods.forEach(function (mod, i) {
       var tab = el('button', 'tab');
       tab.type = 'button';
-      tab.textContent = mod.title;
+      var dot = el('span', 'tab-dot');
+      var text = el('span', 'tab-text');
+      text.textContent = mod.title;
+      tab.appendChild(dot);
+      tab.appendChild(text);
+      if (mod.enabled === false) tab.classList.add('off');
       tab.addEventListener('click', function () { activate(i); });
       sidebar.appendChild(tab);
       tabs.push(tab);
 
-      var panel = buildPanel(mod);
+      var panel = buildPanel(mod, tab);
       content.appendChild(panel);
       panels.push(panel);
     });
