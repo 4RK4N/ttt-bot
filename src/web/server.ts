@@ -132,9 +132,35 @@ async function main(): Promise<void> {
   // Binds 0.0.0.0 for the Caddy-proxied deployment: docker-compose publishes no
   // host port and only exposes this via the internal caddy network (TLS + auth in
   // front). Don't publish a host port without putting access control ahead of it.
-  serve({ fetch: app.fetch, port: cfg.port }, (info) => {
+  const server = serve({ fetch: app.fetch, port: cfg.port }, (info) => {
     console.log(`[web] Admin interface listening on http://0.0.0.0:${info.port}`);
   });
+
+  // Graceful shutdown: Docker sends SIGTERM on `compose up --build`/stop. Without
+  // this the process ignores it and Docker waits the full stop grace period before
+  // SIGKILL, slowing container recreation. Close the server and exit promptly; a
+  // short timer guarantees exit even if close() hangs on a lingering connection.
+  let shuttingDown = false;
+  const shutdown = (signal: NodeJS.Signals) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`[web] Received ${signal}; shutting down...`);
+
+    const forceExit = setTimeout(() => {
+      console.warn('[web] Shutdown timed out; forcing exit.');
+      process.exit(0);
+    }, 5000);
+    forceExit.unref();
+
+    server.close((err) => {
+      if (err) console.error('[web] Error during shutdown:', err);
+      clearTimeout(forceExit);
+      process.exit(0);
+    });
+  };
+
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
 }
 
 main().catch((err) => {

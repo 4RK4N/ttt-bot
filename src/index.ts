@@ -62,6 +62,34 @@ async function main(): Promise<void> {
     }
   });
 
+  // Graceful shutdown: Docker sends SIGTERM on `compose up --build`/stop. Without
+  // this, the process ignores it and Docker waits the full stop grace period
+  // before SIGKILL, making container recreation slow. Destroy the gateway
+  // connection and exit promptly instead. A short timer guarantees we exit even
+  // if client.destroy() hangs.
+  let shuttingDown = false;
+  const shutdown = (signal: NodeJS.Signals) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`Received ${signal}; shutting down...`);
+
+    const forceExit = setTimeout(() => {
+      console.warn('Shutdown timed out; forcing exit.');
+      process.exit(0);
+    }, 5000);
+    forceExit.unref();
+
+    void Promise.resolve(client.destroy())
+      .catch((err) => console.error('Error during shutdown:', err))
+      .finally(() => {
+        clearTimeout(forceExit);
+        process.exit(0);
+      });
+  };
+
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
+
   await client.login(config.discordToken);
 }
 
