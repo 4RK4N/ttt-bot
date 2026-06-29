@@ -63,7 +63,7 @@ const DEFAULTS: WelcomeTexts = {
     ' durch und akzeptiere diese um den Server vollständig freizuschalten für dich (ausser NSFW dies ist optional).',
   ].join('\n'),
   welcomeContent: 'Welcome {mention}',
-  rulesChannelFallback: '{mention}\n\n{rules}',
+  rulesChannelFallback: '{mention} please read and accept the rules in {rulesChannel} to fully unlock the server.',
 };
 
 function texts(): WelcomeTexts {
@@ -122,11 +122,12 @@ async function handleMemberAdd(member: GuildMember): Promise<void> {
   // Rules message: DM first, fall back to a normal channel message if DMs are closed.
   // Isolated so a DM failure never affects the welcome image post above.
   const t = texts();
-  const rulesMessage = format(t.rulesMessage, { rulesChannel: rulesChannelLink(member.guild.id) });
+  const rulesChannel = rulesChannelLink(member.guild.id);
+  const rulesMessage = format(t.rulesMessage, { rulesChannel });
   try {
     await sendRulesDM(member, rulesMessage, async () => {
       await channel.send({
-        content: format(t.rulesChannelFallback, { mention, rules: rulesMessage }),
+        content: format(t.rulesChannelFallback, { mention, rulesChannel }),
         allowedMentions: { users: [member.id] },
       });
     });

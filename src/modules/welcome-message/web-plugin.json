@@ -32,7 +32,7 @@
       "key": "rulesChannelFallback",
       "label": "Rules channel fallback",
       "type": "textarea",
-      "help": "Used when the rules DM fails. Tokens: {mention}, {rules}"
+      "help": "Short message posted in the welcome channel when the rules DM fails. Tokens: {mention}, {rulesChannel}"
     }
   ]
 }

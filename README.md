@@ -16,11 +16,11 @@ welcome channel and sends the server rules to the member.
   (`data/welcome-message/fonts/DancingScript.ttf`). It's posted with a
   `Welcome @member` message.
 - **Rules message**: a bilingual (EN/DE) note is sent to the member by **DM**. If
-  the member has DMs closed, the bot falls back to posting it in the welcome
-  channel, mentioning them. The welcome card post is unaffected if the rules
-  message fails. The rules channel is linked via the `{rulesChannel}` token,
-  which renders as a clickable channel link (built from the guild and the
-  configured `rulesChannelId`).
+  the member has DMs closed, the bot falls back to posting a short message in the
+  welcome channel that mentions them and links the rules channel. The welcome
+  card post is unaffected if the rules message fails. The rules channel is linked
+  via the `{rulesChannel}` token, which renders as a clickable channel link
+  (built from the guild and the configured `rulesChannelId`).
 
 Configure the target channel with `channelId` in
 `data/welcome-message/config.json`, and the linked rules channel with
