@@ -114,7 +114,9 @@ data/                   # runtime config + editable content (git-ignored secrets
     texts.json
     media/background.png
     fonts/DancingScript.ttf
-  pic-repost-commands/texts.json
+  pic-repost-commands/
+    config.json         # { "enabled": true } - master on/off switch
+    texts.json
   links-pics-vids-autothread/
     config.json         # { "channelIds": [...] } - watched channels
     texts.json

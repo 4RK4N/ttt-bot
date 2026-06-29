@@ -158,6 +158,18 @@ off while keeping the channel configured. You can also set both in the
 instead of editing the file. This module needs the privileged **Server Members**
 intent (Developer Portal -> Bot -> Privileged Gateway Intents).
 
+### `data/pic-repost-commands/config.json` - /pic and /post commands
+
+```json
+{ "enabled": true }
+```
+
+This module has no channel setting (the commands work in whatever channel they're
+run), so its `config.json` holds only the `enabled` toggle. Set `"enabled": false`
+(or flip the toggle in the [Web editor](README.md#web-editor)) to turn off `/pic`
+and `/post`; while off they reply with a short "disabled" notice instead of
+posting.
+
 ---
 
 ## Part 4 - Build the image
