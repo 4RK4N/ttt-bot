@@ -21,6 +21,11 @@ export interface TicketTypeTexts {
   confirmCloseYes: string;
   confirmCloseNo: string;
   ticketClosed: string;
+  deleteButtonLabel: string;
+  confirmDeletePrompt: string;
+  confirmDeleteYes: string;
+  confirmDeleteNo: string;
+  ticketDeleted: string;
   alreadyOpen: string;
   openSuccess: string;
 }
@@ -35,6 +40,8 @@ export interface TicketsConfig {
 export interface TicketsTexts {
   disabled: string;
   noPermission: string;
+  noDeletePermission: string;
+  deleteNotClosed: string;
   categoryUnpublished: string;
   types: Record<string, TicketTypeTexts>;
 }
@@ -49,6 +56,11 @@ export const DEFAULT_TYPE_TEXTS: TicketTypeTexts = {
   confirmCloseYes: 'Yes, close',
   confirmCloseNo: 'Cancel',
   ticketClosed: 'This ticket has been closed.',
+  deleteButtonLabel: 'DELETE',
+  confirmDeletePrompt: 'Delete this closed ticket permanently?',
+  confirmDeleteYes: 'Yes, delete',
+  confirmDeleteNo: 'Cancel',
+  ticketDeleted: 'Ticket deleted.',
   alreadyOpen: 'You already have an open ticket in this category.',
   openSuccess: 'Your ticket was created: {thread}',
 };
@@ -56,6 +68,8 @@ export const DEFAULT_TYPE_TEXTS: TicketTypeTexts = {
 export const TEXT_DEFAULTS: TicketsTexts = {
   disabled: 'Tickets are currently disabled.',
   noPermission: "You don't have permission to close this ticket.",
+  noDeletePermission: "You don't have permission to delete this ticket.",
+  deleteNotClosed: 'Only closed tickets can be deleted.',
   categoryUnpublished: 'This ticket category is not available right now.',
   types: {},
 };

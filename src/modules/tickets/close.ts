@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { isModuleEnabled } from '../../core/texts.js';
 import { buildClosedThreadName } from './names.js';
-import { CLOSE_CONFIRM_PREFIX, CLOSE_PREFIX } from './panel.js';
+import { CLOSE_CONFIRM_PREFIX, CLOSE_PREFIX, DELETE_PREFIX } from './panel.js';
 import { resolveTicketType, texts, NAMESPACE } from './types.js';
 
 interface ParsedCloseCustomId {
@@ -136,7 +136,23 @@ export async function handleCloseTicket(interaction: ButtonInteraction): Promise
   await interaction.deferUpdate();
 
   try {
-    await thread.send(ticketType.ticketClosed);
+    const messages = await thread.messages.fetch({ limit: 10 });
+    const welcome = [...messages.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp)[0];
+    if (welcome?.components.length) {
+      await welcome.edit({ components: [] });
+    }
+
+    const deleteButton = new ButtonBuilder()
+      .setCustomId(`${DELETE_PREFIX}${thread.id}:${parsed.typeId}`)
+      .setLabel(ticketType.deleteButtonLabel.slice(0, 80))
+      .setStyle(ButtonStyle.Danger);
+
+    const deleteRow = new ActionRowBuilder<ButtonBuilder>().addComponents(deleteButton);
+
+    await thread.send({
+      content: ticketType.ticketClosed,
+      components: [deleteRow],
+    });
     await thread.setName(buildClosedThreadName(thread.name));
     await thread.setLocked(true);
   } catch (err) {

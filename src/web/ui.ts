@@ -534,6 +534,10 @@ const CLIENT_JS = `
         closeButtonLabel: 'Close ticket', confirmClosePrompt: 'Close this ticket?',
         confirmCloseYes: 'Yes, close', confirmCloseNo: 'Cancel',
         ticketClosed: 'This ticket has been closed.',
+        deleteButtonLabel: 'DELETE',
+        confirmDeletePrompt: 'Delete this closed ticket permanently?',
+        confirmDeleteYes: 'Yes, delete', confirmDeleteNo: 'Cancel',
+        ticketDeleted: 'Ticket deleted.',
         alreadyOpen: 'You already have an open ticket in this category.',
         openSuccess: 'Your ticket was created: {thread}'
       });

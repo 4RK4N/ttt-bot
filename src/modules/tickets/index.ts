@@ -3,6 +3,7 @@ import type { CommandModule, ComponentRoute } from '../../core/moduleLoader.js';
 import { updateTicketType } from './config-io.js';
 import { publishPanel, type DiscordApiContext } from './panel.js';
 import { handleCloseCancel, handleCloseTicket } from './close.js';
+import { handleDeleteCancel, handleDeleteTicket } from './delete.js';
 import { handleOpenTicket } from './open.js';
 import { getTicketTypeConfig } from './config-io.js';
 import { resolveTicketType, NAMESPACE } from './types.js';
@@ -19,6 +20,16 @@ async function handleComponent(interaction: MessageComponentInteraction): Promis
 
   if (customId.startsWith('tickets:close-cancel:')) {
     await handleCloseCancel(interaction);
+    return;
+  }
+
+  if (customId.startsWith('tickets:delete-cancel:')) {
+    await handleDeleteCancel(interaction);
+    return;
+  }
+
+  if (customId.startsWith('tickets:delete-confirm:') || customId.startsWith('tickets:delete:')) {
+    await handleDeleteTicket(interaction as ButtonInteraction);
     return;
   }
 

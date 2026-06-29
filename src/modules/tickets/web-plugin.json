@@ -15,6 +15,18 @@
       "store": "texts"
     },
     {
+      "key": "noDeletePermission",
+      "label": "No delete permission message",
+      "type": "textarea",
+      "store": "texts"
+    },
+    {
+      "key": "deleteNotClosed",
+      "label": "Delete on open ticket message",
+      "type": "textarea",
+      "store": "texts"
+    },
+    {
       "key": "categoryUnpublished",
       "label": "Category unavailable message",
       "type": "textarea",
@@ -99,6 +111,36 @@
         {
           "key": "ticketClosed",
           "label": "Closed message",
+          "type": "textarea",
+          "store": "texts"
+        },
+        {
+          "key": "deleteButtonLabel",
+          "label": "Delete button label",
+          "type": "text",
+          "store": "texts"
+        },
+        {
+          "key": "confirmDeletePrompt",
+          "label": "Delete confirm prompt",
+          "type": "textarea",
+          "store": "texts"
+        },
+        {
+          "key": "confirmDeleteYes",
+          "label": "Delete confirm button label",
+          "type": "text",
+          "store": "texts"
+        },
+        {
+          "key": "confirmDeleteNo",
+          "label": "Delete cancel button label",
+          "type": "text",
+          "store": "texts"
+        },
+        {
+          "key": "ticketDeleted",
+          "label": "Deleted confirmation (ephemeral)",
           "type": "textarea",
           "store": "texts"
         },

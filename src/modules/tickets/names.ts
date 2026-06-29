@@ -37,3 +37,7 @@ export function buildClosedThreadName(openName: string): string {
   const trimmed = base.length <= maxBase ? base : base.slice(0, maxBase - 3) + '...';
   return CLOSED_PREFIX + trimmed;
 }
+
+export function isClosedTicketThread(name: string, locked: boolean): boolean {
+  return locked && name.startsWith(CLOSED_PREFIX);
+}

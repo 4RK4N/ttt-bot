@@ -10,6 +10,8 @@ import { resolveTicketType } from './types.js';
 export const OPEN_PREFIX = 'tickets:open:';
 export const CLOSE_PREFIX = 'tickets:close:';
 export const CLOSE_CONFIRM_PREFIX = 'tickets:close-confirm:';
+export const DELETE_PREFIX = 'tickets:delete:';
+export const DELETE_CONFIRM_PREFIX = 'tickets:delete-confirm:';
 
 export interface DiscordApiContext {
   botToken: string;

@@ -1,6 +1,8 @@
 {
   "disabled": "Tickets are currently disabled.",
   "noPermission": "You don't have permission to close this ticket.",
+  "noDeletePermission": "You don't have permission to delete this ticket.",
+  "deleteNotClosed": "Only closed tickets can be deleted.",
   "categoryUnpublished": "This ticket category is not available right now.",
   "types": {
     "support": {
@@ -13,6 +15,11 @@
       "confirmCloseYes": "Yes, close",
       "confirmCloseNo": "Cancel",
       "ticketClosed": "This ticket has been closed.",
+      "deleteButtonLabel": "DELETE",
+      "confirmDeletePrompt": "Delete this closed ticket permanently?",
+      "confirmDeleteYes": "Yes, delete",
+      "confirmDeleteNo": "Cancel",
+      "ticketDeleted": "Ticket deleted.",
       "alreadyOpen": "You already have an open ticket in this category.",
       "openSuccess": "Your ticket was created: {thread}"
     }
