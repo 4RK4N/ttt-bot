@@ -284,20 +284,22 @@ const CLIENT_JS = `
   }
 
   function buildBooleanControl(wrap, value) {
-    var row = el('label');
-    row.style.display = 'flex';
-    row.style.alignItems = 'center';
-    row.style.gap = '8px';
-    row.style.fontWeight = '400';
-    var cb = el('input');
-    cb.type = 'checkbox';
-    cb.checked = value === true;
-    row.appendChild(cb);
-    var span = el('span');
-    span.textContent = 'Enabled';
-    row.appendChild(span);
-    wrap.appendChild(row);
-    return { node: wrap, getValue: function () { return cb.checked; }, input: cb };
+    var on = value === true;
+    var label = el('label', 'switch');
+    var input = el('input');
+    input.type = 'checkbox';
+    input.checked = on;
+    var track = el('span', 'track');
+    var text = el('span', 'switch-label');
+    text.textContent = on ? 'On' : 'Off';
+    label.appendChild(input);
+    label.appendChild(track);
+    label.appendChild(text);
+    input.addEventListener('change', function () {
+      text.textContent = input.checked ? 'On' : 'Off';
+    });
+    wrap.appendChild(label);
+    return { node: wrap, getValue: function () { return input.checked; }, input: input };
   }
 
   function buildOptionList(wrap, f, value) {
