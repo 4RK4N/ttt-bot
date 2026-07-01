@@ -174,7 +174,10 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
   let threadFailed = false;
   try {
     const thread = await sent.startThread({
-      name: buildThreadName(displayName, message),
+      name: buildThreadName(displayName, message, {
+        guild: interaction.guild,
+        client: interaction.client,
+      }),
       autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
     });
 

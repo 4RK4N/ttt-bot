@@ -117,8 +117,11 @@ async function handleMessage(message: Message): Promise<void> {
 
   if (!hasPostLink && !hasMedia) return;
 
-  const caption = stripUrls(content);
-  const name = buildThreadName(displayNameFor(message), caption);
+  const name = buildThreadName(displayNameFor(message), stripUrls(content), {
+    guild: message.guild,
+    client: message.client,
+    message,
+  });
 
   try {
     const thread = await message.startThread({
