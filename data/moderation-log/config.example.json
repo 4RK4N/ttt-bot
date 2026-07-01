@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "channelId": "",
+  "logMessageDeleted": true,
+  "logMemberLeft": true,
+  "logMemberKicked": true,
+  "logMemberBanned": true
+}

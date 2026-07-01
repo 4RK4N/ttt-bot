@@ -10,7 +10,8 @@ const COMPONENT_ERROR_MESSAGE =
   'Something went wrong while handling that interaction. Please try again.';
 
 async function main(): Promise<void> {
-  // GuildMembers: welcome module + ticket staff cache. GuildMessageReactions:
+  // GuildMembers: welcome module + ticket staff cache + moderation log.
+  // GuildModeration: moderation log ban events. GuildMessageReactions:
   // reaction-roles emoji mode. MessageContent and GuildMembers are privileged
   // intents — enable them in the Developer Portal.
   const client = new Client({
@@ -19,6 +20,7 @@ async function main(): Promise<void> {
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
       GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildModeration,
       GatewayIntentBits.GuildMessageReactions,
     ],
     partials: [Partials.Message, Partials.Reaction],

@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
   StringSelectMenuBuilder,
 } from 'discord.js';
+import { buildEmbed } from '../../core/embedBuilder.js';
 import { emojiMatchKey, parseEmoji, reactionMatchKey } from '../../core/discordEmoji.js';
 import { MAX_PANEL_OPTIONS } from '../../core/limits.js';
 import { syncBotMessageReactions } from '../../core/discordReactions.js';
@@ -109,9 +110,10 @@ export function buildPanelPayload(panelId: string) {
   if (!panel) throw new Error(`Unknown panel "${panelId}".`);
   validatePanel(panel);
 
-  const embed = new EmbedBuilder()
-    .setTitle(panel.panelTitle.slice(0, 256))
-    .setDescription(panel.panelDescription.slice(0, 4096));
+  const embed = buildEmbed({
+    title: panel.panelTitle,
+    description: panel.panelDescription,
+  });
 
   const payload: { embeds: ReturnType<EmbedBuilder['toJSON']>[]; components?: unknown[] } = {
     embeds: [embed.toJSON()],

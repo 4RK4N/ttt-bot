@@ -2,8 +2,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  EmbedBuilder,
 } from 'discord.js';
+import { buildEmbed } from '../../core/embedBuilder.js';
 import { parseEmoji } from '../../core/discordEmoji.js';
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
 import { resolveTicketType } from './types.js';
@@ -21,9 +21,10 @@ export function buildPanelPayload(typeId: string) {
   const ticketType = resolveTicketType(typeId);
   if (!ticketType) throw new Error(`Unknown ticket type "${typeId}".`);
 
-  const embed = new EmbedBuilder()
-    .setTitle(ticketType.panelTitle)
-    .setDescription(ticketType.panelDescription);
+  const embed = buildEmbed({
+    title: ticketType.panelTitle,
+    description: ticketType.panelDescription,
+  });
 
   const button = new ButtonBuilder()
     .setCustomId(`${OPEN_PREFIX}${typeId}`)
