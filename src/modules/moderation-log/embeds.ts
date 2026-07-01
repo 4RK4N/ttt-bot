@@ -7,6 +7,7 @@ const MAX_CONTENT_LENGTH = 1_000;
 export interface ModLogTexts {
   messageDeleted: string;
   messageDeletedEmpty: string;
+  authorUnknown: string;
   memberLeft: string;
   memberKicked: string;
   memberBanned: string;
@@ -18,6 +19,7 @@ export interface ModLogTexts {
 export const TEXT_DEFAULTS: ModLogTexts = {
   messageDeleted: '🗑️ Message sent by {author} deleted in {channel}',
   messageDeletedEmpty: '[no text content]',
+  authorUnknown: 'Unknown user',
   memberLeft: '📤 {mention} has left the server',
   memberKicked: '👮 {mention} has been kicked by {executorId}',
   memberBanned: '👮 🔒 {mention} has been banned by {executorId}',
@@ -26,22 +28,47 @@ export const TEXT_DEFAULTS: ModLogTexts = {
   footerUserId: 'ID: {userId}',
 };
 
+/** Resolved author for a deleted message — works with full or partial API payloads. */
+export interface ResolvedDeleteAuthor {
+  mention: string;
+  displayName: string;
+  iconURL?: string;
+}
+
 interface UserLike {
   id: string;
   username: string;
   displayAvatarURL: () => string;
 }
 
+export function resolveDeleteAuthor(
+  texts: ModLogTexts,
+  author: UserLike | null | undefined
+): ResolvedDeleteAuthor {
+  if (author) {
+    return {
+      mention: `<@${author.id}>`,
+      displayName: author.username,
+      iconURL: author.displayAvatarURL(),
+    };
+  }
+
+  return {
+    mention: texts.authorUnknown,
+    displayName: texts.authorUnknown,
+  };
+}
+
 export function buildMessageDeletedEmbed(
   texts: ModLogTexts,
-  author: UserLike,
+  author: ResolvedDeleteAuthor,
   channelId: string,
   messageId: string,
   content: string | null,
   timestamp: Date
 ): EmbedBuilder {
   const header = format(texts.messageDeleted, {
-    author: `<@${author.id}>`,
+    author: author.mention,
     channel: `<#${channelId}>`,
   });
 
@@ -51,7 +78,9 @@ export function buildMessageDeletedEmbed(
 
   return buildEmbed({
     description: body,
-    author: { name: author.username, iconURL: author.displayAvatarURL() },
+    author: author.iconURL
+      ? { name: author.displayName, iconURL: author.iconURL }
+      : { name: author.displayName },
     footer: format(texts.footerMessageId, { messageId }),
     timestamp,
   });

@@ -7,6 +7,7 @@ import {
   type Message,
   type PartialGuildMember,
   type PartialMessage,
+  type TextBasedChannel,
   type TextChannel,
 } from 'discord.js';
 import type { CommandModule } from '../../core/moduleLoader.js';
@@ -18,6 +19,7 @@ import {
   buildMemberKickedEmbed,
   buildMemberLeftEmbed,
   buildMessageDeletedEmbed,
+  resolveDeleteAuthor,
   type ModLogTexts,
 } from './embeds.js';
 
@@ -78,32 +80,48 @@ async function postLog(client: Client, embed: EmbedBuilder): Promise<void> {
   await (channel as TextChannel).send({ embeds: [embed] });
 }
 
-async function handleMessageDelete(message: Message | PartialMessage): Promise<void> {
+function isGuildTextChannel(channel: TextBasedChannel): boolean {
+  return !channel.isDMBased() && 'guild' in channel && channel.guild !== null;
+}
+
+async function handleMessageDelete(
+  message: Message | PartialMessage,
+  bulkChannel?: TextBasedChannel
+): Promise<void> {
   if (!isModuleEnabled(NAMESPACE)) return;
   if (!config().logMessageDeleted) return;
 
-  const channelId = logChannelId();
-  if (!channelId) return;
+  const logChannel = logChannelId();
+  if (!logChannel) return;
 
-  const guild = message.guild;
-  if (!guild) return;
-  if (message.channelId === channelId) return;
+  const sourceChannel = bulkChannel ?? message.channel;
+  if (!sourceChannel?.isTextBased() || !isGuildTextChannel(sourceChannel)) return;
+  if (sourceChannel.id === logChannel) return;
 
-  const author = message.author;
-  if (!author) return;
-
+  const t = texts();
+  const resolvedAuthor = resolveDeleteAuthor(t, message.author ?? null);
   const content = message.content ?? null;
+  const timestamp = message.createdAt ?? new Date();
 
   const embed = buildMessageDeletedEmbed(
-    texts(),
-    author,
-    message.channelId,
+    t,
+    resolvedAuthor,
+    sourceChannel.id,
     message.id,
     content,
-    message.createdAt
+    timestamp
   );
 
   await postLog(message.client, embed);
+}
+
+async function handleMessageDeleteBulk(
+  messages: ReadonlyMap<string, Message | PartialMessage>,
+  channel: TextBasedChannel
+): Promise<void> {
+  for (const message of messages.values()) {
+    await handleMessageDelete(message, channel);
+  }
 }
 
 async function handleGuildBanAdd(ban: GuildBan): Promise<void> {
@@ -123,6 +141,9 @@ async function handleGuildMemberRemove(member: GuildMember | PartialGuildMember)
   if (!logChannelId()) return;
   if (wasRecentBan(member.id)) return;
 
+  const user = member.user;
+  if (!user) return;
+
   const cfg = config();
   const t = texts();
   const timestamp = new Date();
@@ -136,7 +157,7 @@ async function handleGuildMemberRemove(member: GuildMember | PartialGuildMember)
     if (cfg.logMemberKicked) {
       await postLog(
         member.client,
-        buildMemberKickedEmbed(t, member.user, timestamp, kickEntry.executorId)
+        buildMemberKickedEmbed(t, user, timestamp, kickEntry.executorId)
       );
     }
     return;
@@ -144,7 +165,7 @@ async function handleGuildMemberRemove(member: GuildMember | PartialGuildMember)
 
   if (!cfg.logMemberLeft) return;
 
-  await postLog(member.client, buildMemberLeftEmbed(t, member.user, timestamp));
+  await postLog(member.client, buildMemberLeftEmbed(t, user, timestamp));
 }
 
 const moderationLogModule: CommandModule = {
@@ -160,6 +181,12 @@ const moderationLogModule: CommandModule = {
     client.on(Events.MessageDelete, (message) => {
       void handleMessageDelete(message).catch((err) => {
         console.error('[moderation-log] MessageDelete handler error:', err);
+      });
+    });
+
+    client.on(Events.MessageBulkDelete, (messages, channel) => {
+      void handleMessageDeleteBulk(messages, channel).catch((err) => {
+        console.error('[moderation-log] MessageBulkDelete handler error:', err);
       });
     });
 

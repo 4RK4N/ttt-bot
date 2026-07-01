@@ -46,6 +46,12 @@
       "help": "Shown when the deleted message had no text content."
     },
     {
+      "key": "authorUnknown",
+      "label": "Unknown author",
+      "type": "text",
+      "help": "Used for {author} and the embed author name when Discord sends no author (e.g. bulk/system deletes)."
+    },
+    {
       "key": "memberLeft",
       "label": "Member left",
       "type": "text",
