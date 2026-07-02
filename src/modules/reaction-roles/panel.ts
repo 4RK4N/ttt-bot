@@ -7,58 +7,18 @@ import {
 } from 'discord.js';
 import { buildEmbed } from '../../core/embedBuilder.js';
 import { emojiMatchKey, parseEmoji, reactionMatchKey } from '../../core/discordEmoji.js';
-import { MAX_PANEL_OPTIONS } from '../../core/limits.js';
 import { syncBotMessageReactions } from '../../core/discordReactions.js';
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
 import type { ResolvedRolePanel, RoleOption } from './types.js';
 import { resolvePanel } from './types.js';
+import { validateRolePanel } from './validate.js';
 
 export type { DiscordApiContext };
 
 export const BTN_PREFIX = 'reaction-roles:btn:';
 export const SEL_PREFIX = 'reaction-roles:sel:';
 
-const MAX_OPTIONS = MAX_PANEL_OPTIONS;
 const MAX_BUTTONS_PER_ROW = 5;
-
-function validatePanel(panel: ResolvedRolePanel): void {
-  const count = panel.roleOptions.length;
-  if (count < 1 || count > MAX_OPTIONS) {
-    throw new Error(`Panel must have 1–${MAX_OPTIONS} role options (has ${count}).`);
-  }
-  if (panel.reactionType === 'emoji') {
-    const seenEmoji = new Set<string>();
-    for (const opt of panel.roleOptions) {
-      if (!opt.emoji.trim()) {
-        throw new Error(`Emoji is required for option "${opt.label || opt.id}" in emoji mode.`);
-      }
-      if (!opt.roleId.trim()) {
-        throw new Error(`Role is required for option "${opt.label || opt.id}" in emoji mode.`);
-      }
-      const key = emojiMatchKey(opt.emoji);
-      if (key && seenEmoji.has(key)) {
-        throw new Error(
-          `Duplicate emoji "${opt.emoji.trim()}" — each option must use a different emoji in emoji reaction mode.`
-        );
-      }
-      if (key) seenEmoji.add(key);
-    }
-  }
-  if (
-    panel.reactionType === 'button' ||
-    panel.reactionType === 'dropdown' ||
-    panel.reactionType === 'dropdown-single'
-  ) {
-    for (const opt of panel.roleOptions) {
-      if (!opt.label.trim()) {
-        throw new Error(`Label is required for option "${opt.id}" in ${panel.reactionType} mode.`);
-      }
-      if (!opt.roleId.trim()) {
-        throw new Error(`Role is required for option "${opt.id}".`);
-      }
-    }
-  }
-}
 
 function buildButtonRows(panel: ResolvedRolePanel): ActionRowBuilder<ButtonBuilder>[] {
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
@@ -108,7 +68,7 @@ function buildSelectRow(panel: ResolvedRolePanel): ActionRowBuilder<StringSelect
 export function buildPanelPayload(panelId: string) {
   const panel = resolvePanel(panelId);
   if (!panel) throw new Error(`Unknown panel "${panelId}".`);
-  validatePanel(panel);
+  validateRolePanel(panel);
 
   const embed = buildEmbed({
     title: panel.panelTitle,

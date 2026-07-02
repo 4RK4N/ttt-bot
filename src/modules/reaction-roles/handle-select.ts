@@ -1,5 +1,6 @@
 import { MessageFlags, type GuildMember, type StringSelectMenuInteraction } from 'discord.js';
 import { isModuleEnabled } from '../../core/texts.js';
+import { isOnCooldown, touchCooldown } from './cooldown.js';
 import { formatEphemeralMessage, replyEphemeral } from './respond.js';
 import { memberHasPanelRole, tryAssignRole, tryRemoveRole } from './roles.js';
 import { SEL_PREFIX } from './panel.js';
@@ -69,6 +70,9 @@ export async function handleSelectInteraction(
     await replyEphemeral(interaction, t.roleError);
     return;
   }
+
+  if (isOnCooldown(interaction.user.id, panel.id)) return;
+  touchCooldown(interaction.user.id, panel.id);
 
   const validOptionIds = new Set(panel.roleOptions.map((o) => o.id));
   const selected = interaction.values.filter((v) => validOptionIds.has(v));

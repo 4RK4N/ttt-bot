@@ -562,30 +562,64 @@ const CLIENT_JS = `
     return out;
   }
 
-  function syncEphemeralField(subFields, ns) {
-    if (ns !== 'reaction-roles') return;
-    var reactionField = subFields.find(function (sf) { return sf.key === 'reactionType'; });
-    var ephemeralField = subFields.find(function (sf) { return sf.key === 'ephemeralMessage'; });
-    if (!reactionField || !ephemeralField) return;
-    var reactionSelect = reactionField.node.querySelector('select');
-    var ephemeralWrap = ephemeralField.node;
-    var disabledNote = ephemeralWrap.querySelector('.help-disabled');
-    function apply() {
-      var isEmoji = reactionSelect && reactionSelect.value === 'emoji';
-      ephemeralWrap.classList.toggle('disabled', isEmoji);
-      if (isEmoji) {
-        if (!disabledNote) {
-          disabledNote = el('div', 'help-disabled');
-          disabledNote.textContent = 'Not available for emoji reactions.';
-          ephemeralWrap.appendChild(disabledNote);
-        }
-      } else if (disabledNote) {
-        disabledNote.remove();
-        disabledNote = null;
-      }
+  function isFieldVisible(def, subFields) {
+    if (!def.visibleWhen) return true;
+    for (var watchKey in def.visibleWhen) {
+      var allowed = def.visibleWhen[watchKey];
+      var watchSf = subFields.find(function (s) { return s.key === watchKey; });
+      var current = watchSf ? watchSf.getValue() : '';
+      if (allowed.indexOf(current) === -1) return false;
     }
-    if (reactionSelect) reactionSelect.addEventListener('change', apply);
-    apply();
+    return true;
+  }
+
+  function syncConditionalFields(subFields) {
+    subFields.forEach(function (sf) {
+      if (!sf.def || !sf.def.visibleWhen) return;
+
+      var def = sf.def;
+      var hiddenNote = null;
+
+      function clearFieldValue() {
+        var input = sf.node.querySelector('input[type="text"], textarea');
+        if (input) input.value = '';
+        var cb = sf.node.querySelector('input[type="checkbox"]');
+        if (cb) cb.checked = false;
+      }
+
+      function apply() {
+        var visible = isFieldVisible(def, subFields);
+        sf.node.classList.toggle('disabled', !visible);
+        if (!visible) {
+          if (!hiddenNote) {
+            hiddenNote = el('div', 'help-disabled');
+            hiddenNote.textContent = 'Not available for this configuration.';
+            sf.node.appendChild(hiddenNote);
+          }
+          if (def.clearWhenHidden) clearFieldValue();
+        } else if (hiddenNote) {
+          hiddenNote.remove();
+          hiddenNote = null;
+        }
+      }
+
+      Object.keys(def.visibleWhen).forEach(function (watchKey) {
+        var watchSf = subFields.find(function (s) { return s.key === watchKey; });
+        if (!watchSf) return;
+        var select = watchSf.node.querySelector('select');
+        if (select) select.addEventListener('change', apply);
+      });
+
+      if (def.clearWhenHidden) {
+        var origGet = sf.getValue;
+        sf.getValue = function () {
+          if (!isFieldVisible(def, subFields)) return '';
+          return origGet();
+        };
+      }
+
+      apply();
+    });
   }
 
   function buildObjectList(ns, f, value, saveModule) {
@@ -653,10 +687,10 @@ const CLIENT_JS = `
         (f.itemFields || []).forEach(function (sub) {
           var built = buildSubField(sub, item[sub.key]);
           body.appendChild(built.node);
-          subFields.push({ key: sub.key, getValue: built.getValue, node: built.node });
+          subFields.push({ key: sub.key, getValue: built.getValue, node: built.node, def: sub });
         });
 
-        syncEphemeralField(subFields, ns);
+        syncConditionalFields(subFields);
 
         function refreshHeadTitle() {
           title.textContent = cardTitle(liveRowValues(subFields, item, f));
@@ -789,31 +823,8 @@ const CLIENT_JS = `
     addBtn.type = 'button';
     addBtn.textContent = 'Add ' + (f.itemLabel || 'item').toLowerCase();
     addBtn.addEventListener('click', function () {
-      if (ns === 'reaction-roles') {
-        items.push({
-          id: '', published: false, channelId: '', reactionType: 'button', toggleable: true,
-          panelTitle: 'Pick your roles', panelDescription: '', ephemeralMessage: '', roleOptions: []
-        });
-      } else {
-        items.push({
-          id: '', published: false, openButtonLabel: 'Open ticket', panelTitle: 'Support',
-          panelDescription: '', emoji: '', channelId: '', staffRoleIds: [], deniedRoleIds: [],
-          roleActionRoleId: '',
-          roleDenied: 'You cannot open a ticket in this category.',
-          ticketWelcome: 'Hi {mention}, describe your issue and staff will assist you.',
-          closeButtonLabel: 'Close ticket',
-          roleActionButtonLabel: 'Grant role',
-          roleActionConfirmation: '{mention} was given {role}.', confirmClosePrompt: 'Close this ticket?',
-          confirmCloseYes: 'Yes, close', confirmCloseNo: 'Cancel',
-          ticketClosed: 'This ticket has been closed.',
-          deleteButtonLabel: 'DELETE',
-          confirmDeletePrompt: 'Delete this closed ticket permanently?',
-          confirmDeleteYes: 'Yes, delete', confirmDeleteNo: 'Cancel',
-          ticketDeleted: 'Ticket deleted.',
-          alreadyOpen: 'You already have an open ticket in this category.',
-          openSuccess: 'Your ticket was created: {thread}'
-        });
-      }
+      var defaults = f.defaultItem || { id: '', published: false };
+      items.push(JSON.parse(JSON.stringify(defaults)));
       renderRows();
     });
     wrap.appendChild(addBtn);

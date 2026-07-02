@@ -1,5 +1,6 @@
 import type { MessageComponentInteraction } from 'discord.js';
 import type { CommandModule, ComponentRoute } from '../../core/moduleLoader.js';
+import { createPanelPublisher } from '../../core/panelPublisher.js';
 import { getPanelConfig, updatePanel } from './config-io.js';
 import { handleButtonInteraction } from './handle-button.js';
 import { registerReactionHandlers } from './handle-reaction.js';
@@ -17,27 +18,20 @@ async function handleComponent(interaction: MessageComponentInteraction): Promis
   }
 }
 
+const panelPublisher = createPanelPublisher({
+  resolve: resolvePanel,
+  getConfig: getPanelConfig,
+  update: updatePanel,
+  publishPanel,
+  entityLabel: 'panel',
+});
+
 export async function publishRolePanel(ctx: DiscordApiContext, panelId: string): Promise<void> {
-  const panel = resolvePanel(panelId);
-  if (!panel) throw new Error(`Unknown panel "${panelId}".`);
-  if (!panel.channelId.trim()) throw new Error('Channel is not configured for this panel.');
-
-  const messageId = await publishPanel(
-    ctx,
-    panelId,
-    panel.channelId,
-    panel.panelMessageId || undefined
-  );
-
-  await updatePanel(panelId, {
-    published: true,
-    panelMessageId: messageId,
-  });
+  return panelPublisher.publish(ctx, panelId);
 }
 
 export async function unpublishRolePanel(panelId: string): Promise<void> {
-  if (!getPanelConfig(panelId)) throw new Error(`Unknown panel "${panelId}".`);
-  await updatePanel(panelId, { published: false });
+  return panelPublisher.unpublish(panelId);
 }
 
 const reactionRolesModule: CommandModule = {

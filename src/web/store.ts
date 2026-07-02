@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { MAX_PANEL_OPTIONS } from '../core/limits.js';
 import { moduleDataPath } from '../core/texts.js';
 import { writeJsonAtomic } from '../core/jsonWrite.js';
+import { validateRolePanelRow } from '../modules/reaction-roles/validate.js';
 import type { WebPlugin, WebPluginField, WebPluginSubField, WebFieldStore } from './plugins.js';
 import {
   isBooleanField,
@@ -70,6 +71,38 @@ function uniqueId(base: string, used: Set<string>): string {
   }
   used.add(id);
   return id;
+}
+
+function isSubFieldVisible(sub: WebPluginSubField, mergedRow: Record<string, unknown>): boolean {
+  if (!sub.visibleWhen) return true;
+  for (const [watchKey, allowed] of Object.entries(sub.visibleWhen)) {
+    const current = mergedRow[watchKey];
+    if (typeof current !== 'string' || !allowed.includes(current)) return false;
+  }
+  return true;
+}
+
+function clearedSubValue(sub: WebPluginSubField): FieldValue {
+  if (isMultiSubField(sub)) return [];
+  if (isBooleanSubField(sub)) return false;
+  if (isOptionListSubField(sub)) return [];
+  return '';
+}
+
+function applyClearWhenHidden(
+  field: WebPluginField,
+  configRow: Record<string, unknown>,
+  textRow: Record<string, unknown>
+): void {
+  const merged = { ...configRow, ...textRow };
+  for (const sub of field.itemFields ?? []) {
+    if (!sub.clearWhenHidden || !sub.visibleWhen) continue;
+    if (isSubFieldVisible(sub, merged)) continue;
+    const cleared = clearedSubValue(sub);
+    const store = sub.store ?? 'config';
+    if (store === 'texts') textRow[sub.key] = cleared;
+    else configRow[sub.key] = cleared;
+  }
 }
 
 function readSubValue(sub: WebPluginSubField, val: unknown): FieldValue {
@@ -303,6 +336,17 @@ export async function writeValues(
           const store = sub.store ?? 'config';
           if (store === 'texts') textRow[sub.key] = normalized;
           else configRow[sub.key] = normalized;
+        }
+
+        applyClearWhenHidden(field, configRow, textRow);
+
+        if (plugin.namespace === 'reaction-roles' && field.key === 'panels') {
+          try {
+            validateRolePanelRow(configRow, textRow);
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Invalid panel configuration.';
+            throw new ValidationError(`${key}[${id}]: ${message}`);
+          }
         }
 
         newConfigRows.push(configRow);

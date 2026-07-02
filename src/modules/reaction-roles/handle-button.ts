@@ -1,5 +1,6 @@
 import { MessageFlags, type ButtonInteraction } from 'discord.js';
 import { isModuleEnabled } from '../../core/texts.js';
+import { isOnCooldown, touchCooldown } from './cooldown.js';
 import { formatEphemeralMessage, replyEphemeral } from './respond.js';
 import { tryAssignRole, tryRemoveRole } from './roles.js';
 import { BTN_PREFIX } from './panel.js';
@@ -77,6 +78,9 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
     await replyEphemeral(interaction, t.roleError);
     return;
   }
+
+  if (isOnCooldown(interaction.user.id, panel.id)) return;
+  touchCooldown(interaction.user.id, panel.id);
 
   const guildMember = await interaction.guild.members.fetch(interaction.user.id);
   const hasRole = guildMember.roles.cache.has(option.roleId);

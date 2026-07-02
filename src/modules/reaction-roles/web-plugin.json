@@ -41,6 +41,17 @@
       "itemLabel": "Panel",
       "publishable": true,
       "collapsible": true,
+      "defaultItem": {
+        "id": "",
+        "published": false,
+        "channelId": "",
+        "reactionType": "button",
+        "toggleable": true,
+        "panelTitle": "Pick your roles",
+        "panelDescription": "",
+        "ephemeralMessage": "",
+        "roleOptions": []
+      },
       "itemFields": [
         {
           "key": "channelId",
@@ -97,6 +108,14 @@
           "label": "Ephemeral reply (optional)",
           "type": "textarea",
           "store": "texts",
+          "visibleWhen": {
+            "reactionType": [
+              "button",
+              "dropdown",
+              "dropdown-single"
+            ]
+          },
+          "clearWhenHidden": true,
           "help": "Button and dropdown only. Sent privately after a successful interaction when filled in. Tokens: {mention}, {role}. Leave blank for no reply."
         },
         {

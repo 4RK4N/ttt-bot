@@ -26,6 +26,8 @@ export interface WebPluginSelectOption {
   label: string;
 }
 
+export type WebPluginVisibleWhen = Record<string, string[]>;
+
 export interface WebPluginSubField {
   key: string;
   label: string;
@@ -34,6 +36,10 @@ export interface WebPluginSubField {
   help?: string;
   options?: WebPluginSelectOption[];
   optionFields?: WebPluginSubField[];
+  /** Show only when sibling select values match one of the listed values. */
+  visibleWhen?: WebPluginVisibleWhen;
+  /** When hidden via visibleWhen, clear the value in UI and on save. */
+  clearWhenHidden?: boolean;
 }
 
 export interface WebPluginField {
@@ -50,6 +56,8 @@ export interface WebPluginField {
   /** Nested map key in texts.json for object-list text fields (e.g. "types"). */
   textsKey?: string;
   itemFields?: WebPluginSubField[];
+  /** Default row object when adding a new object-list item. */
+  defaultItem?: Record<string, unknown>;
 }
 
 export interface WebPlugin {
@@ -72,6 +80,22 @@ const VALID_SCALAR_TYPES: WebPluginSubField['type'][] = [
 ];
 const VALID_TYPES: WebFieldType[] = [...VALID_SCALAR_TYPES, 'object-list'];
 const VALID_STORES: WebFieldStore[] = ['texts', 'config'];
+
+function parseVisibleWhen(raw: unknown): WebPluginVisibleWhen | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const out: WebPluginVisibleWhen = {};
+  for (const [key, values] of Object.entries(raw as Record<string, unknown>)) {
+    if (!Array.isArray(values)) continue;
+    const allowed = values.filter((v): v is string => typeof v === 'string');
+    if (allowed.length > 0) out[key] = allowed;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+function parseDefaultItem(raw: unknown): Record<string, unknown> | undefined {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return undefined;
+  return raw as Record<string, unknown>;
+}
 
 function parseSelectOptions(raw: unknown): WebPluginSelectOption[] | undefined {
   if (!Array.isArray(raw)) return undefined;
@@ -116,6 +140,8 @@ function parseSubField(entry: unknown): WebPluginSubField | null {
     help: typeof f.help === 'string' ? f.help : undefined,
     options: parseSelectOptions(f.options),
     optionFields: optionFields.length > 0 ? optionFields : undefined,
+    visibleWhen: parseVisibleWhen(f.visibleWhen),
+    clearWhenHidden: f.clearWhenHidden === true,
   };
 }
 
@@ -173,6 +199,7 @@ function parsePlugin(namespace: string, raw: unknown): WebPlugin | null {
       collapsible: f.collapsible === true,
       textsKey: typeof f.textsKey === 'string' ? f.textsKey : undefined,
       itemFields: itemFields.length > 0 ? itemFields : undefined,
+      defaultItem: parseDefaultItem(f.defaultItem),
     });
   }
 

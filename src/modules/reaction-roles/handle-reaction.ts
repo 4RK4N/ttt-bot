@@ -6,6 +6,7 @@ import {
   type User,
 } from 'discord.js';
 import { isModuleEnabled } from '../../core/texts.js';
+import { isOnCooldown, touchCooldown } from './cooldown.js';
 import { matchOptionByReaction } from './panel.js';
 import { tryAssignRole, tryRemoveRole } from './roles.js';
 import { findPanelByMessageId, NAMESPACE } from './types.js';
@@ -45,6 +46,9 @@ async function handleReaction(
   const emojiId = reaction.emoji.id;
   const option = matchOptionByReaction(panel.roleOptions, emojiName, emojiId);
   if (!option || !option.roleId.trim()) return;
+
+  if (isOnCooldown(user.id, panel.id)) return;
+  touchCooldown(user.id, panel.id);
 
   let member;
   try {
