@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "panels": [
+    {
+      "id": "example-info",
+      "published": false,
+      "panelMessageId": "",
+      "channelId": "",
+      "showTimestamp": false
+    }
+  ]
+}

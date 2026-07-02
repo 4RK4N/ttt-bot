@@ -1,3 +1,4 @@
+import { publishEmbedPanel, unpublishEmbedPanel } from '../modules/custom-embeds/index.js';
 import { publishRolePanel, unpublishRolePanel } from '../modules/reaction-roles/index.js';
 import { publishTicketPanel, unpublishTicketPanel } from '../modules/tickets/index.js';
 import type { DiscordApiContext } from '../core/panelPublish.js';
@@ -9,6 +10,10 @@ export interface PublishHandlers {
 
 /** Maps module namespace to publish/unpublish implementations. */
 export const publishHandlersByNamespace: Record<string, PublishHandlers> = {
+  'custom-embeds': {
+    publish: publishEmbedPanel,
+    unpublish: unpublishEmbedPanel,
+  },
   tickets: {
     publish: publishTicketPanel,
     unpublish: unpublishTicketPanel,

@@ -1,0 +1,11 @@
+{
+  "panels": {
+    "example-info": {
+      "panelTitle": "Server info",
+      "panelDescription": "Welcome! This is an example custom embed panel.",
+      "authorName": "",
+      "authorIconUrl": "",
+      "footer": ""
+    }
+  }
+}

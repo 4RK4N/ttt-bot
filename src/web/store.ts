@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { MAX_PANEL_OPTIONS } from '../core/limits.js';
 import { moduleDataPath } from '../core/texts.js';
 import { writeJsonAtomic } from '../core/jsonWrite.js';
+import { validateEmbedPanelRow } from '../modules/custom-embeds/validate.js';
 import { validateRolePanelRow } from '../modules/reaction-roles/validate.js';
 import type { WebPlugin, WebPluginField, WebPluginSubField, WebFieldStore } from './plugins.js';
 import {
@@ -339,6 +340,15 @@ export async function writeValues(
         }
 
         applyClearWhenHidden(field, configRow, textRow);
+
+        if (plugin.namespace === 'custom-embeds' && field.key === 'panels') {
+          try {
+            validateEmbedPanelRow(configRow, textRow);
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Invalid embed panel configuration.';
+            throw new ValidationError(`${key}[${id}]: ${message}`);
+          }
+        }
 
         if (plugin.namespace === 'reaction-roles' && field.key === 'panels') {
           try {
