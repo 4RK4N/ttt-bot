@@ -1,9 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { rename, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+
+const site = 'https://ttt-ffxiv.eu';
 
 /**
  * The DE homepage lives at the legacy URL /de.html, but a page file at
@@ -30,12 +33,26 @@ const legacyDeHtml = {
 };
 
 export default defineConfig({
-  site: 'https://ttt-ffxiv.eu',
+  site,
   // Astro defaults: static source assets in public/, build output in dist/.
   // 'preserve' keeps the exact URL scheme of the old export:
   // src/pages/de-home/index.astro -> /de-home/index.html (then moved to /de.html),
   // nested index.astro -> /<dir>/index.html
   build: { format: 'preserve' },
-  integrations: [legacyDeHtml],
+  integrations: [
+    legacyDeHtml,
+    sitemap({
+      // /de.html is produced by legacyDeHtml after build, not a normal route.
+      customPages: [`${site}/de.html`],
+      filter: (page) => !page.includes('/de-home'),
+      serialize(item) {
+        const url = new URL(item.url);
+        if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/$/, '');
+        item.url = url.href;
+        item.changefreq = 'weekly';
+        return item;
+      },
+    }),
+  ],
   vite: { plugins: [tailwindcss()] },
 });

@@ -1,15 +1,20 @@
 ---
 import '../styles/global.css';
-import { siteName, navItems, homePath, pathMap, type Lang } from '../data/nav';
+import { siteName, siteDescription, navItems, homePath, pathMap, type Lang } from '../data/nav';
 
 interface Props {
   title: string;
   lang: Lang;
   /** Site-absolute path of this page, e.g. "/de/regeln/" or "/de.html". */
   path: string;
+  /** Overrides the language default for meta description and social previews. */
+  description?: string;
 }
 
-const { title, lang, path } = Astro.props;
+const { title, lang, path, description } = Astro.props;
+
+const metaDescription = description ?? siteDescription[lang];
+const shareImage = 'https://ttt-ffxiv.eu/assets/images/share.jpg';
 
 const nav = navItems[lang];
 const alt = pathMap[path] ?? { de: '/de/', en: '/en/' };
@@ -39,17 +44,21 @@ const isActive = (itemPath: string) => itemPath === path;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light only" />
-    <meta name="description" content="tiny-temptation-tubs" />
+    <meta name="description" content={metaDescription} />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:title" content={siteName} />
+    <meta property="og:title" content={title} />
     <meta property="og:type" content="website" />
-    <meta property="og:description" content="tiny-temptation-tubs" />
-    <meta property="og:image" content="https://ttt-ffxiv.eu/assets/images/share.jpg" />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+    <meta property="og:image" content={shareImage} />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1024" />
     <meta property="og:image:height" content="440" />
     <meta property="og:url" content={canonical} />
-    <meta property="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={shareImage} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />

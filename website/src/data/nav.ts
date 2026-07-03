@@ -2,6 +2,12 @@ export type Lang = 'de' | 'en';
 
 export const siteName = 'Tiny Temptation Tubs';
 
+/** Default meta / Open Graph description per language. */
+export const siteDescription: Record<Lang, string> = {
+  en: 'Step inside, leave your worries behind. A cozy FFXIV roleplay bathhouse on Light, Alpha, Lavender Beds, W2, P51.',
+  de: 'Tritt ein und lege die Last des Alltags ab. Ein gemütliches FFXIV-RP-Badehaus auf Light, Alpha, Lavender Beds, W2, P51.',
+};
+
 export interface NavItem {
   label: string;
   path: string;

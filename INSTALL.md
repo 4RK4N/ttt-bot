@@ -356,7 +356,8 @@ Static multi-page site built with **Astro + Tailwind CSS** and served by
 | `website/src/layouts/`, `website/src/components/` | Shared layout (topbar, drawer) and components (gallery, timer) |
 | `website/src/data/nav.ts` | Navigation labels and DE↔EN path mapping |
 | `website/src/styles/global.css` | Tailwind theme + shared text styles |
-| `website/public/` | Static assets copied verbatim (images, `robots.txt`, `sitemap.xml`) |
+| `website/public/` | Static assets copied verbatim (images, `robots.txt`) |
+| `website/astro.config.mjs` | `@astrojs/sitemap` generates `sitemap-index.xml` at build time |
 | `website/dist/` | **Build output** (gitignored) — never edit by hand |
 | `website/nginx.conf` | nginx config (clean URLs, gzip, caching); `listen 8089` |
 
