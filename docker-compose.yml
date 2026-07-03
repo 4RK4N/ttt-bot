@@ -44,3 +44,19 @@ services:
       caddy: ttt-bot.ii10.de
       caddy.reverse_proxy: "{{upstreams 8088}}"
     restart: unless-stopped
+
+  # Public venue website (static nginx). Serves website/public/ directly.
+  # No host ports published — Caddy reaches this container on port 8089 (plain HTTP).
+  # TLS terminates at Caddy.
+  ttt-website:
+    image: nginx:alpine
+    container_name: ttt-website
+    volumes:
+      - ./website/public:/usr/share/nginx/html:ro
+      - ./website/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - caddy
+    labels:
+      caddy: ttt-ffxiv.eu
+      caddy.reverse_proxy: "{{upstreams 8089}}"
+    restart: unless-stopped

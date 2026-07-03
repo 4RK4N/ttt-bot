@@ -344,6 +344,57 @@ Now go to your Discord server and try `/pic` or `/post`.
 
 ---
 
+## Part 7 - Public website (`ttt-ffxiv.eu`)
+
+Static multi-page site served by **`ttt-website`** (nginx). All content and assets
+live in **`website/public/`** — edit HTML, CSS, JS, and images there directly.
+
+| Path | Purpose |
+| ---- | ------- |
+| `website/public/` | Site root (HTML pages, `assets/`, `sitemap.xml`, `robots.txt`) |
+| `website/public/assets/custom/` | Top bar (`topbar.css`, `topbar.js`, `nav.json`) |
+| `website/nginx.conf` | nginx config (clean URLs, gzip); `listen 8089` |
+
+Deploy or refresh:
+
+```bash
+docker compose up -d ttt-website
+```
+
+File changes under `website/public/` are picked up immediately via the bind mount
+(restart only if `nginx.conf` changed).
+
+### How traffic reaches the site (nginx + Caddy + SSL)
+
+Nothing listens on the host for the public website — same pattern as `ttt-web-editor`:
+
+```text
+Browser ──HTTPS──► Caddy (caddy-docker-proxy, ports 80/443 on host)
+                      │
+                      └── HTTP ──► ttt-website:8089 (nginx, internal Docker network)
+```
+
+| Layer | Role |
+| ----- | ---- |
+| **Caddy** | Public entrypoint. Terminates TLS (Let's Encrypt cert for `ttt-ffxiv.eu`), redirects HTTP→HTTPS, proxies to the container. |
+| **nginx** | Serves static files from `website/public/` on **port 8089 inside the container only**. Plain HTTP — no certificates here. |
+
+The `caddy:` and `caddy.reverse_proxy: "{{upstreams 8089}}"` labels on `ttt-website`
+tell Caddy which hostname and which internal port to use. Keep `website/nginx.conf`
+`listen 8089` in sync with that upstream port (editor uses **8088**, website **8089**).
+
+There is no Apache-style `.htaccess`. Static routing (clean URLs like `/de/regeln/`) lives
+in `website/nginx.conf` (`try_files`). You only edit that file if URL rules change — not
+per-folder overrides.
+
+### DNS
+
+Point **`ttt-ffxiv.eu`** (and optional `www`) to the same host as your Caddy stack.
+Caddy auto-provisions a Let's Encrypt certificate for the hostname in the `caddy:` label
+and redirects plain HTTP to HTTPS — no SSL config in nginx required.
+
+---
+
 ## Everyday commands
 
 | Action                         | Command                                  |
@@ -354,6 +405,7 @@ Now go to your Discord server and try `/pic` or `/post`.
 | Restart the bot                | `docker compose restart ttt-discord-bot` |
 | Rebuild after code changes     | `docker compose up -d --build`           |
 | Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
+| Restart website container      | `docker compose restart ttt-website`                     |
 
 ### Updating to new code
 
