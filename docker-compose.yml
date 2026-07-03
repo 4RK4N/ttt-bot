@@ -41,7 +41,7 @@ services:
     networks:
       - caddy
     labels:
-      caddy: ttt-bot.ii10.de
+      caddy: bot.ttt-ffxiv.eu
       caddy.reverse_proxy: "{{upstreams 8088}}"
     restart: unless-stopped
 
