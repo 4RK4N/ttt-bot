@@ -52,12 +52,6 @@ services:
     build:
       context: ./website
       dockerfile: Dockerfile
-      # esbuild (Go) needs more threads than the host's default build ulimit
-      # allows ("runtime: failed to create new OS thread", errno=11).
-      ulimits:
-        nproc:
-          soft: 4096
-          hard: 4096
     image: ttt-website:1.0.0
     pull_policy: build
     container_name: ttt-website
