@@ -5,6 +5,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "public"
+    "dist"
   ]
 }

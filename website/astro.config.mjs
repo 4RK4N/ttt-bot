@@ -31,11 +31,7 @@ const legacyDeHtml = {
 
 export default defineConfig({
   site: 'https://ttt-ffxiv.eu',
-  // Static source assets (images, robots.txt, ...) live in files/ and are
-  // copied verbatim into the build output.
-  publicDir: './files',
-  // The web entry directory: wiped and regenerated on every build.
-  outDir: './public',
+  // Astro defaults: static source assets in public/, build output in dist/.
   // 'preserve' keeps the exact URL scheme of the old export:
   // src/pages/de-home/index.astro -> /de-home/index.html (then moved to /de.html),
   // nested index.astro -> /<dir>/index.html

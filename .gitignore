@@ -7,9 +7,6 @@ data/config.json
 data/*/config.json
 data/*/texts.json
 
-# Astro build output (web entry directory); sources live in website/files/ and website/src/.
-website/public/
-
 *.log
 npm-debug.log*
 .DS_Store

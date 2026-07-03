@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY astro.config.mjs tsconfig.json ./
-COPY files ./files
+COPY public ./public
 COPY src ./src
 
 # The host caps processes/threads per container tightly (fork EAGAIN, Go/Rust
@@ -21,9 +21,7 @@ ENV GOMAXPROCS=1 \
     ASTRO_TELEMETRY_DISABLED=1
 RUN node ./node_modules/astro/astro.js build
 
-# Stage 2: serve the generated files with nginx.
-# The build writes the complete site into public/ (see astro.config.mjs),
-# which becomes the nginx webroot.
+# Stage 2: serve the generated site (Astro's dist/) with nginx.
 FROM nginx:alpine
-COPY --from=build /site/public /var/www/public
+COPY --from=build /site/dist /var/www/public
 COPY nginx.conf /etc/nginx/conf.d/default.conf

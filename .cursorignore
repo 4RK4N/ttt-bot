@@ -3,8 +3,5 @@ data/config.json
 data/*/config.json
 data/*/texts.json
 
-# Astro build output; sources live in website/src/ and website/files/.
-website/public/
-
+# Build output (bot -> dist/, Astro -> website/dist/).
 dist/
-
