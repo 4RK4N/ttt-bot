@@ -1,12 +1,12 @@
 import { type GuildMember, type StringSelectMenuInteraction } from 'discord.js';
 import { isModuleEnabled } from '../../core/texts.js';
+import { memberHasAnyRole, replyEphemeral } from '../../core/discordInteractions.js';
+import { tryAssignRole, tryRemoveRole } from '../../core/discordRoles.js';
 import { isOnCooldown, touchCooldown } from './cooldown.js';
-import { replyEphemeral } from '../../core/discordInteractions.js';
 import { formatEphemeralMessage } from './respond.js';
-import { memberHasPanelRole, tryAssignRole, tryRemoveRole } from './roles.js';
 import { SEL_PREFIX } from './panel.js';
 import { isActivePanelMessage } from './guards.js';
-import { resolvePanel, texts, NAMESPACE } from './types.js';
+import { resolvePanel, texts, NAMESPACE } from './config-io.js';
 
 function parseSelectCustomId(customId: string): string | null {
   if (!customId.startsWith(SEL_PREFIX)) return null;
@@ -79,7 +79,7 @@ export async function handleSelectInteraction(
   const selected = interaction.values.filter((v) => validOptionIds.has(v));
   const panelRoleIds = panel.roleOptions.map((o) => o.roleId).filter(Boolean);
 
-  if (!panel.toggleable && memberHasPanelRole(guildMember, panelRoleIds)) {
+  if (!panel.toggleable && memberHasAnyRole(guildMember, panelRoleIds)) {
     await interaction.deferUpdate();
     return;
   }

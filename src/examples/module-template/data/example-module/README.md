@@ -14,7 +14,7 @@ host — bind-mounted to `/app/data` inside the bot and web-editor containers
    data/example-module/
    ```
 
-   (Replace `example-module` with your module namespace if you renamed it in `types.ts`.)
+   The folder name must match `NAMESPACE` in `types.ts` (`createModuleConfig('example-module', …)`).
 
 2. Rename the example files to their runtime names:
 
@@ -23,8 +23,16 @@ host — bind-mounted to `/app/data` inside the bot and web-editor containers
    texts.example.json   →  texts.json
    ```
 
-3. Edit `config.json` / `texts.json` (or use the web editor once `web-plugin.json` is
-   in place under `src/modules/<name>/`).
+3. Edit via the web editor (once `web-plugin.json` is in `src/modules/<name>/`) or by hand.
+
+## Config vs texts
+
+| File | Contents |
+|------|----------|
+| `config.json` | Settings: `enabled`, `channelId` (Discord snowflake), panel list rows for panel modules |
+| `texts.json` | User-facing copy edited in the web editor |
+
+The web editor validates `channel` / `role` fields as numeric Discord IDs on save.
 
 ## Non-Docker / custom data path
 
@@ -34,5 +42,5 @@ If you set `DATA_DIR` to relocate the data tree, copy this folder there instead:
 $DATA_DIR/example-module/
 ```
 
-The bot resolves paths as `data/<namespace>/` relative to `DATA_DIR` (default: project
-root `data/`).
+Edits invalidate the bot's in-memory cache automatically (`invalidateModuleCache` in
+`src/web/store.ts`) — no restart required.

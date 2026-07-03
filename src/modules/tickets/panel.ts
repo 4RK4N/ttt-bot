@@ -6,7 +6,7 @@ import {
 import { buildEmbed } from '../../core/embedBuilder.js';
 import { parseEmoji } from '../../core/discordEmoji.js';
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-import { resolveTicketType } from './types.js';
+import { resolveTicketType } from './config-io.js';
 
 export type { DiscordApiContext };
 

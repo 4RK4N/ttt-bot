@@ -5,12 +5,12 @@ import {
 } from 'discord.js';
 import { replyEphemeral } from '../../core/discordInteractions.js';
 import { format, isModuleEnabled } from '../../core/texts.js';
-import { tryAssignRole } from '../reaction-roles/roles.js';
+import { tryAssignRole } from '../../core/discordRoles.js';
 import { finalizeTicketClose, resolveOpenerUserId } from './finalize-close.js';
 import { isClosedTicketThread } from './names.js';
 import { ROLE_ACTION_PREFIX } from './panel.js';
 import { canStaffOrAdmin } from './permissions.js';
-import { resolveTicketType, texts, NAMESPACE } from './types.js';
+import { resolveTicketType, texts, NAMESPACE } from './config-io.js';
 
 interface ParsedRoleActionCustomId {
   threadId: string;

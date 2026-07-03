@@ -8,7 +8,7 @@ import { registerMemberCacheWarm } from './member-cache.js';
 import { handleOpenTicket } from './open.js';
 import { publishPanel, type DiscordApiContext } from './panel.js';
 import { handleRoleAction } from './role-action.js';
-import { resolveTicketType, NAMESPACE } from './types.js';
+import { resolveTicketType, NAMESPACE } from './config-io.js';
 
 async function handleComponent(interaction: MessageComponentInteraction): Promise<void> {
   if (!interaction.isButton()) return;

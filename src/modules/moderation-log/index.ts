@@ -21,7 +21,7 @@ import {
   buildMessageDeletedEmbed,
   resolveDeleteAuthor,
 } from './embeds.js';
-import { NAMESPACE, config, logChannelId, texts } from './types.js';
+import { NAMESPACE, config, logChannelId, texts } from './config-io.js';
 
 const recentBans = new Set<string>();
 const BAN_DEDUPE_MS = 10_000;

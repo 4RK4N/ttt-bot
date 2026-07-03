@@ -1,16 +1,6 @@
 /**
- * Module entry point.
- *
- * Discovered by src/core/moduleLoader.ts when this file lives at
+ * Module entry point — discovered by src/core/moduleLoader.ts at
  * src/modules/<name>/index.ts (compiled to index.js).
- *
- * A valid module exports a CommandModule with at least one of:
- *   commands      — slash commands (/pic, /post, …)
- *   init          — register client.on(...) listeners
- *   componentRoutes — route buttons/selects by customId prefix
- *
- * Panel modules also export publish/unpublish functions and register them in
- * src/web/publishHandlers.ts (not auto-discovered yet).
  */
 import {
   Events,
@@ -27,7 +17,6 @@ import {
   disabledReply,
   greetingForUser,
   isExampleEnabled,
-  logConfigSnapshot,
   replyDisabledEphemeral,
   shouldHandleMessage,
 } from './handlers.js';
@@ -37,15 +26,12 @@ import {
 // =============================================================================
 
 function initExample(client: Client): void {
-  const channelId = targetChannelId();
-  if (!channelId) {
+  if (!targetChannelId()) {
     console.warn(
       `[${NAMESPACE}] No channelId in data/${NAMESPACE}/config.json — module idle.`
     );
     return;
   }
-
-  logConfigSnapshot();
 
   client.on(Events.MessageCreate, (message) => {
     if (!shouldHandleMessage(message)) return;
@@ -57,7 +43,7 @@ function initExample(client: Client): void {
 }
 
 // =============================================================================
-// Pattern B: slash commands
+// Pattern B: slash commands (requires npm run deploy)
 // =============================================================================
 
 async function executeExampleCommand(
@@ -81,14 +67,13 @@ const exampleCommand = {
 };
 
 // =============================================================================
-// Pattern C: component routes (buttons / select menus)
+// Pattern C: component routes
 // =============================================================================
 
 async function handleExampleComponent(
   interaction: MessageComponentInteraction
 ): Promise<void> {
   if (!interaction.isButton()) return;
-  // customId convention: '<namespace>:<action>:<id>' — see panel.ts for prefixes
 
   if (!isExampleEnabled()) {
     await replyDisabledEphemeral(interaction);
@@ -103,14 +88,17 @@ const componentRoutes: ComponentRoute[] = [
 ];
 
 // =============================================================================
-// Pattern D: panel publish (panel modules only — see panel.ts + config-io.ts)
+// Pattern D: panel publish (panel modules — see panel.ts, validate.ts, config-io)
 // =============================================================================
 
 /*
 import { createPanelPublisher } from '../../core/panelPublisher.js';
-import { getExamplePanelConfig, updateExamplePanel } from './config-io.js';
+import {
+  getExamplePanelConfig,
+  resolveExamplePanel,
+  updateExamplePanel,
+} from './config-io.js';
 import { publishPanel, type DiscordApiContext } from './panel.js';
-import { resolveExamplePanel } from './types.js';
 
 const panelPublisher = createPanelPublisher({
   resolve: resolveExamplePanel,
@@ -130,16 +118,22 @@ export async function publishExamplePanel(
 export async function unpublishExamplePanel(panelId: string): Promise<void> {
   return panelPublisher.unpublish(panelId);
 }
+
+// Also register in src/web/publishHandlers.ts and wire validate.ts in store.ts.
 */
 
 // =============================================================================
-// Export — enable the patterns you need; delete the rest
+// Pattern E: comments thread (see handlers.ts startExampleCommentsThread)
 // =============================================================================
+
+/*
+import { startExampleCommentsThread } from './handlers.js';
+// After posting a message: await startExampleCommentsThread(sent, displayName, caption, texts().threadFirstMessage);
+*/
 
 const exampleModule: CommandModule = {
   name: NAMESPACE,
   init: initExample,
-  // Slash commands require `npm run deploy` after changes:
   // commands: [exampleCommand],
   // componentRoutes,
 };

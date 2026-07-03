@@ -1,7 +1,6 @@
 {
-  "namespace": "example-module",
-  "label": "Example module",
-  "description": "Template manifest — copy and edit field keys to match types.ts / data files.",
+  "title": "Example module",
+  "description": "Template manifest — field keys must match types.ts and data/*.json. The web editor validates channel/role fields as Discord IDs (17–20 digit snowflakes) on save.",
   "fields": [
     {
       "key": "greeting",
@@ -21,7 +20,7 @@
       "label": "Target channel",
       "type": "channel",
       "store": "config",
-      "help": "Empty disables the module's channel-specific behavior."
+      "help": "Discord channel ID (snowflake). Empty disables channel-specific behavior."
     }
   ]
 }

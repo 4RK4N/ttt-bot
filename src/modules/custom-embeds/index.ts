@@ -2,7 +2,7 @@ import type { CommandModule } from '../../core/moduleLoader.js';
 import { createPanelPublisher } from '../../core/panelPublisher.js';
 import { getEmbedPanelConfig, updateEmbedPanel } from './config-io.js';
 import { publishPanel, type DiscordApiContext } from './panel.js';
-import { resolveEmbedPanel, NAMESPACE } from './types.js';
+import { resolveEmbedPanel, NAMESPACE } from './config-io.js';
 
 const panelPublisher = createPanelPublisher({
   resolve: resolveEmbedPanel,

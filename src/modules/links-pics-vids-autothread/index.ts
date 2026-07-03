@@ -2,10 +2,10 @@ import { Events, GuildMember, type Client, type Message } from 'discord.js';
 import type { CommandModule } from '../../core/moduleLoader.js';
 import {
   buildThreadName,
-  THREAD_AUTO_ARCHIVE_MINUTES,
+  startAndPopulateCommentsThread,
 } from '../../core/threads.js';
 import { isModuleEnabled } from '../../core/texts.js';
-import { NAMESPACE, channelIds, texts } from './types.js';
+import { NAMESPACE, channelIds, texts } from './config-io.js';
 
 const URL_REGEX = /https?:\/\/[^\s<>]+/gi;
 
@@ -74,22 +74,12 @@ async function handleMessage(message: Message): Promise<void> {
     message,
   });
 
-  try {
-    const thread = await message.startThread({
-      name,
-      autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
-    });
-
-    try {
-      await thread.members.add(message.author.id);
-    } catch (err) {
-      console.error('Failed to add author to auto comments thread:', err);
-    }
-
-    await thread.send(texts().threadFirstMessage);
-  } catch (err) {
-    console.error('Failed to create auto comments thread:', err);
-  }
+  await startAndPopulateCommentsThread(message, {
+    name,
+    logPrefix: `[${NAMESPACE}]`,
+    authorUserId: message.author.id,
+    firstMessage: texts().threadFirstMessage,
+  });
 }
 
 const linksPicsVidsAutoThreadModule: CommandModule = {

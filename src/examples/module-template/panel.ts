@@ -1,18 +1,10 @@
 /**
  * Panel publish stub (panel modules only — delete for simple modules).
  *
- * Publish flow:
- * 1. Web editor saves panel row to config.json + texts.json
- * 2. Admin clicks Publish in web UI → publishHandlers.ts → your publish fn
- * 3. publishPanel posts/edits Discord message
- * 4. updateExamplePanel (config-io.ts) patches published + panelMessageId + channelId
- *
- * Register publish/unpublish in src/web/publishHandlers.ts.
+ * When enabling panel types in types.ts + config-io.ts, import resolveExamplePanel
+ * from config-io and match the signature used by real modules (tickets/panel.ts).
  */
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-
-/** Uncomment when panel types are enabled in types.ts: */
-// import type { ResolvedExamplePanel } from './types.js';
 
 type ResolvedExamplePanel = {
   id: string;
@@ -23,7 +15,6 @@ type ResolvedExamplePanel = {
 
 export type { DiscordApiContext };
 
-/** Prefix for button customIds routed in index.ts componentRoutes. */
 export const EXAMPLE_BTN_PREFIX = 'example-module:btn:';
 
 export function buildPanelPayload(panel: ResolvedExamplePanel) {
@@ -36,3 +27,6 @@ export function buildPanelPayload(panel: ResolvedExamplePanel) {
 export async function publishPanel(ctx: DiscordApiContext, panel: ResolvedExamplePanel) {
   return publishDiscordMessage(ctx, panel.channelId, buildPanelPayload(panel));
 }
+
+// createPanelPublisher expects: publishPanel(ctx, resolvedPanel) — pass the merged
+// resolve*() result. Register publish/unpublish in src/web/publishHandlers.ts.

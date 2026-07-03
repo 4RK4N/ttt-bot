@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { MAX_PANEL_OPTIONS } from '../core/limits.js';
-import { moduleDataPath } from '../core/texts.js';
+import { invalidateModuleCache, moduleDataPath } from '../core/texts.js';
 import { writeJsonAtomic } from '../core/jsonWrite.js';
 import { validateEmbedPanelRow } from '../modules/custom-embeds/validate.js';
 import { validateRolePanelRow } from '../modules/reaction-roles/validate.js';
+import { validateTicketTypeRow } from '../modules/tickets/validate.js';
 import type { WebPlugin, WebPluginField, WebPluginSubField, WebFieldStore } from './plugins.js';
 import {
   isBooleanField,
@@ -36,6 +37,22 @@ function assertSlugId(id: string, label: string): void {
 function assertSnowflake(value: string, label: string): void {
   if (value && !SNOWFLAKE.test(value)) {
     throw new ValidationError(`${label} must be a valid Discord ID.`);
+  }
+}
+
+function assertSnowflakesInArray(values: string[], label: string): void {
+  for (let i = 0; i < values.length; i++) {
+    assertSnowflake(values[i], `${label}[${i}]`);
+  }
+}
+
+function validateDiscordIdField(type: WebPluginField['type'], normalized: FieldValue, label: string): void {
+  if (type === 'channel' || type === 'role') {
+    assertSnowflake(normalized as string, label);
+    return;
+  }
+  if (type === 'channel-multi' || type === 'role-multi') {
+    assertSnowflakesInArray(normalized as string[], label);
   }
 }
 
@@ -164,7 +181,11 @@ function validateSubValue(sub: WebPluginSubField, value: unknown, label: string)
     if (!Array.isArray(value) || value.some((v) => typeof v !== 'string')) {
       throw new ValidationError(`${label}.${sub.key} must be an array of strings.`);
     }
-    return value as string[];
+    const normalized = value as string[];
+    if (sub.type === 'channel-multi' || sub.type === 'role-multi') {
+      assertSnowflakesInArray(normalized, `${label}.${sub.key}`);
+    }
+    return normalized;
   }
   if (isBooleanSubField(sub)) {
     return value === true;
@@ -229,6 +250,7 @@ export async function writeEnabled(namespace: string, enabled: boolean): Promise
   const existing = readDataJson(namespace, 'config');
   const merged = { ...existing, enabled };
   await writeJsonAtomic(moduleDataPath(namespace, STORE_FILES.config), merged);
+  invalidateModuleCache(namespace);
   return enabled;
 }
 
@@ -359,6 +381,15 @@ export async function writeValues(
           }
         }
 
+        if (plugin.namespace === 'tickets' && field.key === 'ticketTypes') {
+          try {
+            validateTicketTypeRow(configRow, textRow);
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Invalid ticket type configuration.';
+            throw new ValidationError(`${key}[${id}]: ${message}`);
+          }
+        }
+
         newConfigRows.push(configRow);
         newTextsMap[id] = textRow;
       }
@@ -388,6 +419,8 @@ export async function writeValues(
       normalized = value;
     }
 
+    validateDiscordIdField(field.type, normalized, `Field "${key}"`);
+
     if (field.store === 'config') {
       configOut[field.key] = normalized;
       configTouched = true;
@@ -399,9 +432,11 @@ export async function writeValues(
 
   if (configTouched) {
     await writeJsonAtomic(moduleDataPath(plugin.namespace, STORE_FILES.config), configOut);
+    invalidateModuleCache(plugin.namespace);
   }
   if (textsTouched) {
     await writeJsonAtomic(moduleDataPath(plugin.namespace, STORE_FILES.texts), textsOut);
+    invalidateModuleCache(plugin.namespace);
   }
 
   return readValues(plugin);

@@ -6,7 +6,7 @@ import { handleButtonInteraction } from './handle-button.js';
 import { registerReactionHandlers } from './handle-reaction.js';
 import { handleSelectInteraction } from './handle-select.js';
 import { publishPanel, type DiscordApiContext } from './panel.js';
-import { resolvePanel, NAMESPACE } from './types.js';
+import { resolvePanel, NAMESPACE } from './config-io.js';
 
 async function handleComponent(interaction: MessageComponentInteraction): Promise<void> {
   if (interaction.isButton()) {

@@ -10,10 +10,10 @@ import {
 import type { CommandModule } from '../../core/moduleLoader.js';
 import {
   buildThreadName,
-  THREAD_AUTO_ARCHIVE_MINUTES,
+  startAndPopulateCommentsThread,
 } from '../../core/threads.js';
 import { format, isModuleEnabled } from '../../core/texts.js';
-import { NAMESPACE, texts } from './types.js';
+import { NAMESPACE, texts } from './config-io.js';
 
 const MAX_IMAGES = 10;
 
@@ -113,27 +113,16 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
     return;
   }
 
-  let threadFailed = false;
-  try {
-    const thread = await sent.startThread({
-      name: buildThreadName(displayName, message, {
-        guild: interaction.guild,
-        client: interaction.client,
-      }),
-      autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
-    });
-
-    try {
-      await thread.members.add(interaction.user.id);
-    } catch (err) {
-      console.error('Failed to add author to comments thread:', err);
-    }
-
-    await thread.send(t.threadFirstMessage);
-  } catch (err) {
-    threadFailed = true;
-    console.error('Failed to create comments thread:', err);
-  }
+  const threadOk = await startAndPopulateCommentsThread(sent, {
+    name: buildThreadName(displayName, message, {
+      guild: interaction.guild,
+      client: interaction.client,
+    }),
+    logPrefix: `[${NAMESPACE}]`,
+    authorUserId: interaction.user.id,
+    firstMessage: t.threadFirstMessage,
+  });
+  const threadFailed = !threadOk;
 
   const success = format(t.postedSuccess, {
     count: files.length,

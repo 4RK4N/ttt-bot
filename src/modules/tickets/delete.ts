@@ -11,7 +11,7 @@ import { isModuleEnabled } from '../../core/texts.js';
 import { isClosedTicketThread } from './names.js';
 import { DELETE_CONFIRM_PREFIX, DELETE_PREFIX } from './panel.js';
 import { canStaffOrAdmin } from './permissions.js';
-import { resolveTicketType, texts, NAMESPACE } from './types.js';
+import { resolveTicketType, texts, NAMESPACE } from './config-io.js';
 
 interface ParsedDeleteCustomId {
   threadId: string;

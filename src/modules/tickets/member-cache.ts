@@ -5,6 +5,10 @@ import {
   type GuildMember,
 } from 'discord.js';
 import { config } from '../../config.js';
+import {
+  removeMemberDisplayName,
+  setMemberDisplayName,
+} from '../../core/memberDisplayNames.js';
 import { warmGuildMemberCache } from './thread-members.js';
 
 export interface CachedMember {
@@ -34,11 +38,13 @@ function displayNameFromApi(data: APIGuildMember): string {
 export function upsertApiMember(guildId: string, data: APIGuildMember): void {
   const userId = data.user?.id;
   if (!userId) return;
+  const displayName = displayNameFromApi(data);
   guildMap(guildId).set(userId, {
     roleIds: data.roles ?? [],
     isBot: data.user.bot ?? false,
-    displayName: displayNameFromApi(data),
+    displayName,
   });
+  setMemberDisplayName(guildId, userId, displayName);
 }
 
 export function upsertGuildMember(member: GuildMember): void {
@@ -47,15 +53,12 @@ export function upsertGuildMember(member: GuildMember): void {
     isBot: member.user.bot,
     displayName: member.displayName,
   });
-}
-
-/** Server display name from the warmed member cache, if present. */
-export function getMemberDisplayName(guildId: string, userId: string): string | undefined {
-  return guildMembers.get(guildId)?.get(userId)?.displayName;
+  setMemberDisplayName(member.guild.id, member.id, member.displayName);
 }
 
 export function removeMember(guildId: string, userId: string): void {
   guildMembers.get(guildId)?.delete(userId);
+  removeMemberDisplayName(guildId, userId);
 }
 
 export function getMembersForGuild(guildId: string): Map<string, CachedMember> {

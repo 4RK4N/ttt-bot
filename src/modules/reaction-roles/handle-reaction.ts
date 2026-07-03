@@ -8,8 +8,8 @@ import {
 import { isModuleEnabled } from '../../core/texts.js';
 import { isOnCooldown, touchCooldown } from './cooldown.js';
 import { matchOptionByReaction } from './panel.js';
-import { tryAssignRole, tryRemoveRole } from './roles.js';
-import { findPanelByMessageId, NAMESPACE } from './types.js';
+import { tryAssignRole, tryRemoveRole } from '../../core/discordRoles.js';
+import { findPanelByMessageId, NAMESPACE } from './config-io.js';
 
 async function handleReaction(
   reaction: MessageReaction | PartialMessageReaction,

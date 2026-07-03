@@ -1,5 +1,5 @@
-import type { Client, Guild, Message } from 'discord.js';
-import { getMemberDisplayName } from '../modules/tickets/member-cache.js';
+import type { Client, Guild, Message, ThreadChannel } from 'discord.js';
+import { getMemberDisplayName } from './memberDisplayNames.js';
 
 const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.
 
@@ -79,4 +79,48 @@ export function buildThreadName(
 
   if (oneLine.length <= THREAD_NAME_MAX) return oneLine;
   return oneLine.slice(0, THREAD_NAME_MAX - 3) + '...';
+}
+
+export interface CommentsThreadOptions {
+  name: string;
+  logPrefix: string;
+  authorUserId: string;
+  firstMessage: string;
+}
+
+/** Adds the author and posts the opener in an already-created thread. */
+export async function populateCommentsThread(
+  thread: ThreadChannel,
+  options: Pick<CommentsThreadOptions, 'logPrefix' | 'authorUserId' | 'firstMessage'>
+): Promise<void> {
+  const { logPrefix, authorUserId, firstMessage } = options;
+
+  try {
+    await thread.members.add(authorUserId);
+  } catch (err) {
+    console.error(`${logPrefix} Failed to add author to comments thread:`, err);
+  }
+
+  await thread.send(firstMessage);
+}
+
+/**
+ * Creates a comments thread on a channel message, adds the author, and sends the opener.
+ * Returns false when thread creation fails (add/send failures are non-fatal).
+ */
+export async function startAndPopulateCommentsThread(
+  message: Message,
+  options: CommentsThreadOptions
+): Promise<boolean> {
+  try {
+    const thread = await message.startThread({
+      name: options.name,
+      autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES,
+    });
+    await populateCommentsThread(thread, options);
+    return true;
+  } catch (err) {
+    console.error(`${options.logPrefix} Failed to create comments thread:`, err);
+    return false;
+  }
 }

@@ -7,6 +7,9 @@
  * - `config()` and `texts()` — cached, hot-reloading reads
  *
  * Handlers should import via config-io.ts, not directly from here (see config-io.ts).
+ *
+ * Web editor writes call invalidateModuleCache() — config() / texts() pick up changes
+ * without restart.
  */
 import { createModuleConfig, resolveKeyedItem } from '../../core/moduleConfig.js';
 
@@ -58,7 +61,7 @@ export function targetChannelId(): string | undefined {
 // per-item copy in texts.json (e.g. texts.panels[id]). Use resolveKeyedItem()
 // to merge config row + text row into one object for handlers and publish.
 //
-// Also switch config-io.ts to the createConfigIo pattern (see that file).
+// Also add validate.ts and wire validateExamplePanelRow in src/web/store.ts.
 //
 /*
 export interface ExamplePanelConfig {

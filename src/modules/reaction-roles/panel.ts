@@ -10,7 +10,7 @@ import { emojiMatchKey, parseEmoji, reactionMatchKey } from '../../core/discordE
 import { syncBotMessageReactions } from '../../core/discordReactions.js';
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
 import type { ResolvedRolePanel, RoleOption } from './types.js';
-import { resolvePanel } from './types.js';
+import { resolvePanel } from './config-io.js';
 import { validateRolePanel } from './validate.js';
 
 export type { DiscordApiContext };

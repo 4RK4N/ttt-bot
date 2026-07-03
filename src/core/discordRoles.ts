@@ -4,7 +4,6 @@ import {
   type GuildMember,
   type Role,
 } from 'discord.js';
-import { memberHasAnyRole } from '../../core/discordInteractions.js';
 
 export interface RoleChangeResult {
   ok: boolean;
@@ -24,7 +23,11 @@ function canManageRole(guild: Guild, role: Role): RoleChangeResult {
   return { ok: true };
 }
 
-export async function tryAssignRole(member: GuildMember, roleId: string): Promise<RoleChangeResult> {
+export async function tryAssignRole(
+  member: GuildMember,
+  roleId: string,
+  logPrefix = '[roles]'
+): Promise<RoleChangeResult> {
   const role = member.guild.roles.cache.get(roleId);
   if (!role) return { ok: false, reason: 'missing' };
 
@@ -37,15 +40,16 @@ export async function tryAssignRole(member: GuildMember, roleId: string): Promis
     await member.roles.add(roleId);
     return { ok: true };
   } catch (err) {
-    console.error(
-      `[reaction-roles] Failed to assign role ${roleId} to ${member.id}:`,
-      err
-    );
+    console.error(`${logPrefix} Failed to assign role ${roleId} to ${member.id}:`, err);
     return { ok: false, reason: 'hierarchy' };
   }
 }
 
-export async function tryRemoveRole(member: GuildMember, roleId: string): Promise<RoleChangeResult> {
+export async function tryRemoveRole(
+  member: GuildMember,
+  roleId: string,
+  logPrefix = '[roles]'
+): Promise<RoleChangeResult> {
   const role = member.guild.roles.cache.get(roleId);
   if (!role) return { ok: false, reason: 'missing' };
 
@@ -58,14 +62,7 @@ export async function tryRemoveRole(member: GuildMember, roleId: string): Promis
     await member.roles.remove(roleId);
     return { ok: true };
   } catch (err) {
-    console.error(
-      `[reaction-roles] Failed to remove role ${roleId} from ${member.id}:`,
-      err
-    );
+    console.error(`${logPrefix} Failed to remove role ${roleId} from ${member.id}:`, err);
     return { ok: false, reason: 'hierarchy' };
   }
-}
-
-export function memberHasPanelRole(member: GuildMember, roleIds: string[]): boolean {
-  return memberHasAnyRole(member, roleIds);
 }

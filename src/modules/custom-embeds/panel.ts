@@ -1,7 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 import { buildEmbed } from '../../core/embedBuilder.js';
 import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-import { resolveEmbedPanel } from './types.js';
+import { resolveEmbedPanel } from './config-io.js';
 import { validateEmbedPanel } from './validate.js';
 
 export type { DiscordApiContext };

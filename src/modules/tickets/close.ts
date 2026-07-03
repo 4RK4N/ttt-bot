@@ -10,7 +10,7 @@ import { isModuleEnabled } from '../../core/texts.js';
 import { finalizeTicketClose, resolveOpenerUserId } from './finalize-close.js';
 import { CLOSE_CONFIRM_PREFIX, CLOSE_PREFIX } from './panel.js';
 import { canStaffOrAdmin } from './permissions.js';
-import { resolveTicketType, texts, NAMESPACE } from './types.js';
+import { resolveTicketType, texts, NAMESPACE } from './config-io.js';
 
 interface ParsedCloseCustomId {
   threadId: string;
