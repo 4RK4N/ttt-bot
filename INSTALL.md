@@ -287,16 +287,26 @@ posting.
 
 ---
 
-## Part 4 - Build the image
+## Part 4 - Build the images
+
+Run from the repo root (where `docker-compose.yml` lives). The committed `.env` sets
+`COMPOSE_BAKE=true` — keep that enabled so builds go through Bake/Buildx and the
+`nproc` ulimits in `docker-compose.yml` take effect.
 
 ```bash
 docker compose build
 ```
 
-This produces an image named `ttt-discord-bot:1.0.0` using the included `Dockerfile`. The
-`Dockerfile` is a multi-stage build: the first stage compiles the TypeScript
-sources to plain JavaScript (`npm run build` -> `dist/`), and the final runtime
-image ships only the compiled output plus production dependencies.
+This builds:
+
+- **`ttt-discord-bot:1.0.0`** — multi-stage Node 24: compile TypeScript (`npm run build` → `dist/`), runtime image with production dependencies only.
+- **`ttt-website:1.0.0`** — multi-stage: Astro static site (`website/`), served by nginx on port **8089** inside the container.
+
+Rebuild everything after code changes:
+
+```bash
+docker compose build --no-cache && docker compose up -d
+```
 
 ---
 
@@ -346,9 +356,8 @@ Now go to your Discord server and try `/pic` or `/post`.
 
 ## Part 7 - Public website (`ttt-ffxiv.eu`)
 
-Static multi-page site built with **Astro + Tailwind CSS** and served by
-**`ttt-website`** (nginx). The site is generated at image build time
-(`website/Dockerfile`); edit the sources and rebuild to deploy changes.
+Static multi-page site built with **Astro 7 + Tailwind CSS**. The site is **built inside the
+`ttt-website` Docker image** (see `website/Dockerfile`) and served by nginx.
 
 | Path | Purpose |
 | ---- | ------- |
@@ -358,17 +367,17 @@ Static multi-page site built with **Astro + Tailwind CSS** and served by
 | `website/src/styles/global.css` | Tailwind theme + shared text styles |
 | `website/public/` | Static assets copied verbatim (images, `robots.txt`) |
 | `website/astro.config.mjs` | `@astrojs/sitemap` generates `sitemap-index.xml` at build time |
-| `website/dist/` | **Build output** (gitignored) — never edit by hand |
+| `website/dist/` | Local `npm run build` output (gitignored); dev preview only — production uses files baked into the image |
+| `website/Dockerfile` | Multi-stage: `npm ci` + `astro build`, then nginx |
 | `website/nginx.conf` | nginx config (clean URLs, gzip, caching); `listen 8089` |
 
-Deploy or refresh after editing sources:
+After **website** source changes, rebuild and restart the website service:
 
 ```bash
-docker compose up -d --build ttt-website
+docker compose build --no-cache ttt-website && docker compose up -d ttt-website
 ```
 
-For local preview, run the dev server in `website/` (`npm install` once, then
-`npm run dev`).
+For local preview, run the dev server in `website/` (`npm install` once, then `npm run dev`).
 
 ### How traffic reaches the site (nginx + Caddy + SSL)
 
@@ -409,15 +418,15 @@ and redirects plain HTTP to HTTPS — no SSL config in nginx required.
 | Stop the bot                   | `docker compose down`                    |
 | Start the bot                  | `docker compose up -d`                   |
 | Restart the bot                | `docker compose restart ttt-discord-bot` |
-| Rebuild after code changes     | `docker compose up -d --build`           |
+| Rebuild after code changes     | `docker compose build --no-cache && docker compose up -d` |
 | Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
-| Rebuild website after edits    | `docker compose up -d --build ttt-website`               |
+| Rebuild website after edits    | `docker compose build --no-cache ttt-website && docker compose up -d ttt-website` |
 
 ### Updating to new code
 
 ```bash
-git pull                       # or copy new files over
-docker compose up -d --build   # rebuild + restart
+git pull
+docker compose build --no-cache && docker compose up -d
 # only if commands changed:
 docker compose run --rm ttt-discord-bot npm run deploy
 ```

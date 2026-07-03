@@ -1,4 +1,5 @@
 # The caddy-docker-proxy network is created by your Caddy stack; we just join it.
+
 networks:
   caddy:
     external: true
@@ -8,56 +9,67 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      ulimits:
+        nproc: 65535
+
     image: ttt-discord-bot:1.0.0
+
     pull_policy: build
+
     container_name: ttt-discord-bot
-    # All configuration (token, client ID, etc.) is read from data/config.json,
-    # provided by the bind mount below. Persist module texts/assets too so edits
-    # survive restarts and rebuilds.
+
     volumes:
       - ./data:/app/data
-    # Keep the bot running and restart it automatically (e.g. after a reboot),
-    # but not if you deliberately stop it.
+
     restart: unless-stopped
 
-  # Web text editor: reuses the same image (built by ttt-discord-bot above) but
-  # runs the web server entrypoint instead of the bot. Lets guild administrators
-  # edit each module's texts.json; the bot hot-reloads the shared ./data volume.
   ttt-web-editor:
     image: ttt-discord-bot:1.0.0
+
     pull_policy: never
+
     container_name: ttt-web-editor
+
     depends_on:
       - ttt-discord-bot
+
     command: ["node", "dist/src/web/server.js"]
-    # Reads the same data/config.json (clientId, clientSecret, sessionSecret,
-    # oauthRedirectUri, guildId, webPort) via the shared data volume below.
-    # Same data volume as the bot, so edits made here take effect without a restart.
+
     volumes:
       - ./data:/app/data
-    # Exposed via the shared caddy-docker-proxy network (TLS + public hostname),
-    # so no host port is published. Caddy reaches the container on WEB_PORT (8088).
-    # The upstream port below is fixed; keep WEB_PORT=8088 (or update both together).
+
     networks:
       - caddy
+
     labels:
       caddy: bot.ttt-ffxiv.eu
+
       caddy.reverse_proxy: "{{upstreams 8088}}"
+
     restart: unless-stopped
 
-  # Public venue website: Astro + Tailwind, built in the image (see website/Dockerfile)
-  # and served by nginx. No host ports published — Caddy reaches this container on
-  # port 8089 (plain HTTP). TLS terminates at Caddy.
   ttt-website:
     build:
       context: ./website
       dockerfile: Dockerfile
+      ulimits:
+        nproc: 65535
+
     image: ttt-website:1.0.0
+
     pull_policy: build
+
     container_name: ttt-website
+
+    depends_on:
+      - ttt-discord-bot
+
     networks:
       - caddy
+
     labels:
       caddy: ttt-ffxiv.eu
+
       caddy.reverse_proxy: "{{upstreams 8089}}"
+
     restart: unless-stopped

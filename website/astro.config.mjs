@@ -54,5 +54,10 @@ export default defineConfig({
       },
     }),
   ],
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    resolve: {
+      tsconfigPaths: true,
+    },
+  },
 });

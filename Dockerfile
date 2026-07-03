@@ -1,36 +1,26 @@
-# Stage 1: compile TypeScript to plain JS.
-FROM node:20-alpine AS builder
+# Stage 1: compile TypeScript
+FROM node:24-alpine AS builder
 WORKDIR /app
 
-# Install all dependencies (including dev) for the build.
-# Uses package-lock.json for reproducible installs.
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Compile the sources into dist/.
 COPY tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
 RUN npm run build
+RUN npm prune --omit=dev
 
-# Stage 2: small runtime image with only production dependencies.
-FROM node:20-alpine
+# Stage 2: runtime
+FROM node:24-alpine
 WORKDIR /app
 
-# Production-only dependencies.
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+ENV NODE_ENV=production
 
-# Bring in the compiled output from the build stage.
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/dist ./dist
-
-# Module texts (JSON) and assets (images/fonts) are read from data/ at runtime.
-# Ship them in the image; docker-compose bind-mounts ./data over this so edits
-# (and a future web editor's writes) persist across restarts.
 COPY data ./data
 
-# Run as the built-in non-root user for safety.
 USER node
-
-# The bot is a long-running process (no inbound ports needed).
 CMD ["node", "dist/src/index.js"]
