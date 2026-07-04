@@ -1,5 +1,6 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
+import PrivacyContent from "../../../components/PrivacyContent.astro";
 ---
 
 <ContentPage
@@ -7,8 +8,8 @@ import ContentPage from "../../../components/ContentPage.astro";
   lang="de"
   path="/de/datenschutz/"
   heading="Datenschutz"
+  wide
+  centerBody={false}
 >
-  <div class="hand-text">
-    <p>Inhalt folgt in Kürze.</p>
-  </div>
+  <PrivacyContent lang="de" />
 </ContentPage>

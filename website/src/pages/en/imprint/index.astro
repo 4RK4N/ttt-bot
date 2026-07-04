@@ -1,5 +1,6 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
+import ImprintContent from "../../../components/ImprintContent.astro";
 ---
 
 <ContentPage
@@ -7,8 +8,8 @@ import ContentPage from "../../../components/ContentPage.astro";
   lang="en"
   path="/en/imprint/"
   heading="Imprint"
+  wide
+  centerBody={false}
 >
-  <div class="hand-text">
-    <p>Content coming soon.</p>
-  </div>
+  <ImprintContent lang="en" />
 </ContentPage>
