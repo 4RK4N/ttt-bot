@@ -40,7 +40,7 @@ export default defineConfig({
     prefetchAll: false,
   },
   image: {
-    defaultQuality: 80,
+    defaultQuality: 75,
   },
   fonts: [
     {

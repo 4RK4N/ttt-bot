@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Timer from './Timer.astro';
 import DiscordButton from './DiscordButton.astro';
@@ -16,17 +16,21 @@ interface Props {
 const { title, lang, path, tagline } = Astro.props;
 
 const EVENT_TIMESTAMP = 1783188000;
+const lcpSrc = (await getImage({ src: homeCircle, width: 864, format: 'webp' })).src;
 ---
 
-<Base title={title} lang={lang} path={path}>
+<Base title={title} lang={lang} path={path} heroLcp lcpPreload={lcpSrc}>
   <section
     class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14"
   >
     <Image
       src={homeCircle}
       alt=""
-      widths={[288, 576]}
-      sizes="(max-width: 720px) 100vw, 288px"
+      width={432}
+      height={432}
+      densities={[1, 2]}
+      loading="eager"
+      fetchpriority="high"
       class="w-72 max-w-full"
     />
     <h1

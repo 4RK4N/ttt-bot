@@ -11,9 +11,13 @@ interface Props {
   path: string;
   /** Overrides the language default for meta description and social previews. */
   description?: string;
+  /** Home page: hero image is LCP; defer logo fetch priority and preload hero font. */
+  heroLcp?: boolean;
+  /** Preload URL for the home hero image (webp). */
+  lcpPreload?: string;
 }
 
-const { title, lang, path, description } = Astro.props;
+const { title, lang, path, description, heroLcp, lcpPreload } = Astro.props;
 
 const metaDescription = description ?? siteDescription[lang];
 const shareImage = 'https://ttt-ffxiv.eu/assets/images/share.jpg';
@@ -53,9 +57,16 @@ const isActive = (itemPath: string) => itemPath === path;
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
+    {lcpPreload && (
+      <link rel="preload" as="image" href={lcpPreload} fetchpriority="high" />
+    )}
     <Font cssVariable="--font-averia-face" preload />
     <Font cssVariable="--font-gochi-face" />
-    <Font cssVariable="--font-caveat-face" />
+    {heroLcp ? (
+      <Font cssVariable="--font-caveat-face" preload />
+    ) : (
+      <Font cssVariable="--font-caveat-face" />
+    )}
   </head>
 
   <body class="pt-[68px]">
@@ -66,10 +77,10 @@ const isActive = (itemPath: string) => itemPath === path;
         <Image
           src={logo}
           alt={siteName}
-          height={56}
+          width={145}
           densities={[1, 2]}
           loading="eager"
-          fetchpriority="high"
+          fetchpriority={heroLcp ? undefined : 'high'}
           class="block h-full w-auto"
         />
       </a>

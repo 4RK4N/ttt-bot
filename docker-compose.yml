@@ -70,6 +70,22 @@ services:
     labels:
       caddy: ttt-ffxiv.eu
 
+      caddy.encode: "gzip zstd"
+
+      caddy.header.Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+
+      caddy.header.X-Content-Type-Options: "nosniff"
+
+      caddy.header.X-Frame-Options: "SAMEORIGIN"
+
+      caddy.header.Referrer-Policy: "strict-origin-when-cross-origin"
+
+      caddy.header.Cross-Origin-Opener-Policy: "same-origin"
+
+      caddy.header.Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+
+      caddy.header.Content-Security-Policy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+
       caddy.reverse_proxy: "{{upstreams 8089}}"
 
     restart: unless-stopped
