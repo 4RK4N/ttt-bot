@@ -45,15 +45,13 @@ export function EditorLayout({
               <h1 class="navbar-brand navbar-brand-autodark pe-0 pe-md-3 mb-0">
                 <span class="navbar-brand-text">{title}</span>
               </h1>
-              <div class="navbar-nav flex-row order-md-last ms-auto align-items-center">
-                <div class="nav-item d-none d-md-flex me-3">
-                  <span class="text-secondary">Signed in as {username}</span>
-                </div>
-                <form method="post" action="/logout" class="nav-item">
+              <div class="d-flex align-items-center gap-3 ms-auto">
+                <span class="text-secondary d-none d-md-inline">
+                  Signed in as {username}
+                </span>
+                <form method="post" action="/logout" class="mb-0">
                   <input type="hidden" name="_csrf" value={csrfToken} />
-                  <button type="submit" class="btn btn-outline-secondary">
-                    Log out
-                  </button>
+                  <button type="submit" class="btn btn-outline-secondary">Log out</button>
                 </form>
               </div>
             </div>

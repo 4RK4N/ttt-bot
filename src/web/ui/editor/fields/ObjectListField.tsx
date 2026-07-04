@@ -57,7 +57,7 @@ export function ObjectListRow({
             'hx-post': toggleUrl,
             'hx-target': `#row-${namespace}-${field.key}-${rowIndex}`,
             'hx-swap': 'outerHTML',
-            'hx-include': `#panel-form-${namespace} :input`,
+            'hx-include': `#panel-form-${namespace}`,
           }
           : {})}
       >
