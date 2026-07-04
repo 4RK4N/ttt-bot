@@ -1,16 +1,16 @@
 ---
-import { Image, getImage } from 'astro:assets';
-import Base from '../layouts/Base.astro';
-import Timer from './Timer.astro';
-import DiscordButton from './DiscordButton.astro';
+import { Image, getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Timer from "./Timer.astro";
+import DiscordButton from "./DiscordButton.astro";
 import {
   HERO_CIRCLE_PX,
   HERO_REM,
   remScaledSizes,
   remScaledWidths,
-} from '../data/layout';
-import type { Lang } from '../data/nav';
-import { homeCircle } from '../data/images';
+} from "../data/layout";
+import type { Lang } from "../data/nav";
+import { homeCircle } from "../data/images";
 
 interface Props {
   title: string;
@@ -27,11 +27,13 @@ const heroWidths = remScaledWidths(HERO_REM);
 const lcpPreload = {
   srcset: (
     await Promise.all(
-      heroWidths.map((w) => getImage({ src: homeCircle, width: w, format: 'webp' })),
+      heroWidths.map((w) =>
+        getImage({ src: homeCircle, width: w, format: "webp" }),
+      ),
     )
   )
     .map((img, i) => `${img.src} ${heroWidths[i]}w`)
-    .join(', '),
+    .join(", "),
   sizes: heroSizes,
 };
 ---
@@ -51,11 +53,7 @@ const lcpPreload = {
       fetchpriority="high"
       class="w-72 max-w-full"
     />
-    <h1
-      class="bg-gradient-to-b from-[#FF5CBE] to-[#FC0000] bg-clip-text font-caveat text-[3.625em] font-bold leading-[1.2] text-transparent"
-    >
-      Tiny Temptation Tubs
-    </h1>
+    <h1 class="page-heading page-heading--hero">Tiny Temptation Tubs</h1>
     <p class="subtitle-text">Event Timer</p>
     <Timer lang={lang} timestamp={EVENT_TIMESTAMP} />
     <p class="subtitle-text">{tagline}</p>

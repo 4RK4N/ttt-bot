@@ -23,14 +23,8 @@ const buttons = navItems[lang].map((item, i) => ({
   <section
     class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14"
   >
-    <p
-      class="font-caveat text-[2.375em] font-bold leading-[1.2] text-black/70 [text-shadow:0.088rem_0.088rem_0.125rem_#B31919]"
-    >
-      {heading}
-    </p>
-    <div
-      class="hand-text flex flex-col gap-6 text-[1.875em] leading-[1.75] tracking-[0.2rem] text-black/70 [text-shadow:0.088rem_0.088rem_0.125rem_#F50707]"
-    >
+    <h1 class="page-heading">{heading}</h1>
+    <div class="hand-text hand-text--welcome flex flex-col gap-6">
       <slot />
     </div>
     <ul class="flex flex-wrap justify-center gap-3">

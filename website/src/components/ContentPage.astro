@@ -1,14 +1,14 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { Image, getImage } from 'astro:assets';
-import Base from '../layouts/Base.astro';
+import type { ImageMetadata } from "astro";
+import { Image, getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
 import {
   ICON_LAYOUT_PX,
   ICON_REM,
   remScaledSizes,
   remScaledWidths,
-} from '../data/layout';
-import type { Lang } from '../data/nav';
+} from "../data/layout";
+import type { Lang } from "../data/nav";
 
 interface Props {
   title: string;
@@ -26,32 +26,38 @@ const lcpPreload = icon
   ? {
       srcset: (
         await Promise.all(
-          iconWidths.map((w) => getImage({ src: icon, width: w, format: 'webp' })),
+          iconWidths.map((w) =>
+            getImage({ src: icon, width: w, format: "webp" }),
+          ),
         )
       )
         .map((img, i) => `${img.src} ${iconWidths[i]}w`)
-        .join(', '),
+        .join(", "),
       sizes: iconSizes,
     }
   : undefined;
 ---
 
 <Base title={title} lang={lang} path={path} lcpPreload={lcpPreload}>
-  <section class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14">
-    <h2 class="page-heading">{heading}</h2>
-    {icon && (
-      <Image
-        src={icon}
-        alt=""
-        width={ICON_LAYOUT_PX}
-        height={ICON_LAYOUT_PX}
-        widths={iconWidths}
-        sizes={iconSizes}
-        loading="eager"
-        fetchpriority="high"
-        class="w-56 max-w-full"
-      />
-    )}
+  <section
+    class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14"
+  >
+    <h1 class="page-heading">{heading}</h1>
+    {
+      icon && (
+        <Image
+          src={icon}
+          alt=""
+          width={ICON_LAYOUT_PX}
+          height={ICON_LAYOUT_PX}
+          widths={iconWidths}
+          sizes={iconSizes}
+          loading="eager"
+          fetchpriority="high"
+          class="w-56 max-w-full"
+        />
+      )
+    }
     <slot />
   </section>
 </Base>

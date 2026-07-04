@@ -1,9 +1,13 @@
 ---
-import ContentPage from '../../../components/ContentPage.astro';
-import ContentImage from '../../../components/ContentImage.astro';
-import Gallery from '../../../components/Gallery.astro';
-import { CARD_IMAGE_PX, cardImageSizes, cardImageWidths } from '../../../data/layout';
-import { pageIcons, resolveGalleryList } from '../../../data/images';
+import ContentPage from "../../../components/ContentPage.astro";
+import ContentImage from "../../../components/ContentImage.astro";
+import Gallery from "../../../components/Gallery.astro";
+import {
+  CARD_IMAGE_PX,
+  cardImageSizes,
+  cardImageWidths,
+} from "../../../data/layout";
+import { pageIcons, resolveGalleryList } from "../../../data/images";
 ---
 
 <ContentPage
@@ -20,15 +24,15 @@ import { pageIcons, resolveGalleryList } from '../../../data/images';
     widths={cardImageWidths()}
     class="w-full max-w-[24rem] rounded-md"
   />
-  <p class="hand-text">★<em><strong>Archive</strong></em>★</p>
+  <h2>★ Archive ★</h2>
   <Gallery
     aspect="portrait"
     images={resolveGalleryList([
-      'gallery03/b38bdd4c.jpg',
-      'gallery03/895354f2.jpg',
-      'gallery03/68509e48.jpg',
-      'gallery03/33482412.jpg',
-      'gallery03/e17c546b.jpg',
+      "gallery03/b38bdd4c.jpg",
+      "gallery03/895354f2.jpg",
+      "gallery03/68509e48.jpg",
+      "gallery03/33482412.jpg",
+      "gallery03/e17c546b.jpg",
     ])}
   />
 </ContentPage>

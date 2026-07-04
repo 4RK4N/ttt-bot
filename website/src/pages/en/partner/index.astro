@@ -1,10 +1,19 @@
 ---
-import ContentPage from '../../../components/ContentPage.astro';
-import ContentImage from '../../../components/ContentImage.astro';
-import Gallery from '../../../components/Gallery.astro';
-import DiscordButton from '../../../components/DiscordButton.astro';
-import { PARTNER_LOGO_PX, PARTNER_REM, remScaledSizes, remScaledWidths } from '../../../data/layout';
-import { pageIcons, resolveGallery, resolveGalleryList } from '../../../data/images';
+import ContentPage from "../../../components/ContentPage.astro";
+import ContentImage from "../../../components/ContentImage.astro";
+import Gallery from "../../../components/Gallery.astro";
+import DiscordButton from "../../../components/DiscordButton.astro";
+import {
+  PARTNER_LOGO_PX,
+  PARTNER_REM,
+  remScaledSizes,
+  remScaledWidths,
+} from "../../../data/layout";
+import {
+  pageIcons,
+  resolveGallery,
+  resolveGalleryList,
+} from "../../../data/images";
 ---
 
 <ContentPage
@@ -16,38 +25,48 @@ import { pageIcons, resolveGallery, resolveGalleryList } from '../../../data/ima
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
-      <em><strong>Beyond our walls, there are places<br /> that are connected to
-      us.</strong></em>
+      <em
+        ><strong
+          >Beyond our walls, there are places<br /> that are connected to us.</strong
+        ></em
+      >
     </p>
     <p>
-      <em><strong>Friends, houses, and communities<br /> with whom we share
-      stories.</strong></em>
+      <em
+        ><strong
+          >Friends, houses, and communities<br /> with whom we share stories.</strong
+        ></em
+      >
     </p>
     <p><em><strong>Together, we create a greater world.</strong></em></p>
   </div>
   <ContentImage
-    src={resolveGallery('gallery20/0d103a87.png')}
+    src={resolveGallery("gallery20/0d103a87.png")}
     width={PARTNER_LOGO_PX}
     sizes={remScaledSizes(PARTNER_REM)}
     widths={remScaledWidths(PARTNER_REM)}
     class="w-48 max-w-full"
   />
-  <p class="hand-text"><u><em><strong>MO'BATH LOFT</strong></em></u></p>
+  <h2>MO'BATH LOFT</h2>
   <p class="hand-text">
-    <em><strong>MO'BATH LOFT is a relaxing bathhouse venue welcoming guests of all races and
-    genders. Enjoy hot baths, friendly conversations, mini-games, and scenic views in a cozy
-    and inclusive atmosphere.<br />
-    The bathhouse is open Friday and Sunday, but you always can visit outside of working hours
-    and hang out there .</strong></em>
+    <em
+      ><strong
+        >MO'BATH LOFT is a relaxing bathhouse venue welcoming guests of all
+        races and genders. Enjoy hot baths, friendly conversations, mini-games,
+        and scenic views in a cozy and inclusive atmosphere.<br />
+        The bathhouse is open Friday and Sunday, but you always can visit outside
+        of working hours and hang out there .</strong
+      ></em
+    >
   </p>
-  <p class="hand-text"><u><em><strong>Chaos, Cerberus, Goblet, W28, P4</strong></em></u></p>
+  <h3>Chaos, Cerberus, Goblet, W28, P4</h3>
   <DiscordButton href="https://discord.gg/y7CUTNfVB9" />
-  <p class="hand-text"><em><strong>♫ Music band ♫</strong></em></p>
+  <h2>♫ Music band ♫</h2>
   <Gallery
     aspect="landscape"
     images={resolveGalleryList([
-      'gallery15/29745391.png',
-      'gallery15/e17de711.png',
+      "gallery15/29745391.png",
+      "gallery15/e17de711.png",
     ])}
   />
 </ContentPage>
