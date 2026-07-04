@@ -2,7 +2,12 @@
 import '../styles/global.css';
 import { Font, Image, getImage } from 'astro:assets';
 import { siteName, siteDescription, navItems, homePath, pathMap, type Lang } from '../data/nav';
-import { HEADER_LOGO_HEIGHT_PX, HEADER_LOGO_WIDTH_PX } from '../data/layout';
+import {
+  headerLogoDisplayHeight,
+  headerLogoDisplayPx,
+  headerLogoSizes,
+  headerLogoWidths,
+} from '../data/layout';
 import { logo, bg } from '../data/images';
 
 interface Props {
@@ -14,8 +19,8 @@ interface Props {
   description?: string;
   /** Home page: hero image is LCP; defer logo fetch priority and preload hero font. */
   heroLcp?: boolean;
-  /** Preload URL for the home hero image (webp). */
-  lcpPreload?: string;
+  /** Preload URL for the home hero image (webp), or responsive srcset for content icons. */
+  lcpPreload?: string | { srcset: string; sizes: string };
 }
 
 const { title, lang, path, description, heroLcp, lcpPreload } = Astro.props;
@@ -58,8 +63,17 @@ const isActive = (itemPath: string) => itemPath === path;
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
-    {lcpPreload && (
+    {lcpPreload && typeof lcpPreload === 'string' && (
       <link rel="preload" as="image" href={lcpPreload} fetchpriority="high" />
+    )}
+    {lcpPreload && typeof lcpPreload === 'object' && (
+      <link
+        rel="preload"
+        as="image"
+        imagesrcset={lcpPreload.srcset}
+        imagesizes={lcpPreload.sizes}
+        fetchpriority="high"
+      />
     )}
     <Font cssVariable="--font-averia-face" preload />
     <Font cssVariable="--font-gochi-face" />
@@ -74,10 +88,10 @@ const isActive = (itemPath: string) => itemPath === path;
         <Image
           src={logo}
           alt={siteName}
-          width={HEADER_LOGO_WIDTH_PX}
-          height={HEADER_LOGO_HEIGHT_PX}
-          widths={[HEADER_LOGO_WIDTH_PX, HEADER_LOGO_WIDTH_PX * 2]}
-          sizes={`${HEADER_LOGO_WIDTH_PX}px`}
+          width={headerLogoDisplayPx()}
+          height={headerLogoDisplayHeight()}
+          widths={headerLogoWidths()}
+          sizes={headerLogoSizes()}
           loading="eager"
           fetchpriority={heroLcp || lcpPreload ? undefined : 'high'}
           class="block h-full w-auto"

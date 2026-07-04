@@ -2,7 +2,12 @@
 import type { ImageMetadata } from 'astro';
 import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { ICON_LAYOUT_PX } from '../data/layout';
+import {
+  ICON_LAYOUT_PX,
+  ICON_REM,
+  remScaledSizes,
+  remScaledWidths,
+} from '../data/layout';
 import type { Lang } from '../data/nav';
 
 interface Props {
@@ -15,8 +20,19 @@ interface Props {
 
 const { title, lang, path, heading, icon } = Astro.props;
 
+const iconSizes = remScaledSizes(ICON_REM);
+const iconWidths = icon ? remScaledWidths(ICON_REM) : [];
 const lcpPreload = icon
-  ? (await getImage({ src: icon, width: ICON_LAYOUT_PX * 2, format: 'webp' })).src
+  ? {
+      srcset: (
+        await Promise.all(
+          iconWidths.map((w) => getImage({ src: icon, width: w, format: 'webp' })),
+        )
+      )
+        .map((img, i) => `${img.src} ${iconWidths[i]}w`)
+        .join(', '),
+      sizes: iconSizes,
+    }
   : undefined;
 ---
 
@@ -29,8 +45,8 @@ const lcpPreload = icon
         alt=""
         width={ICON_LAYOUT_PX}
         height={ICON_LAYOUT_PX}
-        densities={[1, 2]}
-        sizes={`${ICON_LAYOUT_PX}px`}
+        widths={iconWidths}
+        sizes={iconSizes}
         loading="eager"
         fetchpriority="high"
         class="w-56 max-w-full"

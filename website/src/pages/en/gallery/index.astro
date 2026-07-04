@@ -2,7 +2,7 @@
 import ContentPage from '../../../components/ContentPage.astro';
 import ContentImage from '../../../components/ContentImage.astro';
 import Gallery from '../../../components/Gallery.astro';
-import { CONTENT_COLUMN_PX } from '../../../data/layout';
+import { CONTENT_COLUMN_SIZES, CONTENT_COLUMN_PX, contentColumnWidths } from '../../../data/layout';
 import { pageIcons, resolveGalleryList } from '../../../data/images';
 ---
 
@@ -23,7 +23,8 @@ import { pageIcons, resolveGalleryList } from '../../../data/images';
   <ContentImage
     src={pageIcons.image20}
     width={CONTENT_COLUMN_PX}
-    sizes={`${CONTENT_COLUMN_PX}px`}
+    sizes={CONTENT_COLUMN_SIZES}
+    widths={contentColumnWidths()}
     class="w-full rounded-md"
   />
   <Gallery

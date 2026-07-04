@@ -2,10 +2,12 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import {
-  CONTENT_COLUMN_PX,
   LANDSCAPE_CELL_PX,
+  LANDSCAPE_GALLERY_SIZES,
   PORTRAIT_CELL_LG_PX,
-  PORTRAIT_CELL_MD_PX,
+  PORTRAIT_GALLERY_SIZES,
+  landscapeGalleryWidths,
+  portraitGalleryWidths,
 } from '../data/layout';
 
 interface Props {
@@ -30,19 +32,10 @@ const colsClass = cols
     : 'grid-cols-1 sm:grid-cols-2';
 
 const imageSizes =
-  aspect === 'portrait'
-    ? `(max-width: 640px) 45vw, (max-width: 1024px) ${PORTRAIT_CELL_MD_PX}px, ${PORTRAIT_CELL_LG_PX}px`
-    : `(max-width: 640px) calc(100vw - 3rem), ${LANDSCAPE_CELL_PX}px`;
+  aspect === 'portrait' ? PORTRAIT_GALLERY_SIZES : LANDSCAPE_GALLERY_SIZES;
 
 const imageWidths =
-  aspect === 'portrait'
-    ? [
-        PORTRAIT_CELL_LG_PX,
-        PORTRAIT_CELL_LG_PX * 2,
-        PORTRAIT_CELL_MD_PX,
-        PORTRAIT_CELL_MD_PX * 2,
-      ]
-    : [LANDSCAPE_CELL_PX, LANDSCAPE_CELL_PX * 2, CONTENT_COLUMN_PX, CONTENT_COLUMN_PX * 2];
+  aspect === 'portrait' ? portraitGalleryWidths() : landscapeGalleryWidths();
 
 const imageWidth =
   aspect === 'portrait' || aspect === 'square' ? PORTRAIT_CELL_LG_PX : LANDSCAPE_CELL_PX;

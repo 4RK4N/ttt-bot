@@ -6,18 +6,19 @@ interface Props {
   src: ImageMetadata;
   width: number;
   sizes: string;
+  widths?: number[];
   class?: string;
   loading?: 'lazy' | 'eager';
 }
 
-const { src, width, sizes, class: className, loading = 'lazy' } = Astro.props;
+const { src, width, sizes, widths, class: className, loading = 'lazy' } = Astro.props;
 ---
 
 <Image
   src={src}
   alt=""
   width={width}
-  densities={[1, 2]}
+  {...widths ? { widths } : { densities: [1, 2] }}
   sizes={sizes}
   loading={loading}
   class={className}

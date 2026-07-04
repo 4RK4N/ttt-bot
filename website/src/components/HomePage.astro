@@ -3,7 +3,12 @@ import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Timer from './Timer.astro';
 import DiscordButton from './DiscordButton.astro';
-import { HERO_CIRCLE_PX } from '../data/layout';
+import {
+  HERO_CIRCLE_PX,
+  HERO_REM,
+  remScaledSizes,
+  remScaledWidths,
+} from '../data/layout';
 import type { Lang } from '../data/nav';
 import { homeCircle } from '../data/images';
 
@@ -17,10 +22,21 @@ interface Props {
 const { title, lang, path, tagline } = Astro.props;
 
 const EVENT_TIMESTAMP = 1783188000;
-const lcpSrc = (await getImage({ src: homeCircle, width: HERO_CIRCLE_PX * 2, format: 'webp' })).src;
+const heroSizes = remScaledSizes(HERO_REM);
+const heroWidths = remScaledWidths(HERO_REM);
+const lcpPreload = {
+  srcset: (
+    await Promise.all(
+      heroWidths.map((w) => getImage({ src: homeCircle, width: w, format: 'webp' })),
+    )
+  )
+    .map((img, i) => `${img.src} ${heroWidths[i]}w`)
+    .join(', '),
+  sizes: heroSizes,
+};
 ---
 
-<Base title={title} lang={lang} path={path} heroLcp lcpPreload={lcpSrc}>
+<Base title={title} lang={lang} path={path} heroLcp lcpPreload={lcpPreload}>
   <section
     class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14"
   >
@@ -29,8 +45,8 @@ const lcpSrc = (await getImage({ src: homeCircle, width: HERO_CIRCLE_PX * 2, for
       alt=""
       width={HERO_CIRCLE_PX}
       height={HERO_CIRCLE_PX}
-      densities={[1, 2]}
-      sizes={`${HERO_CIRCLE_PX}px`}
+      widths={heroWidths}
+      sizes={heroSizes}
       loading="eager"
       fetchpriority="high"
       class="w-72 max-w-full"
