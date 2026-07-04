@@ -56,7 +56,7 @@ export function EditorLayout({
               </div>
             </div>
           </header>
-          <div class="page-wrapper flex-fill">{children}</div>
+          <div class="page-wrapper">{children}</div>
         </div>
         <HtmxScripts />
       </body>

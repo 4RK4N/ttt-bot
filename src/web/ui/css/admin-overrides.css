@@ -8,6 +8,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 .page>header.navbar {
@@ -86,6 +88,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 0 !important;
+  background-color: var(--tblr-navbar-bg, var(--tblr-bg-surface));
   box-shadow: inset calc(-1 * var(--tblr-navbar-border-width, 1px)) 0 0 0 var(--tblr-navbar-border-color, var(--tblr-border-color)) !important;
 }
 
@@ -129,12 +132,12 @@
   margin-right: 0;
 }
 
-/* Shell: sidebar + content side by side */
+/* Shell: sidebar + content side by side — wrapper must grow with page-body or sticky breaks */
 .page-wrapper {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   min-height: calc(100vh - var(--editor-header-height));
 }
 
@@ -146,7 +149,7 @@
   width: 100%;
   min-width: 0;
   min-height: calc(100vh - var(--editor-header-height));
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .page-body {
