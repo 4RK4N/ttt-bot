@@ -1,9 +1,11 @@
+# syntax=docker/dockerfile:1
 FROM node:24-alpine AS builder
 WORKDIR /site
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN --mount=type=cache,target=/site/.astro-cache \
+    npm run build
 
 FROM nginx:alpine
 COPY --from=builder /site/dist /usr/share/nginx/html

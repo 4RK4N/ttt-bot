@@ -34,6 +34,7 @@ const legacyDeHtml = {
 
 export default defineConfig({
   site,
+  cacheDir: './.astro-cache',
   build: { format: 'preserve' },
   prefetch: {
     defaultStrategy: 'hover',
