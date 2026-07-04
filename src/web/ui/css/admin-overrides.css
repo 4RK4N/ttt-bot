@@ -51,7 +51,9 @@
   background: var(--tblr-secondary);
 }
 
-.navbar-vertical {
+/* Sidebar: override Tabler navbar-expand-lg row/center layout */
+.navbar-vertical,
+.navbar-vertical.navbar-expand-lg {
   width: 15rem;
   min-width: 15rem;
   max-width: 15rem;
@@ -62,17 +64,20 @@
   justify-content: flex-start !important;
 }
 
-.navbar-vertical .container-fluid {
-  flex: 1 1 auto;
+.navbar-vertical .container-fluid,
+.navbar-vertical.navbar-expand-lg .container-fluid {
+  flex: 0 0 auto;
   flex-direction: column !important;
   align-items: stretch !important;
   justify-content: flex-start !important;
   width: 100%;
-  height: auto;
+  height: auto !important;
+  min-height: 0;
 }
 
 .navbar-vertical .navbar-nav {
   width: 100%;
+  flex-direction: column;
 }
 
 .navbar-vertical .nav-link {
@@ -86,10 +91,23 @@
   margin-right: 0;
 }
 
+/* Shell: sidebar + content side by side */
 .page-wrapper {
   display: flex;
-  flex-direction: row;
   flex: 1;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 0;
+}
+
+/* Legacy wrapper from older EditorBody markup */
+.page-wrapper>.d-flex {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   align-items: stretch;
 }
 
@@ -99,11 +117,14 @@
 }
 
 @media (max-width: 720px) {
-  .page-wrapper {
+
+  .page-wrapper,
+  .page-wrapper>.d-flex {
     flex-direction: column;
   }
 
-  .navbar-vertical {
+  .navbar-vertical,
+  .navbar-vertical.navbar-expand-lg {
     width: 100%;
     min-width: 0;
     max-width: none;
