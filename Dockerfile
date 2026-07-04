@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1
-# Stage 1: compile TypeScript
 FROM node:24-alpine AS builder
 WORKDIR /app
 
@@ -15,8 +14,7 @@ RUN test -f dist/src/web/ui/css/tabler.min.css
 RUN test -f dist/src/web/ui/js/htmx.min.js
 RUN npm prune --omit=dev
 
-# Stage 2: runtime
-FROM node:24-alpine
+FROM node:24-alpine AS runtime-base
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -27,4 +25,10 @@ COPY --from=builder /app/dist ./dist
 COPY data ./data
 
 USER node
+
+FROM runtime-base AS ttt-web-editor
+CMD ["node", "dist/src/web/server.js"]
+
+# Default target for plain `docker build` (bot last).
+FROM runtime-base AS ttt-discord-bot
 CMD ["node", "dist/src/index.js"]

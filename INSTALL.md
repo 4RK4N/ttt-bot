@@ -305,7 +305,8 @@ chmod +x scripts/build.sh   # once, on Linux/macOS
 
 This builds:
 
-- **`ttt-discord-bot:1.0.0`** — multi-stage Node 24: compile TypeScript (`npm run build` → `dist/`), runtime image with production dependencies only. Also used by `ttt-web-editor`.
+- **`ttt-discord-bot:1.0.0`** — multi-stage Node 24: compile TypeScript (`npm run build` → `dist/`), runtime image with production dependencies only.
+- **`ttt-web-editor:1.0.0`** — same compile step, separate runtime image (`node dist/src/web/server.js`). Shares the builder stage with the bot in one compose build.
 - **`ttt-website:1.0.0`** — multi-stage: Astro static site (`website/`), served by nginx on port **8089** inside the container.
 
 Then recreates all running containers (`docker compose up -d --force-recreate`).
@@ -433,6 +434,7 @@ and redirects plain HTTP to HTTPS — no SSL config in nginx required.
 | Restart the bot                | `docker compose restart ttt-discord-bot` |
 | Rebuild after code changes     | `./scripts/build.sh` |
 | Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
+| Rebuild web editor after edits | `docker compose build --no-cache ttt-web-editor && docker compose up -d --force-recreate ttt-web-editor` |
 | Rebuild website after edits    | `docker compose build --no-cache ttt-website && docker compose up -d --force-recreate ttt-website` |
 
 ### Updating to new code
@@ -451,8 +453,11 @@ docker compose run --rm ttt-discord-bot npm run deploy
 If you prefer not to use Compose:
 
 ```bash
-# Build
+# Build (bot is the default Dockerfile target)
 docker build -t ttt-discord-bot .
+
+# Web editor (optional separate image)
+docker build --target ttt-web-editor -t ttt-web-editor .
 
 # Register commands (one-off). The -v mount provides data/config.json.
 docker run --rm -v "$(pwd)/data:/app/data" ttt-discord-bot npm run deploy

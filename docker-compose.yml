@@ -9,6 +9,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: ttt-discord-bot
       ulimits:
         nproc: 65535
 
@@ -27,10 +28,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: ttt-web-editor
       ulimits:
         nproc: 65535
 
-    image: ttt-discord-bot:1.0.0
+    image: ttt-web-editor:1.0.0
 
     pull_policy: build
 
@@ -38,8 +40,6 @@ services:
 
     depends_on:
       - ttt-discord-bot
-
-    command: ["node", "dist/src/web/server.js"]
 
     volumes:
       - ./data:/app/data
