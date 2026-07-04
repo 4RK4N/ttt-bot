@@ -86,7 +86,7 @@ With Docker: `docker compose up -d --build` starts bot + editor. See [INSTALL.md
 
 ## Setup
 
-1. Node.js 18+
+1. Node.js 24+
 2. `npm install`
 3. [Developer Portal](https://discord.com/developers/applications): bot token + client ID; invite with Administrator (see [INSTALL.md](INSTALL.md))
 4. `cp data/config.example.json data/config.json` — fill `discordToken`, `clientId`
