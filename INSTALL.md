@@ -380,13 +380,6 @@ After **website** source changes, rebuild and restart the website service:
 docker compose up -d --build ttt-website
 ```
 
-If the browser still shows old styling after a rebuild, hard-refresh once (HTML was
-previously cacheable; nginx now sends `no-cache` on pages). Use `--no-cache` only if
-a normal rebuild still looks wrong.
-
-The website Dockerfile persists Astro’s asset cache (`.cache/astro`) via a BuildKit
-cache mount; Vite’s cache (`.cache/vite`) is not mounted, so CSS rebuilds stay correct.
-
 For local preview, run the dev server in `website/` (`npm install` once, then `npm run dev`).
 
 ### How traffic reaches the site (nginx + Caddy + SSL)
