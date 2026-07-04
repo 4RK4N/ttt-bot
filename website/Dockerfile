@@ -2,11 +2,14 @@
 FROM node:24-alpine AS builder
 WORKDIR /site
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 COPY astro.config.mjs tsconfig.json ./
 COPY public ./public
 COPY src ./src
-RUN sh -c "ulimit -c 0 && npm run build"
+# Astro asset cache (images, fonts). Vite cache (.cache/vite) stays ephemeral per build.
+RUN --mount=type=cache,target=/site/.cache/astro,id=ttt-website-astro-assets \
+    npm run build
 
 FROM nginx:alpine
 COPY --from=builder /site/dist /usr/share/nginx/html

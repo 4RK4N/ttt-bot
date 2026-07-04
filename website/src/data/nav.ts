@@ -45,6 +45,18 @@ export const homePath: Record<Lang, string> = {
   en: '/',
 };
 
+/** Footer legal links per language. */
+export const footerLinks: Record<Lang, NavItem[]> = {
+  de: [
+    { label: 'Impressum', path: '/de/impressum/' },
+    { label: 'Datenschutz', path: '/de/datenschutz/' },
+  ],
+  en: [
+    { label: 'Imprint', path: '/en/imprint/' },
+    { label: 'Privacy Policy', path: '/en/privacy/' },
+  ],
+};
+
 /** Maps each page path to its counterpart in both languages (language switcher). */
 export const pathMap: Record<string, Record<Lang, string>> = {
   '/': { de: '/de.html', en: '/' },
@@ -65,4 +77,8 @@ export const pathMap: Record<string, Record<Lang, string>> = {
   '/en/gallery/': { de: '/de/galerie/', en: '/en/gallery/' },
   '/de/gaestebuch/': { de: '/de/gaestebuch/', en: '/en/guestbook/' },
   '/en/guestbook/': { de: '/de/gaestebuch/', en: '/en/guestbook/' },
+  '/de/impressum/': { de: '/de/impressum/', en: '/en/imprint/' },
+  '/en/imprint/': { de: '/de/impressum/', en: '/en/imprint/' },
+  '/de/datenschutz/': { de: '/de/datenschutz/', en: '/en/privacy/' },
+  '/en/privacy/': { de: '/de/datenschutz/', en: '/en/privacy/' },
 };

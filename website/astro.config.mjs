@@ -53,6 +53,8 @@ const legacyDeHtml = {
 export default defineConfig({
   site,
   build: { format: 'preserve' },
+  /** Astro build cache (images, fonts). Vite uses `.cache/vite` — see vite.cacheDir. */
+  cacheDir: '.cache/astro',
   redirects: legacyRedirects,
   prefetch: {
     defaultStrategy: 'hover',
@@ -109,5 +111,6 @@ export default defineConfig({
     resolve: {
       tsconfigPaths: true,
     },
+    cacheDir: '.cache/vite',
   },
 });

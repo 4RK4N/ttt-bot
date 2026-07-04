@@ -5,6 +5,7 @@ import {
   siteName,
   siteDescription,
   navItems,
+  footerLinks,
   homePath,
   pathMap,
   type Lang,
@@ -36,6 +37,7 @@ const metaDescription = description ?? siteDescription[lang];
 const shareImage = "https://ttt-ffxiv.eu/assets/images/share.jpg";
 
 const nav = navItems[lang];
+const legal = footerLinks[lang];
 const alt = pathMap[path] ?? { de: "/de.html", en: "/" };
 const canonical =
   "https://ttt-ffxiv.eu" + (path === "/" ? "" : path.replace(/\/$/, ""));
@@ -187,6 +189,28 @@ const isActive = (itemPath: string) => itemPath === path;
     <main>
       <slot />
     </main>
+
+    <footer
+      class="border-t border-bar-border px-4 py-4 text-center font-averia text-[13px] text-bar-text/70"
+    >
+      <nav aria-label={lang === "de" ? "Rechtliches" : "Legal"}>
+        <a
+          href={legal[0].path}
+          data-astro-prefetch
+          class="transition-colors hover:text-bar-accent"
+        >
+          {legal[0].label}
+        </a>
+        <span aria-hidden="true" class="px-1.5 text-bar-text/40">·</span>
+        <a
+          href={legal[1].path}
+          data-astro-prefetch
+          class="transition-colors hover:text-bar-accent"
+        >
+          {legal[1].label}
+        </a>
+      </nav>
+    </footer>
 
     <script>
       const toggle = document.getElementById("menu-toggle")!;
