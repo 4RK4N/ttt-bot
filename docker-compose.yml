@@ -52,6 +52,8 @@ services:
     build:
       context: ./website
       dockerfile: Dockerfile
+      additional_contexts:
+        astro-cache: ./website/.astro-cache
       ulimits:
         nproc: 65535
 
