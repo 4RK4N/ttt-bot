@@ -17,6 +17,7 @@
   --color-subtitle: rgb(235 152 152 / 0.71);
   --color-page-heading-bottom: #fc0000;
   --color-page-heading-top: #ff5cbe;
+  --color-highlight: #fc0000;
 }
 
 @layer base {
@@ -90,6 +91,14 @@
     @apply max-w-[45rem];
   }
 
+  .content-section--center-body .hand-text {
+    text-align: center;
+  }
+
+  .content-section--center-body h3 {
+    text-align: center;
+  }
+
   /* Page title (h1) — layered mask gradient; flex-shrink:0 prevents tail clipping */
   .page-heading {
     flex-shrink: 0;
@@ -155,6 +164,10 @@
 
   .hand-text--home {
     text-align: center;
+  }
+
+  .highlight {
+    color: var(--color-highlight);
   }
 
   .subtitle-text {

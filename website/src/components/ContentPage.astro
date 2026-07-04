@@ -1,14 +1,5 @@
 ---
-import type { ImageMetadata } from "astro";
-import { Image } from "astro:assets";
 import Base from "../layouts/Base.astro";
-import {
-  ICON_LAYOUT_PX,
-  ICON_REM,
-  remScaledSizes,
-  remScaledWidths,
-} from "../data/layout";
-import { buildResponsivePreload } from "../data/preload";
 import type { Lang } from "../data/nav";
 
 interface Props {
@@ -16,40 +7,33 @@ interface Props {
   lang: Lang;
   path: string;
   heading: string;
-  icon?: ImageMetadata;
   /** Rules pages use the wider column (45rem); default is 36rem. */
   wide?: boolean;
+  /** Long-form pages (about, rules) keep left-aligned body text. */
+  centerBody?: boolean;
 }
 
-const { title, lang, path, heading, icon, wide = false } = Astro.props;
-
-const iconSizes = remScaledSizes(ICON_REM);
-const iconWidths = icon ? remScaledWidths(ICON_REM) : [];
-const lcpPreload = icon
-  ? await buildResponsivePreload(icon, iconWidths, iconSizes)
-  : undefined;
+const {
+  title,
+  lang,
+  path,
+  heading,
+  wide = false,
+  centerBody = true,
+} = Astro.props;
 ---
 
-<Base title={title} lang={lang} path={path} lcpPreload={lcpPreload}>
-  <section class:list={["content-section", wide && "content-section--wide"]}>
+<Base title={title} lang={lang} path={path}>
+  <section
+    class:list={[
+      "content-section",
+      wide && "content-section--wide",
+      centerBody && "content-section--center-body",
+    ]}
+  >
     <h1 class="page-heading">
       <span class="page-heading__text" data-text={heading}>{heading}</span>
     </h1>
-    {
-      icon && (
-        <Image
-          src={icon}
-          alt=""
-          width={ICON_LAYOUT_PX}
-          height={ICON_LAYOUT_PX}
-          widths={iconWidths}
-          sizes={iconSizes}
-          loading="eager"
-          fetchpriority="high"
-          class="w-56 max-w-full"
-        />
-      )
-    }
     <slot />
   </section>
 </Base>

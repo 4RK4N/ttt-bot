@@ -1,6 +1,5 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
-import { pageIcons } from "../../../data/images";
 ---
 
 <ContentPage
@@ -8,8 +7,8 @@ import { pageIcons } from "../../../data/images";
   lang="en"
   path="/en/rules/"
   heading="Rules"
-  icon={pageIcons.image13}
   wide
+  centerBody={false}
 >
   <div class="hand-text flex flex-col gap-6">
     <h2>Venue &amp; Server Rules</h2>
@@ -33,7 +32,7 @@ import { pageIcons } from "../../../data/images";
       No advertisements unless approved by staff.<br />
       No illegal, harmful, or disruptive content.<br />
       Respect privacy - no doxxing or sharing personal information.<br />
-      <strong
+      <strong class="highlight"
         >The usage and advertisement of Loporrit Sync is strongly discouraged!
         As adult Lalafell you have nothing to worry on Lightless!</strong
       >
@@ -42,7 +41,7 @@ import { pageIcons } from "../../../data/images";
     <p>
       This is an 18+ venue!<br />
       Entry is only allowed if both real age and roleplay age are 18+.<br />
-      <strong
+      <strong class="highlight"
         >The Kitten Body, any variation of it using C+, as well as any depiction
         of an underage character will be immediately banned and reported to
         Lightless!</strong

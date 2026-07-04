@@ -1,9 +1,9 @@
 ---
-import ContentPage from '../../../components/ContentPage.astro';
-import Gallery from '../../../components/Gallery.astro';
-import DiscordButton from '../../../components/DiscordButton.astro';
-import { pageIcons, resolveGalleryList } from '../../../data/images';
-import { DISCORD_TTT } from '../../../data/site';
+import ContentPage from "../../../components/ContentPage.astro";
+import Gallery from "../../../components/Gallery.astro";
+import DiscordButton from "../../../components/DiscordButton.astro";
+import { pageIcons, resolveGalleryList } from "../../../data/images";
+import { DISCORD_TTT } from "../../../data/site";
 ---
 
 <ContentPage
@@ -11,16 +11,20 @@ import { DISCORD_TTT } from '../../../data/site';
   lang="en"
   path="/en/join/"
   heading="Join Us"
-  icon={pageIcons.image18}
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
-      <strong>Perhaps you are more than just a guest…<br /> If you carry music in your
-      heart,<br /> wish to bring joy to others,<br /> or want to become part of something
-      greater</strong>
+      <strong
+        >Perhaps you are more than just a guest…<br /> If you carry music in your
+        heart,<br /> wish to bring joy to others,<br /> or want to become part of
+        something greater</strong
+      >
     </p>
     <p>
-      <em><strong>Then we invite you<br /> to become part of our story.</strong></em>
+      <em
+        ><strong>Then we invite you<br /> to become part of our story.</strong
+        ></em
+      >
     </p>
   </div>
   <Gallery
@@ -28,8 +32,8 @@ import { DISCORD_TTT } from '../../../data/site';
     cols={2}
     class="mx-auto max-w-[24rem]"
     images={resolveGalleryList([
-      'gallery17/88d650d3.jpg',
-      'gallery17/7a80e7c4.jpg',
+      "gallery17/88d650d3.jpg",
+      "gallery17/7a80e7c4.jpg",
     ])}
   />
   <DiscordButton href={DISCORD_TTT} />

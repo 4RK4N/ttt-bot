@@ -15,10 +15,6 @@ export const NARROW_CONTENT_BP_PX = 720;
 /** Inner content width: max-w-[36rem] section minus px-6 (1.5rem × 2). */
 export const CONTENT_COLUMN_PX = 33 * ROOT_FONT_PX;
 
-/** w-56 = 14rem — ContentPage icon */
-export const ICON_REM = 14;
-export const ICON_LAYOUT_PX = ICON_REM * ROOT_FONT_PX;
-
 /** w-72 = 18rem — home hero circle */
 export const HERO_REM = 18;
 export const HERO_CIRCLE_PX = HERO_REM * ROOT_FONT_PX;

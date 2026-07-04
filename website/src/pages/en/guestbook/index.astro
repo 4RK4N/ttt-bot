@@ -1,7 +1,7 @@
 ---
-import ContentPage from '../../../components/ContentPage.astro';
-import Gallery from '../../../components/Gallery.astro';
-import { pageIcons, resolveGalleryList } from '../../../data/images';
+import ContentPage from "../../../components/ContentPage.astro";
+import Gallery from "../../../components/Gallery.astro";
+import { pageIcons, resolveGalleryList } from "../../../data/images";
 ---
 
 <ContentPage
@@ -9,23 +9,26 @@ import { pageIcons, resolveGalleryList } from '../../../data/images';
   lang="en"
   path="/en/guestbook/"
   heading="Guestbook"
-  icon={pageIcons.image21}
 >
   <p class="hand-text">
-    <em><strong>They say words can remain…<br /> Leave a piece of yourself,<br /> a few
-    thoughts or memories<br /> so your journey here never truly fades.</strong></em>
+    <em
+      ><strong
+        >They say words can remain…<br /> Leave a piece of yourself,<br /> a few thoughts
+        or memories<br /> so your journey here never truly fades.</strong
+      ></em
+    >
   </p>
   <Gallery
     aspect="landscape"
     images={resolveGalleryList([
-      'gallery08/b04b2349.jpg',
-      'gallery08/fb0b75e8.jpg',
-      'gallery08/228b4f2a.jpg',
-      'gallery08/ca8d23e8.jpg',
-      'gallery08/ab7b15ef.jpg',
-      'gallery08/4422e621.jpg',
-      'gallery08/ca8cef1a.jpg',
-      'gallery08/895a9878.jpg',
+      "gallery08/b04b2349.jpg",
+      "gallery08/fb0b75e8.jpg",
+      "gallery08/228b4f2a.jpg",
+      "gallery08/ca8d23e8.jpg",
+      "gallery08/ab7b15ef.jpg",
+      "gallery08/4422e621.jpg",
+      "gallery08/ca8cef1a.jpg",
+      "gallery08/895a9878.jpg",
     ])}
   />
 </ContentPage>
