@@ -1,6 +1,7 @@
 ---
 import ContentPage from '../../../components/ContentPage.astro';
 import Gallery from '../../../components/Gallery.astro';
+import { pageIcons, resolveGalleryList } from '../../../data/images';
 ---
 
 <ContentPage
@@ -8,7 +9,7 @@ import Gallery from '../../../components/Gallery.astro';
   lang="de"
   path="/de/staff/"
   heading="Staff"
-  icon="/assets/images/image07.png"
+  icon={pageIcons.image07}
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
@@ -26,12 +27,12 @@ import Gallery from '../../../components/Gallery.astro';
   </div>
   <Gallery
     aspect="portrait"
-    images={[
-      '/assets/images/gallery06/cdd1f6f1.jpg',
-      '/assets/images/gallery06/c52619d5.jpg',
-      '/assets/images/gallery06/e5fc5b6d.jpg',
-      '/assets/images/gallery06/e8ddd9ff.jpg',
-      '/assets/images/gallery06/c3bfe344.jpg',
-    ]}
+    images={resolveGalleryList([
+      'gallery06/cdd1f6f1.jpg',
+      'gallery06/c52619d5.jpg',
+      'gallery06/e5fc5b6d.jpg',
+      'gallery06/e8ddd9ff.jpg',
+      'gallery06/c3bfe344.jpg',
+    ])}
   />
 </ContentPage>

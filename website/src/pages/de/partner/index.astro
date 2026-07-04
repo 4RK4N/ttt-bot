@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import ContentPage from '../../../components/ContentPage.astro';
 import Gallery from '../../../components/Gallery.astro';
 import DiscordButton from '../../../components/DiscordButton.astro';
+import { pageIcons, resolveGallery, resolveGalleryList } from '../../../data/images';
 ---
 
 <ContentPage
@@ -9,7 +11,7 @@ import DiscordButton from '../../../components/DiscordButton.astro';
   lang="de"
   path="/de/partner/"
   heading="Partner"
-  icon="/assets/images/image03.png"
+  icon={pageIcons.image03}
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
@@ -22,9 +24,11 @@ import DiscordButton from '../../../components/DiscordButton.astro';
     </p>
     <p><em><strong>Gemeinsam erschaffen wir eine größere Welt.</strong></em></p>
   </div>
-  <img
-    src="/assets/images/gallery16/0d103a87.png"
+  <Image
+    src={resolveGallery('gallery16/0d103a87.png')}
     alt=""
+    widths={[192, 384]}
+    sizes="192px"
     loading="lazy"
     class="w-48 max-w-full"
   />
@@ -41,9 +45,9 @@ import DiscordButton from '../../../components/DiscordButton.astro';
   <p class="hand-text"><em><strong>♫ Musikband ♫</strong></em></p>
   <Gallery
     aspect="landscape"
-    images={[
-      '/assets/images/gallery02/29745391.png',
-      '/assets/images/gallery02/e17de711.png',
-    ]}
+    images={resolveGalleryList([
+      'gallery02/29745391.png',
+      'gallery02/e17de711.png',
+    ])}
   />
 </ContentPage>

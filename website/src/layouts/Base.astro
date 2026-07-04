@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
+import { Font, Image, getImage } from 'astro:assets';
 import { siteName, siteDescription, navItems, homePath, pathMap, type Lang } from '../data/nav';
+import { logo, bg } from '../data/images';
 
 interface Props {
   title: string;
@@ -18,27 +20,16 @@ const shareImage = 'https://ttt-ffxiv.eu/assets/images/share.jpg';
 
 const nav = navItems[lang];
 const alt = pathMap[path] ?? { de: '/de/', en: '/en/' };
-// Old export used canonicals without trailing slash ("/de/regeln"); keep that.
 const canonical =
   'https://ttt-ffxiv.eu' + (path === '/' ? '' : path.replace(/\/$/, ''));
 
-const fontsHref =
-  'https://fonts.googleapis.com/css2?display=swap' +
-  '&family=Caveat:ital,wght@0,700;1,700' +
-  '&family=Patua+One' +
-  '&family=Pacifico' +
-  '&family=Averia+Serif+Libre:ital,wght@0,400;0,700;1,400;1,700' +
-  '&family=Gloock' +
-  '&family=Rock+Salt' +
-  '&family=Send+Flowers' +
-  '&family=Oswald:wght@400;700' +
-  '&family=Gochi+Hand';
+const bgOptimized = await getImage({ src: bg, width: 1920, format: 'webp' });
 
 const isActive = (itemPath: string) => itemPath === path;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} style={`--page-bg-image: url(${bgOptimized.src})`}>
   <head>
     <title>{title}</title>
     <meta charset="utf-8" />
@@ -62,8 +53,9 @@ const isActive = (itemPath: string) => itemPath === path;
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={fontsHref} />
+    <Font cssVariable="--font-averia-face" preload />
+    <Font cssVariable="--font-gochi-face" />
+    <Font cssVariable="--font-caveat-face" />
   </head>
 
   <body class="pt-[68px]">
@@ -71,7 +63,15 @@ const isActive = (itemPath: string) => itemPath === path;
       class="fixed inset-x-0 top-0 z-50 flex h-[68px] items-center gap-4 border-b border-bar-border bg-bar-bg px-4 font-averia text-[15px] backdrop-blur-sm lg:px-6"
     >
       <a href={homePath[lang]} class="flex h-full shrink-0 items-center py-1.5">
-        <img src="/assets/custom/logo.png" alt={siteName} class="block h-full w-auto" />
+        <Image
+          src={logo}
+          alt={siteName}
+          height={56}
+          densities={[1, 2]}
+          loading="eager"
+          fetchpriority="high"
+          class="block h-full w-auto"
+        />
       </a>
 
       <nav class="hidden flex-1 md:block" aria-label={lang === 'de' ? 'Hauptmenü' : 'Main menu'}>
@@ -80,6 +80,7 @@ const isActive = (itemPath: string) => itemPath === path;
             <li>
               <a
                 href={item.path}
+                data-astro-prefetch
                 class:list={[
                   'whitespace-nowrap px-0.5 py-1 transition-colors hover:text-bar-accent',
                   isActive(item.path) ? 'text-bar-accent' : 'text-bar-text',
@@ -128,6 +129,7 @@ const isActive = (itemPath: string) => itemPath === path;
           <li class="border-b border-bar-border/50 last:border-b-0">
             <a
               href={item.path}
+              data-astro-prefetch
               class:list={[
                 'block px-1 py-2.5 transition-colors hover:text-bar-accent',
                 isActive(item.path) ? 'text-bar-accent' : 'text-bar-text',

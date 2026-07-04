@@ -13,18 +13,28 @@ const labels =
   lang === 'de'
     ? ['Tage', 'Stunden', 'Minuten', 'Sekunden']
     : ['Days', 'Hours', 'Minutes', 'Seconds'];
+
+const units = [86_400_000, 3_600_000, 60_000, 1000];
+const targetMs = timestamp * 1000;
+const now = Date.now();
+let remaining = Math.max(0, targetMs - now);
+const initialDigits = units.map((unit) => {
+  const value = Math.floor(remaining / unit);
+  remaining -= value * unit;
+  return String(value).padStart(2, '0');
+});
 ---
 
 <div
   id="event-timer"
   data-timestamp={timestamp}
-  class="flex w-full max-w-[36rem] items-stretch justify-center font-oswald"
+  class="flex w-full max-w-[36rem] items-stretch justify-center font-averia font-bold"
 >
   {labels.map((label, i) => (
     <>
       {i > 0 && <div class="mx-4 w-px self-stretch bg-white/40 sm:mx-8" />}
       <div class="flex flex-col items-center py-4">
-        <span data-digit class="text-[2.5em] leading-none text-[#FF9242]">0</span>
+        <span data-digit class="text-[2.5em] leading-none text-[#FF9242]">{initialDigits[i]}</span>
         <span class="mt-3 text-[0.625rem] uppercase tracking-[0.225rem] text-white">
           {label}
         </span>
@@ -48,6 +58,5 @@ const labels =
     });
   }
 
-  tick();
   setInterval(tick, 1000);
 </script>

@@ -1,4 +1,6 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import type { Lang } from '../data/nav';
 
@@ -7,8 +9,7 @@ interface Props {
   lang: Lang;
   path: string;
   heading: string;
-  /** Decorative icon shown under the heading (562x562 png from the old export). */
-  icon?: string;
+  icon?: ImageMetadata;
 }
 
 const { title, lang, path, heading, icon } = Astro.props;
@@ -17,7 +18,16 @@ const { title, lang, path, heading, icon } = Astro.props;
 <Base title={title} lang={lang} path={path}>
   <section class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14">
     <h2 class="page-heading">{heading}</h2>
-    {icon && <img src={icon} alt="" class="w-56 max-w-full" loading="lazy" />}
+    {icon && (
+      <Image
+        src={icon}
+        alt=""
+        widths={[224, 448]}
+        sizes="224px"
+        class="w-56 max-w-full"
+        loading="lazy"
+      />
+    )}
     <slot />
   </section>
 </Base>

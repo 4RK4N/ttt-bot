@@ -1,8 +1,10 @@
 ---
-import Base from "../layouts/Base.astro";
-import Timer from "./Timer.astro";
-import DiscordButton from "./DiscordButton.astro";
-import type { Lang } from "../data/nav";
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Timer from './Timer.astro';
+import DiscordButton from './DiscordButton.astro';
+import type { Lang } from '../data/nav';
+import { homeCircle } from '../data/images';
 
 interface Props {
   title: string;
@@ -13,7 +15,6 @@ interface Props {
 
 const { title, lang, path, tagline } = Astro.props;
 
-// Countdown target carried over from the old Carrd timer config.
 const EVENT_TIMESTAMP = 1783188000;
 ---
 
@@ -21,7 +22,13 @@ const EVENT_TIMESTAMP = 1783188000;
   <section
     class="mx-auto flex w-full max-w-[45rem] flex-col items-center gap-7 px-6 py-14"
   >
-    <img src="/assets/images/image22.png" alt="" class="w-72 max-w-full" />
+    <Image
+      src={homeCircle}
+      alt=""
+      widths={[288, 576]}
+      sizes="(max-width: 720px) 100vw, 288px"
+      class="w-72 max-w-full"
+    />
     <h1
       class="bg-gradient-to-b from-[#FF5CBE] to-[#FC0000] bg-clip-text font-caveat text-[3.625em] font-bold leading-[1.2] text-transparent"
     >

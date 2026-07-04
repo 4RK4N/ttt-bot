@@ -1,15 +1,9 @@
 @import "tailwindcss";
 
-@theme {
-  --font-caveat: "Caveat", cursive;
-  --font-patua: "Patua One", serif;
-  --font-averia: "Averia Serif Libre", serif;
-  --font-gochi: "Gochi Hand", cursive;
-  --font-gloock: "Gloock", serif;
-  --font-oswald: "Oswald", sans-serif;
-  --font-pacifico: "Pacifico", cursive;
-  --font-rock-salt: "Rock Salt", cursive;
-  --font-send-flowers: "Send Flowers", cursive;
+@theme inline {
+  --font-averia: var(--font-averia-face), serif;
+  --font-gochi: var(--font-gochi-face), cursive;
+  --font-caveat: var(--font-caveat-face), cursive;
 
   /* Topbar palette (carried over from the old custom topbar) */
   --color-bar-bg: rgba(26, 20, 16, 0.94);
@@ -52,7 +46,7 @@
     text-align: center;
   }
 
-  /* Fixed page background: bg.jpg under a heavy dark overlay */
+  /* Fixed page background: bg.webp under a heavy dark overlay (--page-bg-image set in Base.astro) */
   body::before {
     content: '';
     position: fixed;
@@ -61,7 +55,7 @@
     pointer-events: none;
     background-image:
       linear-gradient(to top, rgba(0, 0, 0, 0.859), rgba(0, 0, 0, 0.859)),
-      url('/assets/images/bg.jpg');
+      var(--page-bg-image);
     background-position: 0% 0%, center;
     background-repeat: repeat, no-repeat;
     background-size: auto, cover;
@@ -81,7 +75,8 @@
   }
 
   /* Handwritten body text used on most content pages */
-  .hand-text {
+  .hand-text,
+  .rules-text {
     font-family: var(--font-gochi);
     font-size: 1.25em;
     line-height: 1.625;
@@ -90,19 +85,9 @@
     text-shadow: 0.073rem 0.101rem 0.125rem #a80000;
   }
 
-  /* Serif body text used on the rules pages */
-  .rules-text {
-    font-family: var(--font-gloock);
-    font-size: 1.25em;
-    line-height: 1.625;
-    letter-spacing: 0.2rem;
-    color: rgba(255, 255, 255, 0.71);
-    text-shadow: 0 0 0.125rem #a80000;
-  }
-
-  /* Pink-on-black subtitle (home pages, Patua One) */
+  /* Pink-on-black subtitle (home pages) */
   .subtitle-text {
-    font-family: var(--font-patua);
+    font-family: var(--font-averia);
     font-size: 1.5em;
     line-height: 1.75;
     color: rgba(235, 152, 152, 0.71);

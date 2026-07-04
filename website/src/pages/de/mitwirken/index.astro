@@ -2,6 +2,7 @@
 import ContentPage from '../../../components/ContentPage.astro';
 import Gallery from '../../../components/Gallery.astro';
 import DiscordButton from '../../../components/DiscordButton.astro';
+import { pageIcons, resolveGalleryList } from '../../../data/images';
 ---
 
 <ContentPage
@@ -9,7 +10,7 @@ import DiscordButton from '../../../components/DiscordButton.astro';
   lang="de"
   path="/de/mitwirken/"
   heading="Mitwirken"
-  icon="/assets/images/image10.png"
+  icon={pageIcons.image10}
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
@@ -26,10 +27,10 @@ import DiscordButton from '../../../components/DiscordButton.astro';
     aspect="portrait"
     cols={2}
     class="mx-auto max-w-[24rem]"
-    images={[
-      '/assets/images/gallery12/c4a04ae5.jpg',
-      '/assets/images/gallery12/3cb16362.jpg',
-    ]}
+    images={resolveGalleryList([
+      'gallery12/c4a04ae5.jpg',
+      'gallery12/3cb16362.jpg',
+    ])}
   />
   <DiscordButton href="https://discord.gg/JjWMxjAPBe" />
 </ContentPage>

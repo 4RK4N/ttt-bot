@@ -1,6 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import ContentPage from '../../../components/ContentPage.astro';
 import Gallery from '../../../components/Gallery.astro';
+import { pageIcons, resolveGalleryList } from '../../../data/images';
 ---
 
 <ContentPage
@@ -8,23 +10,25 @@ import Gallery from '../../../components/Gallery.astro';
   lang="en"
   path="/en/events/"
   heading="Events"
-  icon="/assets/images/image02.png"
+  icon={pageIcons.image02}
 >
-  <img
-    src="/assets/images/image04.jpg"
+  <Image
+    src={pageIcons.image04}
     alt=""
+    widths={[384, 768]}
+    sizes="(max-width: 720px) 100vw, 384px"
     loading="lazy"
     class="w-full max-w-[24rem] rounded-md"
   />
   <p class="hand-text">★<em><strong>Archive</strong></em>★</p>
   <Gallery
     aspect="portrait"
-    images={[
-      '/assets/images/gallery03/b38bdd4c.jpg',
-      '/assets/images/gallery03/895354f2.jpg',
-      '/assets/images/gallery03/68509e48.jpg',
-      '/assets/images/gallery03/33482412.jpg',
-      '/assets/images/gallery03/e17c546b.jpg',
-    ]}
+    images={resolveGalleryList([
+      'gallery03/b38bdd4c.jpg',
+      'gallery03/895354f2.jpg',
+      'gallery03/68509e48.jpg',
+      'gallery03/33482412.jpg',
+      'gallery03/e17c546b.jpg',
+    ])}
   />
 </ContentPage>

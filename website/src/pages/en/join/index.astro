@@ -2,6 +2,7 @@
 import ContentPage from '../../../components/ContentPage.astro';
 import Gallery from '../../../components/Gallery.astro';
 import DiscordButton from '../../../components/DiscordButton.astro';
+import { pageIcons, resolveGalleryList } from '../../../data/images';
 ---
 
 <ContentPage
@@ -9,7 +10,7 @@ import DiscordButton from '../../../components/DiscordButton.astro';
   lang="en"
   path="/en/join/"
   heading="Join Us"
-  icon="/assets/images/image18.png"
+  icon={pageIcons.image18}
 >
   <div class="hand-text flex flex-col gap-6">
     <p>
@@ -25,10 +26,10 @@ import DiscordButton from '../../../components/DiscordButton.astro';
     aspect="portrait"
     cols={2}
     class="mx-auto max-w-[24rem]"
-    images={[
-      '/assets/images/gallery17/88d650d3.jpg',
-      '/assets/images/gallery17/7a80e7c4.jpg',
-    ]}
+    images={resolveGalleryList([
+      'gallery17/88d650d3.jpg',
+      'gallery17/7a80e7c4.jpg',
+    ])}
   />
   <DiscordButton href="https://discord.gg/JjWMxjAPBe" />
 </ContentPage>

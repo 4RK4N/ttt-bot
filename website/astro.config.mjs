@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { rename, rm } from 'node:fs/promises';
@@ -34,15 +34,46 @@ const legacyDeHtml = {
 
 export default defineConfig({
   site,
-  // Astro defaults: static source assets in public/, build output in dist/.
-  // 'preserve' keeps the exact URL scheme of the old export:
-  // src/pages/de-home/index.astro -> /de-home/index.html (then moved to /de.html),
-  // nested index.astro -> /<dir>/index.html
   build: { format: 'preserve' },
+  prefetch: {
+    defaultStrategy: 'hover',
+    prefetchAll: false,
+  },
+  image: {
+    defaultQuality: 80,
+  },
+  fonts: [
+    {
+      name: 'Averia Serif Libre',
+      cssVariable: '--font-averia-face',
+      provider: fontProviders.google(),
+      weights: [400, 700],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    },
+    {
+      name: 'Gochi Hand',
+      cssVariable: '--font-gochi-face',
+      provider: fontProviders.google(),
+      weights: [400],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    },
+    {
+      name: 'Caveat',
+      cssVariable: '--font-caveat-face',
+      provider: fontProviders.google(),
+      weights: [700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    },
+  ],
   integrations: [
     legacyDeHtml,
     sitemap({
-      // /de.html is produced by legacyDeHtml after build, not a normal route.
       customPages: [`${site}/de.html`],
       filter: (page) => !page.includes('/de-home'),
       serialize(item) {

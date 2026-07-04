@@ -365,11 +365,14 @@ Static multi-page site built with **Astro 7 + Tailwind CSS**. The site is **buil
 | `website/src/layouts/`, `website/src/components/` | Shared layout (topbar, drawer) and components (gallery, timer) |
 | `website/src/data/nav.ts` | Navigation labels and DE↔EN path mapping |
 | `website/src/styles/global.css` | Tailwind theme + shared text styles |
-| `website/public/` | Static assets copied verbatim (images, `robots.txt`) |
+| `website/src/assets/` | Page images (logo, icons, gallery, background) — optimized to WebP at build via Astro `<Image>` |
+| `website/public/` | Fixed-URL assets only: `robots.txt`, favicon, apple-touch-icon, OG share image |
 | `website/astro.config.mjs` | `@astrojs/sitemap` generates `sitemap-index.xml` at build time |
 | `website/dist/` | Local `npm run build` output (gitignored); dev preview only — production uses files baked into the image |
 | `website/Dockerfile` | Multi-stage: `npm ci` + `astro build`, then nginx |
 | `website/nginx.conf` | nginx config (clean URLs, gzip, caching); `listen 8089` |
+
+**Site images:** keep `website/src/assets/` **in git** (do not gitignore). Logo, gallery, icons, and background are source content — the Docker build runs `astro build` and needs them on disk after `git pull`. Only `website/dist/` and `website/.astro/` are build output and stay gitignored. `website/public/` holds four fixed-URL files (favicon, share image, etc.) only.
 
 After **website** source changes, rebuild and restart the website service:
 

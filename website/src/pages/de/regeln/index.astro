@@ -1,5 +1,6 @@
 ---
 import ContentPage from '../../../components/ContentPage.astro';
+import { pageIcons } from '../../../data/images';
 ---
 
 <ContentPage
@@ -7,7 +8,7 @@ import ContentPage from '../../../components/ContentPage.astro';
   lang="de"
   path="/de/regeln/"
   heading="Regeln"
-  icon="/assets/images/image01.png"
+  icon={pageIcons.image01}
 >
   <div class="rules-text flex flex-col gap-6">
     <p>VENUE &amp; SERVER REGELN</p>
