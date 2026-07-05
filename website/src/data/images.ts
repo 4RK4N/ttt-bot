@@ -6,8 +6,6 @@ import homeCircle from "../assets/images/image22.png";
 
 import image04 from "../assets/images/image04.jpg";
 import image09 from "../assets/images/image09.jpg";
-import image15 from "../assets/images/image15.jpg";
-import image20 from "../assets/images/image20.jpg";
 
 export { logo, bg, homeCircle };
 
@@ -15,8 +13,6 @@ export { logo, bg, homeCircle };
 export const pageImages = {
   image04,
   image09,
-  image15,
-  image20,
 } as const satisfies Record<string, ImageMetadata>;
 
 const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
@@ -30,7 +26,7 @@ for (const [key, mod] of Object.entries(galleryModules)) {
   galleryByPath.set(suffix, mod);
 }
 
-/** Resolve a gallery path suffix (e.g. `gallery01/foo.jpg`) to imported metadata. */
+/** Resolve a gallery path suffix (e.g. `gallery03/foo.jpg`) to imported metadata. */
 export function resolveGallery(suffix: string): ImageMetadata {
   const img = galleryByPath.get(suffix);
   if (!img) {
