@@ -41,8 +41,8 @@ export function FieldWrap({
 }) {
   return (
     <div class={`mb-4 field w-full${disabled ? " disabled" : ""}`}>
-      <label class="label py-0" for={id}>
-        <span class="label-text font-medium">{label}</span>
+      <label class="mb-1 block font-medium" for={id}>
+        {label}
       </label>
       <Help text={help} />
       {children}

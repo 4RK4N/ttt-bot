@@ -5,109 +5,109 @@
     {
       "key": "disabled",
       "label": "Module disabled message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "noPermission",
       "label": "No permission message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "noDeletePermission",
       "label": "No delete permission message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "deleteNotClosed",
       "label": "Delete on open ticket message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "categoryUnpublished",
       "label": "Category unavailable message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "channelNotConfigured",
       "label": "Channel not configured message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "invalidChannel",
       "label": "Invalid channel message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "openError",
       "label": "Open error message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "closeError",
       "label": "Close error message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "deleteError",
       "label": "Delete error message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "closeCancelled",
       "label": "Close cancelled message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "deleteCancelled",
       "label": "Delete cancelled message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "threadContextRequired",
       "label": "Wrong context message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "invalidInteraction",
       "label": "Mismatched button message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "openInProgress",
       "label": "Open in progress message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "roleActionError",
       "label": "Role action error message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "roleActionHierarchyError",
       "label": "Role action hierarchy error message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {
       "key": "roleActionOpenerMissing",
       "label": "Role action opener missing message",
-      "type": "textarea",
+      "type": "text",
       "store": "texts"
     },
     {

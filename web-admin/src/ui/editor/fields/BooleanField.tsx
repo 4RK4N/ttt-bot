@@ -6,19 +6,21 @@ export function BooleanField({ f, value, name, disabled }: SubFieldProps) {
   const checked = value === true;
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <label class="label cursor-pointer justify-start gap-3">
+      <div class="flex items-center gap-3">
         <input
-          class="toggle toggle-primary"
+          class="toggle toggle-success"
           type="checkbox"
           id={id}
           name={name}
           value="true"
           checked={checked}
           disabled={disabled}
-          onchange="var l=this.closest('label');if(l){var s=l.querySelector('.toggle-label');if(s)s.textContent=this.checked?'On':'Off'}"
+          onchange="var r=this.closest('.field');if(r){var s=r.querySelector('.toggle-label');if(s)s.textContent=this.checked?'On':'Off'}"
         />
-        <span class="label-text toggle-label">{checked ? "On" : "Off"}</span>
-      </label>
+        <span class="text-sm text-base-content/80 toggle-label">
+          {checked ? "On" : "Off"}
+        </span>
+      </div>
     </FieldWrap>
   );
 }

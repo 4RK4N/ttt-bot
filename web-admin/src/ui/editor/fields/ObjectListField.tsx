@@ -129,7 +129,7 @@ export function ObjectListRow({
               </button>
               <button
                 type="button"
-                class="btn btn-sm"
+                class="btn btn-outline btn-warning btn-sm"
                 hx-post={`/htmx/modules/${namespace}/unpublish/${fieldValueStr(row.id)}`}
                 hx-include={`#panel-form-${namespace}`}
                 hx-target={`#htmx-panel-${namespace}`}
@@ -181,9 +181,7 @@ export function ObjectListField({
 
   return (
     <div class="field mb-4 w-full">
-      <label class="label py-0">
-        <span class="label-text font-medium">{f.label}</span>
-      </label>
+      <label class="mb-1 block font-medium">{f.label}</label>
       {f.help ? (
         <p class="mb-1 text-sm text-base-content/60">{f.help}</p>
       ) : null}
