@@ -53,81 +53,145 @@
 </div>
 
 <script>
-  function initLightbox() {
-    const overlay = document.getElementById("lightbox")!;
-    const img = document.getElementById("lightbox-image") as HTMLImageElement;
-    const counter = document.getElementById("lightbox-counter")!;
-    const closeBtn = document.getElementById("lightbox-close")!;
-    const prevBtn = document.getElementById("lightbox-prev")!;
-    const nextBtn = document.getElementById("lightbox-next")!;
+  let triggers: HTMLButtonElement[] = [];
+  let current = 0;
+  let lastFocus: HTMLElement | null = null;
+  let overlayAbort: AbortController | null = null;
 
-    let triggers: HTMLButtonElement[] = [];
-    let current = 0;
-    let lastFocus: HTMLElement | null = null;
-
-    function collectTriggers() {
-      triggers = [
-        ...document.querySelectorAll<HTMLButtonElement>(".lightbox-trigger"),
-      ];
-    }
-
-    function show(index: number) {
-      if (!triggers.length) return;
-      current = (index + triggers.length) % triggers.length;
-      const trigger = triggers[current];
-      const source = trigger.querySelector("img");
-      if (!source) return;
-
-      img.src = source.currentSrc || source.src;
-      img.alt = source.alt;
-      counter.textContent = `${current + 1} / ${triggers.length}`;
-      overlay.classList.remove("hidden");
-      overlay.hidden = false;
-      document.body.classList.add("overflow-hidden");
-      closeBtn.focus();
-    }
-
-    function hide() {
-      overlay.classList.add("hidden");
-      overlay.hidden = true;
-      document.body.classList.remove("overflow-hidden");
-      img.src = "";
-      lastFocus?.focus();
-    }
-
-    function onTriggerClick(e: Event) {
-      const trigger = e.currentTarget as HTMLButtonElement;
-      lastFocus = trigger;
-      const index = triggers.indexOf(trigger);
-      if (index >= 0) show(index);
-    }
-
-    function bindTriggers() {
-      collectTriggers();
-      triggers.forEach((trigger) => {
-        trigger.removeEventListener("click", onTriggerClick);
-        trigger.addEventListener("click", onTriggerClick);
-      });
-    }
-
-    closeBtn.onclick = hide;
-    prevBtn.onclick = () => show(current - 1);
-    nextBtn.onclick = () => show(current + 1);
-
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) hide();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (overlay.hidden) return;
-      if (e.key === "Escape") hide();
-      else if (e.key === "ArrowLeft") show(current - 1);
-      else if (e.key === "ArrowRight") show(current + 1);
-    });
-
-    bindTriggers();
-    document.addEventListener("astro:page-load", bindTriggers);
+  function getElements() {
+    return {
+      overlay: document.getElementById("lightbox"),
+      img: document.getElementById("lightbox-image") as HTMLImageElement | null,
+      counter: document.getElementById("lightbox-counter"),
+      closeBtn: document.getElementById("lightbox-close"),
+      prevBtn: document.getElementById("lightbox-prev"),
+      nextBtn: document.getElementById("lightbox-next"),
+    };
   }
 
-  initLightbox();
+  function imageSrc(source: HTMLImageElement): string {
+    const src = source.currentSrc || source.src;
+    if (src) return src;
+
+    const srcset = source.getAttribute("srcset");
+    if (!srcset) return "";
+
+    const largest = srcset
+      .split(",")
+      .map((entry) => entry.trim().split(/\s+/))
+      .sort((a, b) => {
+        const wA = parseInt(a[1] || "0", 10);
+        const wB = parseInt(b[1] || "0", 10);
+        return wB - wA;
+      })[0]?.[0];
+
+    return largest || "";
+  }
+
+  function hide() {
+    const { overlay, img } = getElements();
+    if (!overlay || !img) return;
+
+    overlay.classList.add("hidden");
+    overlay.hidden = true;
+    document.body.classList.remove("overflow-hidden");
+    img.src = "";
+    lastFocus?.focus();
+  }
+
+  function show(index: number) {
+    if (!triggers.length) return;
+
+    const { overlay, img, counter, closeBtn } = getElements();
+    if (!overlay || !img || !counter || !closeBtn) return;
+
+    current = (index + triggers.length) % triggers.length;
+    const trigger = triggers[current];
+    const source = trigger.querySelector("img");
+    if (!source) return;
+
+    const src = imageSrc(source);
+    if (!src) return;
+
+    img.src = src;
+    img.alt = source.alt;
+    counter.textContent = `${current + 1} / ${triggers.length}`;
+    overlay.classList.remove("hidden");
+    overlay.hidden = false;
+    document.body.classList.add("overflow-hidden");
+    closeBtn.focus();
+  }
+
+  function onTriggerClick(e: Event) {
+    const trigger = e.currentTarget as HTMLButtonElement;
+    lastFocus = trigger;
+    const index = triggers.indexOf(trigger);
+    if (index >= 0) show(index);
+  }
+
+  function resetLightboxOnNavigation() {
+    document.body.classList.remove("overflow-hidden");
+    const overlay = document.getElementById("lightbox");
+    if (!overlay) return;
+
+    overlay.classList.add("hidden");
+    overlay.hidden = true;
+    const img = document.getElementById(
+      "lightbox-image",
+    ) as HTMLImageElement | null;
+    if (img) img.src = "";
+  }
+
+  function setupLightbox() {
+    const els = getElements();
+    if (
+      !els.overlay ||
+      !els.img ||
+      !els.counter ||
+      !els.closeBtn ||
+      !els.prevBtn ||
+      !els.nextBtn
+    ) {
+      return;
+    }
+
+    resetLightboxOnNavigation();
+
+    overlayAbort?.abort();
+    overlayAbort = new AbortController();
+    const { signal } = overlayAbort;
+
+    triggers = [
+      ...document.querySelectorAll<HTMLButtonElement>(".lightbox-trigger"),
+    ];
+    triggers.forEach((trigger) => {
+      trigger.removeEventListener("click", onTriggerClick);
+      trigger.addEventListener("click", onTriggerClick);
+    });
+
+    els.closeBtn.onclick = hide;
+    els.prevBtn.onclick = () => show(current - 1);
+    els.nextBtn.onclick = () => show(current + 1);
+
+    els.overlay.addEventListener(
+      "click",
+      (e) => {
+        if (e.target === els.overlay) hide();
+      },
+      { signal },
+    );
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const overlay = document.getElementById("lightbox");
+    if (!overlay || overlay.hidden) return;
+
+    if (e.key === "Escape") hide();
+    else if (e.key === "ArrowLeft") show(current - 1);
+    else if (e.key === "ArrowRight") show(current + 1);
+  });
+
+  document.addEventListener("astro:before-swap", resetLightboxOnNavigation);
+  document.addEventListener("astro:page-load", setupLightbox);
+  setupLightbox();
 </script>
