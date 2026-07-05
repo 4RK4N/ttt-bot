@@ -1,5 +1,5 @@
-import { siteName } from './nav';
-import { DISCORD_TTT, SITE_URL } from './site';
+import { siteName } from "./nav";
+import { DISCORD_TTT, SITE_URL } from "./site";
 
 /** Public operator label and contact — no postal address. */
 export const legalContact = {

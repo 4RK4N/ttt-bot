@@ -22,25 +22,25 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 
 ## File map
 
-| Location | File | Purpose |
-|----------|------|---------|
-| `shared/modules/<name>/` | `types.ts` | Interfaces, defaults, `createModuleConfig`, `config()`, `texts()`, `resolve*()` |
-| `shared/modules/<name>/` | `config-io.ts` | IO boundary — **handlers import from here**, not `types.ts` |
-| `bot/src/modules/<name>/` | `handlers.ts` | Example patterns: guards, config/text reads, interactions |
-| `bot/src/modules/<name>/` | `index.ts` | `CommandModule` export only |
-| `shared/modules/<name>/` | `web-plugin.json` | Web editor manifest (`title`, `description`, `fields`) |
-| `shared/modules/<name>/` | `validate.ts` | Panel/list row validation (web editor save) — optional |
-| `shared/modules/<name>/` | `panel.ts` | Panel publish payload — panel modules only |
-| `shared/modules/<name>/` | `publisher.ts` | Publish/unpublish for web editor — panel modules only |
-| `data/example-module/` | (under this folder) | Seed JSON for `data/<namespace>/` |
+| Location                  | File                | Purpose                                                                         |
+| ------------------------- | ------------------- | ------------------------------------------------------------------------------- |
+| `shared/modules/<name>/`  | `types.ts`          | Interfaces, defaults, `createModuleConfig`, `config()`, `texts()`, `resolve*()` |
+| `shared/modules/<name>/`  | `config-io.ts`      | IO boundary — **handlers import from here**, not `types.ts`                     |
+| `bot/src/modules/<name>/` | `handlers.ts`       | Example patterns: guards, config/text reads, interactions                       |
+| `bot/src/modules/<name>/` | `index.ts`          | `CommandModule` export only                                                     |
+| `shared/modules/<name>/`  | `web-plugin.json`   | Web editor manifest (`title`, `description`, `fields`)                          |
+| `shared/modules/<name>/`  | `validate.ts`       | Panel/list row validation (web editor save) — optional                          |
+| `shared/modules/<name>/`  | `panel.ts`          | Panel publish payload — panel modules only                                      |
+| `shared/modules/<name>/`  | `publisher.ts`      | Publish/unpublish for web editor — panel modules only                           |
+| `data/example-module/`    | (under this folder) | Seed JSON for `data/<namespace>/`                                               |
 
 ## Import rule
 
-| Import from | Use for |
-|-------------|---------|
+| Import from        | Use for                                                                   |
+| ------------------ | ------------------------------------------------------------------------- |
 | **`config-io.ts`** | `NAMESPACE`, `config()`, `texts()`, `resolve*()`, `get*Config`, `update*` |
-| **`types.ts`** | TypeScript types only (`ResolvedExamplePanel`, etc.) |
-| **`handlers.ts`** | Shared handler logic (optional but recommended) |
+| **`types.ts`**     | TypeScript types only (`ResolvedExamplePanel`, etc.)                      |
+| **`handlers.ts`**  | Shared handler logic (optional but recommended)                           |
 
 ## How config and texts are read
 
@@ -58,10 +58,10 @@ data/<namespace>/texts.json   ──►  texts()   in types.ts  ──►  re-ex
 
 ## config-io.ts: simple vs panel
 
-| Module kind | `config-io.ts` role |
-|-------------|---------------------|
-| **Simple** | Re-export `config`, `texts`, `NAMESPACE`, helpers (`targetChannelId`, …) |
-| **Panel** | `createConfigIo` → `get*Config` / `update*` + re-export reads and `resolve*` |
+| Module kind | `config-io.ts` role                                                          |
+| ----------- | ---------------------------------------------------------------------------- |
+| **Simple**  | Re-export `config`, `texts`, `NAMESPACE`, helpers (`targetChannelId`, …)     |
+| **Panel**   | `createConfigIo` → `get*Config` / `update*` + re-export reads and `resolve*` |
 
 After publish, patch config rows:
 
@@ -77,15 +77,15 @@ await updateExamplePanel(panelId, {
 
 Reuse these instead of duplicating logic:
 
-| Module | Use for |
-|--------|---------|
-| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts) | `createModuleConfig`, `resolveKeyedItem` |
-| [`shared/core/texts.ts`](../../../../shared/core/texts.ts) | `format`, `isModuleEnabled`, `getConfig`/`getTexts` (via factory) |
-| [`shared/core/discordInteractions.ts`](../../../../shared/core/discordInteractions.ts) | `replyEphemeral`, `memberHasAnyRole` |
-| [`shared/core/discordRoles.ts`](../../../../shared/core/discordRoles.ts) | `tryAssignRole`, `tryRemoveRole` |
-| [`shared/core/threads.ts`](../../../../shared/core/threads.ts) | `buildThreadName`, `startAndPopulateCommentsThread` |
-| [`shared/core/panelFields.ts`](../../../../shared/core/panelFields.ts) | `parsePanelBaseFields` (validators) |
-| [`shared/core/panelPublisher.ts`](../../../../shared/core/panelPublisher.ts) | Publish/unpublish orchestration |
+| Module                                                                                 | Use for                                                           |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts)               | `createModuleConfig`, `resolveKeyedItem`                          |
+| [`shared/core/texts.ts`](../../../../shared/core/texts.ts)                             | `format`, `isModuleEnabled`, `getConfig`/`getTexts` (via factory) |
+| [`shared/core/discordInteractions.ts`](../../../../shared/core/discordInteractions.ts) | `replyEphemeral`, `memberHasAnyRole`                              |
+| [`shared/core/discordRoles.ts`](../../../../shared/core/discordRoles.ts)               | `tryAssignRole`, `tryRemoveRole`                                  |
+| [`shared/core/threads.ts`](../../../../shared/core/threads.ts)                         | `buildThreadName`, `startAndPopulateCommentsThread`               |
+| [`shared/core/panelFields.ts`](../../../../shared/core/panelFields.ts)                 | `parsePanelBaseFields` (validators)                               |
+| [`shared/core/panelPublisher.ts`](../../../../shared/core/panelPublisher.ts)           | Publish/unpublish orchestration                                   |
 
 ## Web editor validation
 
@@ -97,11 +97,12 @@ validated on save in `web-admin/src/store.ts` (17–20 digits; empty = unset). S
 `writeValues()` object-list loop (same pattern as `custom-embeds`, `reaction-roles`, `tickets`):
 
 ```typescript
-if (plugin.namespace === '<your-namespace>' && field.key === '<listKey>') {
+if (plugin.namespace === "<your-namespace>" && field.key === "<listKey>") {
   try {
     validateYourRow(configRow, textRow);
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Invalid configuration.';
+    const message =
+      err instanceof Error ? err.message : "Invalid configuration.";
     throw new ValidationError(`${key}[${id}]: ${message}`);
   }
 }
@@ -112,12 +113,12 @@ for full examples.
 
 ## Module loader patterns (`index.ts`)
 
-| Export | Use for |
-|--------|---------|
-| `init(client)` | `client.on(Events.…)` listeners |
-| `commands[]` | Slash commands — requires `npm run deploy` |
-| `componentRoutes[]` | `{ prefix: '<namespace>:', handle }` for buttons/selects |
-| `publish*()` | Panel modules — register in `web-admin/src/publishHandlers.ts` |
+| Export              | Use for                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| `init(client)`      | `client.on(Events.…)` listeners                                |
+| `commands[]`        | Slash commands — requires `npm run deploy`                     |
+| `componentRoutes[]` | `{ prefix: '<namespace>:', handle }` for buttons/selects       |
+| `publish*()`        | Panel modules — register in `web-admin/src/publishHandlers.ts` |
 
 ## Data folder
 

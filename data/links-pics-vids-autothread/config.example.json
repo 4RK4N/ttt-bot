@@ -1,7 +1,4 @@
 {
   "enabled": true,
-  "channelIds": [
-    "",
-    ""
-  ]
+  "channelIds": ["", ""]
 }

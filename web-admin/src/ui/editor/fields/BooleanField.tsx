@@ -1,8 +1,8 @@
-import { FieldWrap } from './shared.js';
-import type { SubFieldProps } from './shared.js';
+import { FieldWrap } from "./shared.js";
+import type { SubFieldProps } from "./shared.js";
 
 export function BooleanField({ f, value, name, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+  const id = name.replace(/[[\].]/g, "-");
   const checked = value === true;
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
@@ -17,7 +17,7 @@ export function BooleanField({ f, value, name, disabled }: SubFieldProps) {
           disabled={disabled}
           onchange="this.closest('label').querySelector('.form-check-label').textContent = this.checked ? 'On' : 'Off'"
         />
-        <span class="form-check-label">{checked ? 'On' : 'Off'}</span>
+        <span class="form-check-label">{checked ? "On" : "Off"}</span>
       </label>
     </FieldWrap>
   );
@@ -30,11 +30,17 @@ export function SelectField({
   disabled,
   ...extra
 }: SubFieldProps & Record<string, unknown>) {
-  const id = name.replace(/[[\].]/g, '-');
-  const strVal = value != null ? String(value) : '';
+  const id = name.replace(/[[\].]/g, "-");
+  const strVal = value != null ? String(value) : "";
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <select class="form-select" id={id} name={name} disabled={disabled} {...extra}>
+      <select
+        class="form-select"
+        id={id}
+        name={name}
+        disabled={disabled}
+        {...extra}
+      >
         {(f.options ?? []).map((opt) => (
           <option value={opt.value} selected={opt.value === strVal}>
             {opt.label}

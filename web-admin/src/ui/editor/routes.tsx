@@ -1,19 +1,19 @@
-import type { Context } from 'hono';
-import type { WebConfig } from '../../config.js';
-import { ensureCsrfToken } from '../../auth.js';
-import type { WebPlugin } from '../../plugin-types.js';
-import type { SessionUser } from '../../auth.js';
-import { hasPublishableField } from '../../plugins.js';
+import type { Context } from "hono";
+import type { WebConfig } from "../../config.js";
+import { ensureCsrfToken } from "../../auth.js";
+import type { WebPlugin } from "../../plugin-types.js";
+import type { SessionUser } from "../../auth.js";
+import { hasPublishableField } from "../../plugins.js";
 import {
   DataReadError,
   readValues,
   ValidationError,
   writeEnabled,
   writeValues,
-} from '../../store.js';
-import { getPublishHandlers } from '../../publishHandlers.js';
-import { buildEditorModule, loadEditorContext, parseExpanded } from './data.js';
-import { formBodyToValues } from './form-parse.js';
+} from "../../store.js";
+import { getPublishHandlers } from "../../publishHandlers.js";
+import { buildEditorModule, loadEditorContext, parseExpanded } from "./data.js";
+import { formBodyToValues } from "./form-parse.js";
 import {
   defaultObjectItem,
   defaultOptionItem,
@@ -24,13 +24,13 @@ import {
   rowKeyForItem,
   toggleExpanded,
   valuesFromForm,
-} from './htmx-handlers.js';
-import { EnabledToggleResponse } from './enabled-ui.js';
-import { ModulePanel } from './ModulePanel.js';
-import { ObjectListRow } from './Field.js';
-import { ObjectListRowsOnly } from './fields/ObjectListField.js';
-import { OptionListRowsOnly } from './fields/OptionListField.js';
-import type { EditorContext } from './context.js';
+} from "./htmx-handlers.js";
+import { EnabledToggleResponse } from "./enabled-ui.js";
+import { ModulePanel } from "./ModulePanel.js";
+import { ObjectListRow } from "./Field.js";
+import { ObjectListRowsOnly } from "./fields/ObjectListField.js";
+import { OptionListRowsOnly } from "./fields/OptionListField.js";
+import type { EditorContext } from "./context.js";
 
 type Env = { Variables: { user: SessionUser } };
 type HonoCtx = Context<Env>;
@@ -67,87 +67,100 @@ export async function renderPanel(
 ) {
   const data = await ctxAndMod(c, deps, namespace);
   if (!data) return c.text(`Unknown module "${namespace}".`, 404);
-  return c.html(<ModulePanel {...panelProps(data.mod, data.ctx, expanded, status)} />);
+  return c.html(
+    <ModulePanel {...panelProps(data.mod, data.ctx, expanded, status)} />,
+  );
 }
 
-export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDeps): void {
-  htmx.get('/modules/:namespace/panel', async (c) => {
-    const namespace = c.req.param('namespace');
-    const expanded = parseExpanded(c.req.query('expanded'));
+export function registerHtmxRoutes(
+  htmx: import("hono").Hono<Env>,
+  deps: HtmxDeps,
+): void {
+  htmx.get("/modules/:namespace/panel", async (c) => {
+    const namespace = c.req.param("namespace");
+    const expanded = parseExpanded(c.req.query("expanded"));
     return renderPanel(c, deps, namespace, expanded);
   });
 
-  htmx.put('/modules/:namespace', async (c) => {
-    const namespace = c.req.param('namespace');
+  htmx.put("/modules/:namespace", async (c) => {
+    const namespace = c.req.param("namespace");
     const plugin = deps.byNamespace.get(namespace);
     if (!plugin) return c.text(`Unknown module "${namespace}".`, 404);
 
     const body = await c.req.parseBody();
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     const values = formBodyToValues(plugin, body);
 
     try {
       const saved = await writeValues(plugin, values);
-      console.log(`[web] ${c.get('user').username} updated "${namespace}" via HTMX.`);
+      console.log(
+        `[web] ${c.get("user").username} updated "${namespace}" via HTMX.`,
+      );
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       mod.values = saved;
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: true, message: 'Saved' })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, { ok: true, message: "Saved" })}
+        />,
       );
     } catch (err) {
       const message =
         err instanceof ValidationError || err instanceof DataReadError
           ? err.message
-          : 'Failed to save changes.';
+          : "Failed to save changes.";
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: false, message })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, { ok: false, message })}
+        />,
         400,
       );
     }
   });
 
-  htmx.put('/modules/:namespace/enabled', async (c) => {
-    const namespace = c.req.param('namespace');
+  htmx.put("/modules/:namespace/enabled", async (c) => {
+    const namespace = c.req.param("namespace");
     if (!deps.byNamespace.has(namespace)) {
       return c.text(`Unknown module "${namespace}".`, 404);
     }
 
     let enabled = false;
-    const contentType = c.req.header('content-type') ?? '';
-    if (contentType.includes('application/json')) {
+    const contentType = c.req.header("content-type") ?? "";
+    if (contentType.includes("application/json")) {
       const body = (await c.req.json()) as { enabled?: unknown };
       enabled = body.enabled === true;
     } else {
       const body = await c.req.parseBody();
-      enabled = body.enabled === 'true';
+      enabled = body.enabled === "true";
     }
 
     try {
       await writeEnabled(namespace, enabled);
       console.log(
-        `[web] ${c.get('user').username} ${enabled ? 'enabled' : 'disabled'} module "${namespace}".`,
+        `[web] ${c.get("user").username} ${enabled ? "enabled" : "disabled"} module "${namespace}".`,
       );
-      return c.html(<EnabledToggleResponse namespace={namespace} enabled={enabled} />);
+      return c.html(
+        <EnabledToggleResponse namespace={namespace} enabled={enabled} />,
+      );
     } catch (err) {
       console.error(`[web] Failed to set enabled for "${namespace}":`, err);
-      return c.text('Failed to save changes.', 500);
+      return c.text("Failed to save changes.", 500);
     }
   });
 
-  htmx.post('/modules/:namespace/list/:fieldKey/add', async (c) => {
-    const namespace = c.req.param('namespace');
-    const fieldKey = c.req.param('fieldKey');
+  htmx.post("/modules/:namespace/list/:fieldKey/add", async (c) => {
+    const namespace = c.req.param("namespace");
+    const fieldKey = c.req.param("fieldKey");
     const plugin = deps.byNamespace.get(namespace);
     const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-    if (!plugin || !field) return c.text('Not found', 404);
+    if (!plugin || !field) return c.text("Not found", 404);
 
     const body = await c.req.parseBody();
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     const items = getObjectListItems(plugin, body, fieldKey);
     items.push(defaultObjectItem(field));
 
@@ -165,16 +178,17 @@ export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDep
     );
   });
 
-  htmx.post('/modules/:namespace/list/:fieldKey/remove/:index', async (c) => {
-    const namespace = c.req.param('namespace');
-    const fieldKey = c.req.param('fieldKey');
-    const index = Number(c.req.param('index'));
+  htmx.post("/modules/:namespace/list/:fieldKey/remove/:index", async (c) => {
+    const namespace = c.req.param("namespace");
+    const fieldKey = c.req.param("fieldKey");
+    const index = Number(c.req.param("index"));
     const plugin = deps.byNamespace.get(namespace);
     const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-    if (!plugin || !field || !Number.isFinite(index)) return c.text('Not found', 404);
+    if (!plugin || !field || !Number.isFinite(index))
+      return c.text("Not found", 404);
 
     const body = await c.req.parseBody();
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     const items = getObjectListItems(plugin, body, fieldKey);
     items.splice(index, 1);
 
@@ -192,16 +206,17 @@ export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDep
     );
   });
 
-  htmx.post('/modules/:namespace/row/:fieldKey/:index/toggle', async (c) => {
-    const namespace = c.req.param('namespace');
-    const fieldKey = c.req.param('fieldKey');
-    const index = Number(c.req.param('index'));
+  htmx.post("/modules/:namespace/row/:fieldKey/:index/toggle", async (c) => {
+    const namespace = c.req.param("namespace");
+    const fieldKey = c.req.param("fieldKey");
+    const index = Number(c.req.param("index"));
     const plugin = deps.byNamespace.get(namespace);
     const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-    if (!plugin || !field || !Number.isFinite(index)) return c.text('Not found', 404);
+    if (!plugin || !field || !Number.isFinite(index))
+      return c.text("Not found", 404);
 
     const body = await c.req.parseBody();
-    let expanded = parseExpanded(c.req.query('expanded'));
+    let expanded = parseExpanded(c.req.query("expanded"));
     const items = getObjectListItems(plugin, body, fieldKey);
     const row = items[index];
     if (row) {
@@ -224,20 +239,24 @@ export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDep
     );
   });
 
-  htmx.post('/modules/:namespace/row/:fieldKey/:index/refresh', async (c) => {
-    const namespace = c.req.param('namespace');
-    const fieldKey = c.req.param('fieldKey');
-    const index = Number(c.req.param('index'));
+  htmx.post("/modules/:namespace/row/:fieldKey/:index/refresh", async (c) => {
+    const namespace = c.req.param("namespace");
+    const fieldKey = c.req.param("fieldKey");
+    const index = Number(c.req.param("index"));
     const plugin = deps.byNamespace.get(namespace);
     const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-    if (!plugin || !field || !Number.isFinite(index)) return c.text('Not found', 404);
+    if (!plugin || !field || !Number.isFinite(index))
+      return c.text("Not found", 404);
 
     const body = await c.req.parseBody();
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     const items = valuesFromForm(plugin, body);
     const listRaw = items[fieldKey];
-    const listItems = Array.isArray(listRaw) ? (listRaw as Record<string, unknown>[]) : getObjectListItems(plugin, body, fieldKey);
-    const row = listItems[index] ?? mergeRowFromForm(plugin, body, fieldKey, index);
+    const listItems = Array.isArray(listRaw)
+      ? (listRaw as Record<string, unknown>[])
+      : getObjectListItems(plugin, body, fieldKey);
+    const row =
+      listItems[index] ?? mergeRowFromForm(plugin, body, fieldKey, index);
 
     const csrfToken = await ensureCsrfToken(c, deps.cfg);
     const ctx = await loadEditorContext(deps.cfg, csrfToken);
@@ -254,54 +273,68 @@ export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDep
     );
   });
 
-  htmx.post('/modules/:namespace/list/:fieldKey/option/:optionKey/add/:rowIndex', async (c) => {
-    const namespace = c.req.param('namespace');
-    const fieldKey = c.req.param('fieldKey');
-    const optionKey = c.req.param('optionKey');
-    const rowIndex = Number(c.req.param('rowIndex'));
-    const plugin = deps.byNamespace.get(namespace);
-    const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-    const sub = field?.itemFields?.find((s) => s.key === optionKey && s.type === 'option-list');
-    if (!plugin || !field || !sub || !Number.isFinite(rowIndex)) return c.text('Not found', 404);
-
-    const body = await c.req.parseBody();
-    const items = getObjectListItems(plugin, body, fieldKey);
-    const row = items[rowIndex] ?? {};
-    const opts = getOptionListItems(row, optionKey);
-    opts.push(defaultOptionItem());
-    row[optionKey] = opts;
-    items[rowIndex] = row;
-
-    const csrfToken = await ensureCsrfToken(c, deps.cfg);
-    const ctx = await loadEditorContext(deps.cfg, csrfToken);
-    const name = `${fieldKey}[${rowIndex}].${optionKey}`;
-
-    return c.html(
-      <OptionListRowsOnly
-        f={sub}
-        name={name}
-        items={opts}
-        ctx={ctx}
-        namespace={namespace}
-        fieldKey={fieldKey}
-        rowIndex={rowIndex}
-      />,
-    );
-  });
-
   htmx.post(
-    '/modules/:namespace/list/:fieldKey/option/:optionKey/remove/:rowIndex/:optIndex',
+    "/modules/:namespace/list/:fieldKey/option/:optionKey/add/:rowIndex",
     async (c) => {
-      const namespace = c.req.param('namespace');
-      const fieldKey = c.req.param('fieldKey');
-      const optionKey = c.req.param('optionKey');
-      const rowIndex = Number(c.req.param('rowIndex'));
-      const optIndex = Number(c.req.param('optIndex'));
+      const namespace = c.req.param("namespace");
+      const fieldKey = c.req.param("fieldKey");
+      const optionKey = c.req.param("optionKey");
+      const rowIndex = Number(c.req.param("rowIndex"));
       const plugin = deps.byNamespace.get(namespace);
       const field = plugin ? findObjectListField(plugin, fieldKey) : null;
-      const sub = field?.itemFields?.find((s) => s.key === optionKey && s.type === 'option-list');
-      if (!plugin || !field || !sub || !Number.isFinite(rowIndex) || !Number.isFinite(optIndex)) {
-        return c.text('Not found', 404);
+      const sub = field?.itemFields?.find(
+        (s) => s.key === optionKey && s.type === "option-list",
+      );
+      if (!plugin || !field || !sub || !Number.isFinite(rowIndex))
+        return c.text("Not found", 404);
+
+      const body = await c.req.parseBody();
+      const items = getObjectListItems(plugin, body, fieldKey);
+      const row = items[rowIndex] ?? {};
+      const opts = getOptionListItems(row, optionKey);
+      opts.push(defaultOptionItem());
+      row[optionKey] = opts;
+      items[rowIndex] = row;
+
+      const csrfToken = await ensureCsrfToken(c, deps.cfg);
+      const ctx = await loadEditorContext(deps.cfg, csrfToken);
+      const name = `${fieldKey}[${rowIndex}].${optionKey}`;
+
+      return c.html(
+        <OptionListRowsOnly
+          f={sub}
+          name={name}
+          items={opts}
+          ctx={ctx}
+          namespace={namespace}
+          fieldKey={fieldKey}
+          rowIndex={rowIndex}
+        />,
+      );
+    },
+  );
+
+  htmx.post(
+    "/modules/:namespace/list/:fieldKey/option/:optionKey/remove/:rowIndex/:optIndex",
+    async (c) => {
+      const namespace = c.req.param("namespace");
+      const fieldKey = c.req.param("fieldKey");
+      const optionKey = c.req.param("optionKey");
+      const rowIndex = Number(c.req.param("rowIndex"));
+      const optIndex = Number(c.req.param("optIndex"));
+      const plugin = deps.byNamespace.get(namespace);
+      const field = plugin ? findObjectListField(plugin, fieldKey) : null;
+      const sub = field?.itemFields?.find(
+        (s) => s.key === optionKey && s.type === "option-list",
+      );
+      if (
+        !plugin ||
+        !field ||
+        !sub ||
+        !Number.isFinite(rowIndex) ||
+        !Number.isFinite(optIndex)
+      ) {
+        return c.text("Not found", 404);
       }
 
       const body = await c.req.parseBody();
@@ -330,70 +363,95 @@ export function registerHtmxRoutes(htmx: import('hono').Hono<Env>, deps: HtmxDep
     },
   );
 
-  htmx.post('/modules/:namespace/publish/:itemId', async (c) => {
-    const namespace = c.req.param('namespace');
-    const itemId = c.req.param('itemId');
+  htmx.post("/modules/:namespace/publish/:itemId", async (c) => {
+    const namespace = c.req.param("namespace");
+    const itemId = c.req.param("itemId");
     const plugin = deps.byNamespace.get(namespace);
     if (!plugin || !hasPublishableField(plugin)) {
       return c.text(`Module "${namespace}" does not support publishing.`, 404);
     }
     const handlers = getPublishHandlers(namespace);
-    if (!handlers) return c.text(`No publish handler registered for "${namespace}".`, 501);
+    if (!handlers)
+      return c.text(`No publish handler registered for "${namespace}".`, 501);
 
     const body = await c.req.parseBody();
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     try {
       const values = formBodyToValues(plugin, body);
       await writeValues(plugin, values);
       await handlers.publish({ botToken: deps.cfg.botToken }, itemId);
-      console.log(`[web] ${c.get('user').username} published ${namespace} panel "${itemId}".`);
+      console.log(
+        `[web] ${c.get("user").username} published ${namespace} panel "${itemId}".`,
+      );
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       mod.values = readValues(plugin);
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: true, message: 'Published' })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, {
+            ok: true,
+            message: "Published",
+          })}
+        />,
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to publish panel.';
+      const message =
+        err instanceof Error ? err.message : "Failed to publish panel.";
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: false, message })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, { ok: false, message })}
+        />,
         400,
       );
     }
   });
 
-  htmx.post('/modules/:namespace/unpublish/:itemId', async (c) => {
-    const namespace = c.req.param('namespace');
-    const itemId = c.req.param('itemId');
+  htmx.post("/modules/:namespace/unpublish/:itemId", async (c) => {
+    const namespace = c.req.param("namespace");
+    const itemId = c.req.param("itemId");
     const plugin = deps.byNamespace.get(namespace);
     if (!plugin || !hasPublishableField(plugin)) {
-      return c.text(`Module "${namespace}" does not support unpublishing.`, 404);
+      return c.text(
+        `Module "${namespace}" does not support unpublishing.`,
+        404,
+      );
     }
     const handlers = getPublishHandlers(namespace);
-    if (!handlers) return c.text(`No unpublish handler registered for "${namespace}".`, 501);
+    if (!handlers)
+      return c.text(`No unpublish handler registered for "${namespace}".`, 501);
 
-    const expanded = parseExpanded(c.req.query('expanded'));
+    const expanded = parseExpanded(c.req.query("expanded"));
     try {
       await handlers.unpublish(itemId);
-      console.log(`[web] ${c.get('user').username} unpublished ${namespace} panel "${itemId}".`);
+      console.log(
+        `[web] ${c.get("user").username} unpublished ${namespace} panel "${itemId}".`,
+      );
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       mod.values = readValues(plugin);
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: true, message: 'Unpublished' })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, {
+            ok: true,
+            message: "Unpublished",
+          })}
+        />,
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to unpublish panel.';
+      const message =
+        err instanceof Error ? err.message : "Failed to unpublish panel.";
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
       return c.html(
-        <ModulePanel {...panelProps(mod, ctx, expanded, { ok: false, message })} />,
+        <ModulePanel
+          {...panelProps(mod, ctx, expanded, { ok: false, message })}
+        />,
         400,
       );
     }

@@ -1,4 +1,4 @@
-import { config } from '../../shared/config.js';
+import { config } from "../../shared/config.js";
 
 export interface WebConfig {
   clientId: string;
@@ -22,25 +22,27 @@ export interface WebConfig {
  */
 export function loadWebConfig(): WebConfig {
   const missing: string[] = [];
-  if (!config.clientSecret) missing.push('clientSecret');
-  if (!config.sessionSecret) missing.push('sessionSecret');
-  if (!config.oauthRedirectUri) missing.push('oauthRedirectUri');
+  if (!config.clientSecret) missing.push("clientSecret");
+  if (!config.sessionSecret) missing.push("sessionSecret");
+  if (!config.oauthRedirectUri) missing.push("oauthRedirectUri");
   // guildId is optional for the bot but required here for the admin check.
-  if (!config.guildId) missing.push('guildId');
+  if (!config.guildId) missing.push("guildId");
 
   if (missing.length > 0) {
     console.error(
-      `[web] Missing required config value(s): ${missing.join(', ')}.\n` +
-      'Set them in "data/config.json" (see "data/config.example.json").'
+      `[web] Missing required config value(s): ${missing.join(", ")}.\n` +
+        'Set them in "data/config.json" (see "data/config.example.json").',
     );
     process.exit(1);
   }
 
   let secureCookies = false;
   try {
-    secureCookies = new URL(config.oauthRedirectUri!).protocol === 'https:';
+    secureCookies = new URL(config.oauthRedirectUri!).protocol === "https:";
   } catch {
-    console.error(`[web] Config value "oauthRedirectUri" is not a valid URL: "${config.oauthRedirectUri}".`);
+    console.error(
+      `[web] Config value "oauthRedirectUri" is not a valid URL: "${config.oauthRedirectUri}".`,
+    );
     process.exit(1);
   }
 

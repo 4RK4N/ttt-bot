@@ -21,6 +21,12 @@
       "store": "texts"
     },
     {
+      "key": "cooldown",
+      "label": "Cooldown message",
+      "type": "textarea",
+      "store": "texts"
+    },
+    {
       "key": "roleError",
       "label": "Role update error message",
       "type": "textarea",
@@ -109,11 +115,7 @@
           "type": "textarea",
           "store": "texts",
           "visibleWhen": {
-            "reactionType": [
-              "button",
-              "dropdown",
-              "dropdown-single"
-            ]
+            "reactionType": ["button", "dropdown", "dropdown-single"]
           },
           "clearWhenHidden": true,
           "help": "Button and dropdown only. Sent privately after a successful interaction when filled in. Tokens: {mention}, {role}. Leave blank for no reply."

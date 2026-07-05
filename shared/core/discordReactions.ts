@@ -1,5 +1,5 @@
-import { discordBotFetch } from './discordApi.js';
-import { encodeEmojiForReaction } from './discordEmoji.js';
+import { discordBotFetch } from "./discordApi.js";
+import { encodeEmojiForReaction } from "./discordEmoji.js";
 
 const MAX_ATTEMPTS = 5;
 const DEFAULT_DELAY_MS = 350;
@@ -13,16 +13,17 @@ function sleep(ms: number): Promise<void> {
 async function parseRetryAfterMs(res: Response): Promise<number> {
   try {
     const body = (await res.json()) as { retry_after?: number };
-    if (typeof body.retry_after === 'number' && body.retry_after > 0) {
+    if (typeof body.retry_after === "number" && body.retry_after > 0) {
       return Math.ceil(body.retry_after * 1000) + 50;
     }
   } catch {
     // ignore
   }
-  const header = res.headers.get('Retry-After');
+  const header = res.headers.get("Retry-After");
   if (header) {
     const seconds = Number(header);
-    if (!Number.isNaN(seconds) && seconds > 0) return Math.ceil(seconds * 1000) + 50;
+    if (!Number.isNaN(seconds) && seconds > 0)
+      return Math.ceil(seconds * 1000) + 50;
   }
   return 1000;
 }
@@ -32,15 +33,16 @@ export async function addBotMessageReaction(
   botToken: string,
   channelId: string,
   messageId: string,
-  emoji: string
+  emoji: string,
 ): Promise<void> {
   const encoded = encodeEmojiForReaction(emoji);
-  if (!encoded) throw new Error(`Invalid emoji "${emoji.trim() || '(empty)'}".`);
+  if (!encoded)
+    throw new Error(`Invalid emoji "${emoji.trim() || "(empty)"}".`);
 
   const path = `/channels/${channelId}/messages/${messageId}/reactions/${encoded}/@me`;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const res = await discordBotFetch(botToken, path, { method: 'PUT' });
+    const res = await discordBotFetch(botToken, path, { method: "PUT" });
     if (res.ok || res.status === 204) return;
 
     if (res.status === 429 && attempt < MAX_ATTEMPTS - 1) {
@@ -48,9 +50,9 @@ export async function addBotMessageReaction(
       continue;
     }
 
-    const detail = await res.text().catch(() => '');
+    const detail = await res.text().catch(() => "");
     throw new Error(
-      `Failed to add reaction "${emoji.trim()}" (HTTP ${res.status})${detail ? `: ${detail}` : ''}.`
+      `Failed to add reaction "${emoji.trim()}" (HTTP ${res.status})${detail ? `: ${detail}` : ""}.`,
     );
   }
 }
@@ -64,7 +66,7 @@ export async function syncBotMessageReactions(
   channelId: string,
   messageId: string,
   emojis: string[],
-  options?: { delayMs?: number; afterMessageEdit?: boolean }
+  options?: { delayMs?: number; afterMessageEdit?: boolean },
 ): Promise<void> {
   const trimmed = emojis.map((e) => e.trim()).filter(Boolean);
   if (!trimmed.length) return;

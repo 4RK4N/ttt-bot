@@ -4,23 +4,32 @@ import {
   ButtonStyle,
   EmbedBuilder,
   StringSelectMenuBuilder,
-} from 'discord.js';
-import { buildEmbed } from '../../core/embedBuilder.js';
-import { emojiMatchKey, parseEmoji, reactionMatchKey } from '../../core/discordEmoji.js';
-import { syncBotMessageReactions } from '../../core/discordReactions.js';
-import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-import type { ResolvedRolePanel, RoleOption } from './types.js';
-import { resolvePanel } from './config-io.js';
-import { validateRolePanel } from './validate.js';
+} from "discord.js";
+import { buildEmbed } from "../../core/embedBuilder.js";
+import {
+  emojiMatchKey,
+  parseEmoji,
+  reactionMatchKey,
+} from "../../core/discordEmoji.js";
+import { syncBotMessageReactions } from "../../core/discordReactions.js";
+import {
+  publishDiscordMessage,
+  type DiscordApiContext,
+} from "../../core/panelPublish.js";
+import type { ResolvedRolePanel, RoleOption } from "./types.js";
+import { resolvePanel } from "./config-io.js";
+import { validateRolePanel } from "./validate.js";
 
 export type { DiscordApiContext };
 
-export const BTN_PREFIX = 'reaction-roles:btn:';
-export const SEL_PREFIX = 'reaction-roles:sel:';
+export const BTN_PREFIX = "reaction-roles:btn:";
+export const SEL_PREFIX = "reaction-roles:sel:";
 
 const MAX_BUTTONS_PER_ROW = 5;
 
-function buildButtonRows(panel: ResolvedRolePanel): ActionRowBuilder<ButtonBuilder>[] {
+function buildButtonRows(
+  panel: ResolvedRolePanel,
+): ActionRowBuilder<ButtonBuilder>[] {
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
   let current = new ActionRowBuilder<ButtonBuilder>();
 
@@ -31,7 +40,10 @@ function buildButtonRows(panel: ResolvedRolePanel): ActionRowBuilder<ButtonBuild
       .setStyle(ButtonStyle.Primary);
 
     const parsed = parseEmoji(opt.emoji);
-    if (parsed) button.setEmoji(parsed.id ? { id: parsed.id, name: parsed.name } : parsed);
+    if (parsed)
+      button.setEmoji(
+        parsed.id ? { id: parsed.id, name: parsed.name } : parsed,
+      );
 
     current.addComponents(button);
     if (current.components.length >= MAX_BUTTONS_PER_ROW) {
@@ -44,21 +56,28 @@ function buildButtonRows(panel: ResolvedRolePanel): ActionRowBuilder<ButtonBuild
   return rows;
 }
 
-function buildSelectRow(panel: ResolvedRolePanel): ActionRowBuilder<StringSelectMenuBuilder> {
-  const single = panel.reactionType === 'dropdown-single';
+function buildSelectRow(
+  panel: ResolvedRolePanel,
+): ActionRowBuilder<StringSelectMenuBuilder> {
+  const single = panel.reactionType === "dropdown-single";
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${SEL_PREFIX}${panel.id}`)
-    .setPlaceholder(single ? 'Select a role' : 'Select roles')
+    .setPlaceholder(single ? "Select a role" : "Select roles")
     .setMinValues(0)
     .setMaxValues(single ? 1 : panel.roleOptions.length);
 
   for (const opt of panel.roleOptions) {
-    const option: { label: string; value: string; emoji?: { name: string; id?: string } } = {
+    const option: {
+      label: string;
+      value: string;
+      emoji?: { name: string; id?: string };
+    } = {
       label: opt.label.slice(0, 100),
       value: opt.id,
     };
     const parsed = parseEmoji(opt.emoji);
-    if (parsed) option.emoji = parsed.id ? { id: parsed.id, name: parsed.name } : parsed;
+    if (parsed)
+      option.emoji = parsed.id ? { id: parsed.id, name: parsed.name } : parsed;
     menu.addOptions(option);
   }
 
@@ -75,13 +94,19 @@ export function buildPanelPayload(panelId: string) {
     description: panel.panelDescription,
   });
 
-  const payload: { embeds: ReturnType<EmbedBuilder['toJSON']>[]; components?: unknown[] } = {
+  const payload: {
+    embeds: ReturnType<EmbedBuilder["toJSON"]>[];
+    components?: unknown[];
+  } = {
     embeds: [embed.toJSON()],
   };
 
-  if (panel.reactionType === 'button') {
+  if (panel.reactionType === "button") {
     payload.components = buildButtonRows(panel).map((r) => r.toJSON());
-  } else if (panel.reactionType === 'dropdown' || panel.reactionType === 'dropdown-single') {
+  } else if (
+    panel.reactionType === "dropdown" ||
+    panel.reactionType === "dropdown-single"
+  ) {
     payload.components = [buildSelectRow(panel).toJSON()];
   }
 
@@ -92,7 +117,7 @@ async function syncEmojiReactions(
   ctx: DiscordApiContext,
   channelId: string,
   messageId: string,
-  options: RoleOption[]
+  options: RoleOption[],
 ): Promise<void> {
   const emojis = options.map((opt) => opt.emoji);
   await syncBotMessageReactions(ctx.botToken, channelId, messageId, emojis);
@@ -102,22 +127,29 @@ export async function publishPanel(
   ctx: DiscordApiContext,
   panelId: string,
   channelId: string,
-  existingMessageId?: string
+  existingMessageId?: string,
 ): Promise<string> {
   const { panel, payload } = buildPanelPayload(panelId);
   const afterPublish =
-    panel.reactionType === 'emoji'
-      ? (messageId: string) => syncEmojiReactions(ctx, channelId, messageId, panel.roleOptions)
+    panel.reactionType === "emoji"
+      ? (messageId: string) =>
+          syncEmojiReactions(ctx, channelId, messageId, panel.roleOptions)
       : undefined;
 
-  return publishDiscordMessage(ctx, channelId, payload, existingMessageId, afterPublish);
+  return publishDiscordMessage(
+    ctx,
+    channelId,
+    payload,
+    existingMessageId,
+    afterPublish,
+  );
 }
 
 /** Match a reaction emoji to a panel option. */
 export function matchOptionByReaction(
   options: RoleOption[],
   emojiName: string | null,
-  emojiId: string | null
+  emojiId: string | null,
 ): RoleOption | undefined {
   const key = reactionMatchKey(emojiName, emojiId);
   if (!key) return undefined;

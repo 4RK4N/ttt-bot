@@ -1,7 +1,7 @@
-import type { WebPluginField } from '../../../plugin-types.js';
-import type { EditorContext } from '../context.js';
-import { RowSubFieldsWithWatch } from '../Field.js';
-import { OptionListField } from './OptionListField.js';
+import type { WebPluginField } from "../../../plugin-types.js";
+import type { EditorContext } from "../context.js";
+import { RowSubFieldsWithWatch } from "../Field.js";
+import { OptionListField } from "./OptionListField.js";
 
 function rowKey(item: Record<string, unknown>, index: number): string {
   const id = item.id;
@@ -15,7 +15,11 @@ function cardTitle(
 ): string {
   const merged = { ...row, ...subValues };
   return String(
-    merged.openButtonLabel ?? merged.panelTitle ?? merged.id ?? field.itemLabel ?? 'Item',
+    merged.openButtonLabel ??
+      merged.panelTitle ??
+      merged.id ??
+      field.itemLabel ??
+      "Item",
   );
 }
 
@@ -41,30 +45,30 @@ export function ObjectListRow({
     String(row.id).trim() &&
     !(expanded ?? []).includes(key);
 
-  const expandedParam = encodeURIComponent((expanded ?? []).join(','));
+  const expandedParam = encodeURIComponent((expanded ?? []).join(","));
   const toggleUrl = `/htmx/modules/${namespace}/row/${field.key}/${rowIndex}/toggle?expanded=${expandedParam}`;
   const listPrefix = field.key;
 
   return (
     <div
-      class={`card${collapsed ? ' is-collapsed' : ''}`}
+      class={`card${collapsed ? " is-collapsed" : ""}`}
       id={`row-${namespace}-${field.key}-${rowIndex}`}
     >
       <div
-        class={`card-header d-flex align-items-center justify-content-between gap-2${field.collapsible ? ' is-toggle' : ''}`}
+        class={`card-header d-flex align-items-center justify-content-between gap-2${field.collapsible ? " is-toggle" : ""}`}
         {...(field.collapsible
           ? {
-            'hx-post': toggleUrl,
-            'hx-target': `#row-${namespace}-${field.key}-${rowIndex}`,
-            'hx-swap': 'outerHTML',
-            'hx-include': `#panel-form-${namespace}`,
-          }
+              "hx-post": toggleUrl,
+              "hx-target": `#row-${namespace}-${field.key}-${rowIndex}`,
+              "hx-swap": "outerHTML",
+              "hx-include": `#panel-form-${namespace}`,
+            }
           : {})}
       >
         <div class="d-flex align-items-center gap-2 flex-fill overflow-hidden">
           {field.collapsible ? (
             <span class="text-secondary" aria-hidden="true">
-              {collapsed ? '\u25B6' : '\u25BC'}
+              {collapsed ? "\u25B6" : "\u25BC"}
             </span>
           ) : null}
           <h3 class="card-title mb-0 text-truncate">
@@ -72,9 +76,9 @@ export function ObjectListRow({
           </h3>
         </div>
         <span
-          class={`badge ${row.published ? 'bg-success-lt text-success' : 'bg-secondary-lt text-secondary'}`}
+          class={`badge ${row.published ? "bg-success-lt text-success" : "bg-secondary-lt text-secondary"}`}
         >
-          {row.published ? 'Published' : 'Unpublished'}
+          {row.published ? "Published" : "Unpublished"}
         </span>
       </div>
       <div class="card-body">
@@ -87,7 +91,7 @@ export function ObjectListRow({
           expanded={expanded}
         />
         {(field.itemFields ?? [])
-          .filter((sub) => sub.type === 'option-list')
+          .filter((sub) => sub.type === "option-list")
           .map((sub) => (
             <OptionListField
               f={sub}
@@ -143,7 +147,7 @@ export function ObjectListRow({
 }
 
 function fieldValueStr(value: unknown): string {
-  return value != null ? String(value) : '';
+  return value != null ? String(value) : "";
 }
 
 export function ObjectListField({
@@ -159,8 +163,11 @@ export function ObjectListField({
   namespace: string;
   expanded?: string[];
 }) {
-  const items = (Array.isArray(value) ? value : []) as Record<string, unknown>[];
-  const expandedParam = encodeURIComponent((expanded ?? []).join(','));
+  const items = (Array.isArray(value) ? value : []) as Record<
+    string,
+    unknown
+  >[];
+  const expandedParam = encodeURIComponent((expanded ?? []).join(","));
 
   return (
     <div class="mb-3 field">
@@ -186,7 +193,7 @@ export function ObjectListField({
         hx-target={`#list-${namespace}-${f.key}`}
         hx-swap="innerHTML"
       >
-        Add {(f.itemLabel ?? 'item').toLowerCase()}
+        Add {(f.itemLabel ?? "item").toLowerCase()}
       </button>
     </div>
   );

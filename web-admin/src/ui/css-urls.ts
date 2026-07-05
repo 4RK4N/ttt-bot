@@ -1,7 +1,7 @@
 /** Self-hosted vendor assets (copied to dist on build). */
-export const TABLER_CSS = '/assets/css/tabler.min.css';
-export const HTMX_JS = '/assets/js/htmx.min.js';
-export const OVERRIDES_CSS = '/assets/css/admin-overrides.css';
+export const TABLER_CSS = "/assets/css/tabler.min.css";
+export const HTMX_JS = "/assets/js/htmx.min.js";
+export const OVERRIDES_CSS = "/assets/css/admin-overrides.css";
 
 /** Inline SVG favicon — avoids automatic /favicon.ico requests. */
 export const FAVICON_HREF =

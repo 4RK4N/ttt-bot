@@ -1,5 +1,10 @@
-import { FAVICON_HREF, HTMX_JS, OVERRIDES_CSS, TABLER_CSS } from '../css-urls.js';
-import { StatusDot } from './enabled-ui.js';
+import {
+  FAVICON_HREF,
+  HTMX_JS,
+  OVERRIDES_CSS,
+  TABLER_CSS,
+} from "../css-urls.js";
+import { StatusDot } from "./enabled-ui.js";
 
 export function HtmxScripts() {
   return (
@@ -52,7 +57,9 @@ export function EditorLayout({
                 </span>
                 <form method="post" action="/logout" class="mb-0">
                   <input type="hidden" name="_csrf" value={csrfToken} />
-                  <button type="submit" class="btn btn-outline-secondary">Log out</button>
+                  <button type="submit" class="btn btn-outline-secondary">
+                    Log out
+                  </button>
                 </form>
               </div>
             </div>
@@ -81,13 +88,15 @@ export function EditorBody({
           <div class="collapse navbar-collapse show" id="sidebar-menu">
             <ul class="navbar-nav pt-lg-3">
               <li class="nav-item">
-                <span class="text-secondary text-uppercase small px-3 py-2 d-block">Modules</span>
+                <span class="text-secondary text-uppercase small px-3 py-2 d-block">
+                  Modules
+                </span>
               </li>
               {plugins.map((p) => (
                 <li class="nav-item w-100">
                   <button
                     type="button"
-                    class={`nav-link w-100 text-start${p.namespace === activeNamespace ? ' active' : ''}`}
+                    class={`nav-link w-100 text-start${p.namespace === activeNamespace ? " active" : ""}`}
                     hx-get={`/htmx/modules/${p.namespace}/panel`}
                     hx-target="#module-content"
                     hx-swap="innerHTML"

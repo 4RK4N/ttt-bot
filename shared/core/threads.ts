@@ -1,13 +1,13 @@
-import type { Client, Guild, Message, ThreadChannel } from 'discord.js';
-import { getMemberDisplayName } from './memberDisplayNames.js';
+import type { Client, Guild, Message, ThreadChannel } from "discord.js";
+import { getMemberDisplayName } from "./memberDisplayNames.js";
 
 const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.
 
 // Default bilingual opener for comments threads. Each thread module keeps its own
 // editable copy in its texts.json; this constant is the seed/fallback for them.
 export const DEFAULT_THREAD_FIRST_MESSAGE =
-  'Please comment here in the thread to not clutter the channel.\n\n' +
-  'Bitte hier im Thread kommentieren um nicht den Channel zu überlasten.';
+  "Please comment here in the thread to not clutter the channel.\n\n" +
+  "Bitte hier im Thread kommentieren um nicht den Channel zu überlasten.";
 
 export const THREAD_AUTO_ARCHIVE_MINUTES = 10080; // 7 days
 
@@ -16,6 +16,11 @@ export const THREAD_AUTO_ARCHIVE_MINUTES = 10080; // 7 days
 const CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
 const USER_MENTION_REGEX = /<@!?(\d+)>/g;
 
+/** Strips custom Discord emoji markup and collapses whitespace. */
+export function stripCustomEmoji(text: string): string {
+  return text.replace(CUSTOM_EMOJI_REGEX, "").replace(/\s+/g, " ").trim();
+}
+
 /** Optional context for resolving @mentions when building a thread title caption. */
 export interface ThreadCaptionContext {
   guild: Guild | null;
@@ -23,7 +28,10 @@ export interface ThreadCaptionContext {
   message?: Message;
 }
 
-function lookupDisplayName(ctx: ThreadCaptionContext, userId: string): string | undefined {
+function lookupDisplayName(
+  ctx: ThreadCaptionContext,
+  userId: string,
+): string | undefined {
   const fromMention = ctx.message?.mentions.members?.get(userId);
   if (fromMention) return fromMention.displayName;
 
@@ -36,13 +44,17 @@ function lookupDisplayName(ctx: ThreadCaptionContext, userId: string): string | 
   }
 
   const user =
-    ctx.message?.mentions.users.get(userId) ?? ctx.client.users.cache.get(userId);
+    ctx.message?.mentions.users.get(userId) ??
+    ctx.client.users.cache.get(userId);
   if (user) return user.displayName ?? user.username;
 
   return undefined;
 }
 
-function resolveUserMentions(content: string, ctx: ThreadCaptionContext): string {
+function resolveUserMentions(
+  content: string,
+  ctx: ThreadCaptionContext,
+): string {
   return content.replace(USER_MENTION_REGEX, (match, userId: string) => {
     const name = lookupDisplayName(ctx, userId);
     return name ? `@${name}` : match;
@@ -53,9 +65,12 @@ function resolveUserMentions(content: string, ctx: ThreadCaptionContext): string
  * Sanitizes free-form caption text for thread titles: resolves @mentions to
  * server display names, strips custom emoji, and collapses whitespace.
  */
-export function prepareThreadCaptionText(content: string, ctx?: ThreadCaptionContext): string {
+export function prepareThreadCaptionText(
+  content: string,
+  ctx?: ThreadCaptionContext,
+): string {
   const text = ctx ? resolveUserMentions(content, ctx) : content;
-  return text.replace(CUSTOM_EMOJI_REGEX, '').replace(/\s+/g, ' ').trim();
+  return stripCustomEmoji(text);
 }
 
 /**
@@ -75,10 +90,10 @@ export function buildThreadName(
   const trimmedText = text ? prepareThreadCaptionText(text, ctx) : undefined;
 
   const base = trimmedText ? `${authorName} - ${trimmedText}` : authorName;
-  const oneLine = base.replace(CUSTOM_EMOJI_REGEX, '').replace(/\s+/g, ' ').trim();
+  const oneLine = stripCustomEmoji(base);
 
   if (oneLine.length <= THREAD_NAME_MAX) return oneLine;
-  return oneLine.slice(0, THREAD_NAME_MAX - 3) + '...';
+  return oneLine.slice(0, THREAD_NAME_MAX - 3) + "...";
 }
 
 export interface CommentsThreadOptions {
@@ -91,7 +106,10 @@ export interface CommentsThreadOptions {
 /** Adds the author and posts the opener in an already-created thread. */
 export async function populateCommentsThread(
   thread: ThreadChannel,
-  options: Pick<CommentsThreadOptions, 'logPrefix' | 'authorUserId' | 'firstMessage'>
+  options: Pick<
+    CommentsThreadOptions,
+    "logPrefix" | "authorUserId" | "firstMessage"
+  >,
 ): Promise<void> {
   const { logPrefix, authorUserId, firstMessage } = options;
 
@@ -110,7 +128,7 @@ export async function populateCommentsThread(
  */
 export async function startAndPopulateCommentsThread(
   message: Message,
-  options: CommentsThreadOptions
+  options: CommentsThreadOptions,
 ): Promise<boolean> {
   try {
     const thread = await message.startThread({
@@ -120,7 +138,10 @@ export async function startAndPopulateCommentsThread(
     await populateCommentsThread(thread, options);
     return true;
   } catch (err) {
-    console.error(`${options.logPrefix} Failed to create comments thread:`, err);
+    console.error(
+      `${options.logPrefix} Failed to create comments thread:`,
+      err,
+    );
     return false;
   }
 }

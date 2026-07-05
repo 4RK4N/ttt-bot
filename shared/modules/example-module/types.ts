@@ -11,7 +11,7 @@
  * Web editor writes call invalidateModuleCache() — config() / texts() pick up changes
  * without restart.
  */
-import { createModuleConfig, resolveKeyedItem } from '../../core/moduleConfig.js';
+import { createModuleConfig } from "../../core/moduleConfig.js";
 
 // =============================================================================
 // SIMPLE MODULE (default — delete panel section below if unused)
@@ -33,15 +33,19 @@ export interface ExampleTexts {
 
 export const CONFIG_DEFAULTS: ExampleConfig = {
   enabled: true,
-  channelId: '',
+  channelId: "",
 };
 
 export const TEXT_DEFAULTS: ExampleTexts = {
-  disabled: 'This feature is currently disabled.',
-  greeting: 'Hello {mention}!',
+  disabled: "This feature is currently disabled.",
+  greeting: "Hello {mention}!",
 };
 
-const module = createModuleConfig('example-module', CONFIG_DEFAULTS, TEXT_DEFAULTS);
+const module = createModuleConfig(
+  "example-module",
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+);
 
 export const NAMESPACE = module.NAMESPACE;
 export const config = module.config;
@@ -50,7 +54,7 @@ export const texts = module.texts;
 /** Normalized config helper — prefer small named accessors over raw config() in handlers. */
 export function targetChannelId(): string | undefined {
   const id = config().channelId.trim();
-  return id === '' ? undefined : id;
+  return id === "" ? undefined : id;
 }
 
 // =============================================================================

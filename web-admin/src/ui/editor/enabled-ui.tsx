@@ -19,8 +19,8 @@ export function StatusDot({
   return (
     <span
       id={`status-dot-${namespace}`}
-      class={`status-dot ${on ? 'status-green' : 'status-muted'}`}
-      {...(oob ? { 'hx-swap-oob': 'true' } : {})}
+      class={`status-dot ${on ? "status-green" : "status-muted"}`}
+      {...(oob ? { "hx-swap-oob": "true" } : {})}
     />
   );
 }
@@ -51,7 +51,7 @@ export function EnabledToggle({
           hx-on:response-error={REVERT_CHECKBOX_ON_HTMX_ERROR}
           hx-on:send-error={REVERT_CHECKBOX_ON_HTMX_ERROR}
         />
-        <span class="form-check-label">{on ? 'On' : 'Off'}</span>
+        <span class="form-check-label">{on ? "On" : "Off"}</span>
       </label>
     </div>
   );

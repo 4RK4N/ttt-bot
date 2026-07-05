@@ -2,14 +2,15 @@ import {
   type ButtonInteraction,
   type GuildMember,
   type ThreadChannel,
-} from 'discord.js';
-import { replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { format } from '../../../../shared/core/texts.js';
-import { tryAssignRole } from '../../../../shared/core/discordRoles.js';
-import { finalizeTicketClose, resolveOpenerUserId } from './finalize-close.js';
-import { guardTicketThreadAction } from './guards.js';
-import { ROLE_ACTION_PREFIX } from '../../../../shared/modules/tickets/panel.js';
-import { canStaffOrAdmin } from './permissions.js';
+} from "discord.js";
+import { replyEphemeral } from "../../../../shared/core/discordInteractions.js";
+import { format } from "../../../../shared/core/texts.js";
+import { tryAssignRole } from "../../../../shared/core/discordRoles.js";
+import { finalizeTicketClose, resolveOpenerUserId } from "./finalize-close.js";
+import { guardTicketThreadAction } from "./guards.js";
+import { ROLE_ACTION_PREFIX } from "../../../../shared/modules/tickets/panel.js";
+import { canStaffOrAdmin } from "./permissions.js";
+import { texts } from "../../../../shared/modules/tickets/config-io.js";
 
 interface ParsedRoleActionCustomId {
   threadId: string;
@@ -17,24 +18,35 @@ interface ParsedRoleActionCustomId {
   openerUserId?: string;
 }
 
-function parseRoleActionCustomId(customId: string): ParsedRoleActionCustomId | null {
+function parseRoleActionCustomId(
+  customId: string,
+): ParsedRoleActionCustomId | null {
   if (!customId.startsWith(ROLE_ACTION_PREFIX)) return null;
 
-  const segments = customId.slice(ROLE_ACTION_PREFIX.length).split(':');
+  const segments = customId.slice(ROLE_ACTION_PREFIX.length).split(":");
   if (segments.length < 3) return null;
 
-  return { threadId: segments[0], typeId: segments[1], openerUserId: segments[2] };
+  return {
+    threadId: segments[0],
+    typeId: segments[1],
+    openerUserId: segments[2],
+  };
 }
 
-export async function handleRoleAction(interaction: ButtonInteraction): Promise<void> {
+export async function handleRoleAction(
+  interaction: ButtonInteraction,
+): Promise<void> {
   const parsed = parseRoleActionCustomId(interaction.customId);
-  if (!parsed) return;
+  if (!parsed) {
+    await replyEphemeral(interaction, texts().invalidInteraction);
+    return;
+  }
 
   const guarded = await guardTicketThreadAction(
     interaction,
     parsed.typeId,
     parsed.threadId,
-    { requireOpen: true }
+    { requireOpen: true },
   );
   if (!guarded.ok) return;
 
@@ -51,14 +63,19 @@ export async function handleRoleAction(interaction: ButtonInteraction): Promise<
     return;
   }
 
-  const openerUserId = await resolveOpenerUserId(thread, parsed.openerUserId);
+  const { openerUserId, welcomeMessage } = await resolveOpenerUserId(
+    thread,
+    parsed.openerUserId,
+  );
   if (!openerUserId) {
     await replyEphemeral(interaction, t.roleActionOpenerMissing);
     return;
   }
 
   const guild = thread.guild;
-  const openerMember = await guild.members.fetch(openerUserId).catch(() => null);
+  const openerMember = await guild.members
+    .fetch(openerUserId)
+    .catch(() => null);
   if (!openerMember) {
     await replyEphemeral(interaction, t.roleActionOpenerMissing);
     return;
@@ -70,7 +87,9 @@ export async function handleRoleAction(interaction: ButtonInteraction): Promise<
 
   if (!result.ok) {
     const message =
-      result.reason === 'hierarchy' ? t.roleActionHierarchyError : t.roleActionError;
+      result.reason === "hierarchy"
+        ? t.roleActionHierarchyError
+        : t.roleActionError;
     await replyEphemeral(interaction, message);
     return;
   }
@@ -80,11 +99,17 @@ export async function handleRoleAction(interaction: ButtonInteraction): Promise<
   try {
     const confirmation = format(ticketType.roleActionConfirmation, {
       mention: `<@${openerUserId}>`,
-      role: role?.name ?? 'role',
+      role: role?.name ?? "role",
     });
-    await finalizeTicketClose(thread as ThreadChannel, parsed.typeId, ticketType, confirmation);
+    await finalizeTicketClose(
+      thread as ThreadChannel,
+      parsed.typeId,
+      ticketType,
+      confirmation,
+      welcomeMessage,
+    );
   } catch (err) {
-    console.error('[tickets] Failed to complete role action:', err);
+    console.error("[tickets] Failed to complete role action:", err);
     await replyEphemeral(interaction, t.closeError);
   }
 }

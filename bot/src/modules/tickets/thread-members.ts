@@ -4,9 +4,9 @@ import {
   type APIGuildMember,
   type Guild,
   type ThreadChannel,
-} from 'discord.js';
-import { setTimeout as sleep } from 'node:timers/promises';
-import { getMembersForGuild, upsertApiMember } from './member-cache.js';
+} from "discord.js";
+import { setTimeout as sleep } from "node:timers/promises";
+import { getMembersForGuild, upsertApiMember } from "./member-cache.js";
 
 /** Discord max per GET /guilds/{id}/members page. */
 const MEMBER_LIST_PAGE_SIZE = 1000;
@@ -25,9 +25,9 @@ async function fetchAllGuildMembers(guild: Guild): Promise<number> {
   let after: string | undefined;
   let total = 0;
 
-  for (; ;) {
+  for (;;) {
     const query = new URLSearchParams({ limit: String(MEMBER_LIST_PAGE_SIZE) });
-    if (after) query.set('after', after);
+    if (after) query.set("after", after);
 
     const page = (await guild.client.rest.get(Routes.guildMembers(guild.id), {
       query,
@@ -60,9 +60,14 @@ export async function warmGuildMemberCache(guild: Guild): Promise<void> {
     try {
       const count = await fetchAllGuildMembers(guild);
       memberCacheWarmed.add(guild.id);
-      console.log(`[tickets] Member cache warmed for ${guild.name} (${count} members).`);
+      console.log(
+        `[tickets] Member cache warmed for ${guild.name} (${count} members).`,
+      );
     } catch (err) {
-      console.error(`[tickets] Failed to warm member cache for guild ${guild.id}:`, err);
+      console.error(
+        `[tickets] Failed to warm member cache for guild ${guild.id}:`,
+        err,
+      );
       throw err;
     } finally {
       warmPromises.delete(guild.id);
@@ -74,7 +79,10 @@ export async function warmGuildMemberCache(guild: Guild): Promise<void> {
 }
 
 /** Non-bot guild admins plus all members of the configured staff roles (deduped). */
-export async function collectStaffUserIds(guild: Guild, staffRoleIds: string[]): Promise<string[]> {
+export async function collectStaffUserIds(
+  guild: Guild,
+  staffRoleIds: string[],
+): Promise<string[]> {
   try {
     await warmGuildMemberCache(guild);
   } catch {
@@ -93,7 +101,9 @@ export async function collectStaffUserIds(guild: Guild, staffRoleIds: string[]):
 
   for (const [userId, member] of getMembersForGuild(guild.id)) {
     if (member.isBot) continue;
-    if (member.roleIds.some((rid) => staffSet.has(rid) || adminRoleIds.has(rid))) {
+    if (
+      member.roleIds.some((rid) => staffSet.has(rid) || adminRoleIds.has(rid))
+    ) {
       ids.add(userId);
     }
   }
@@ -101,13 +111,19 @@ export async function collectStaffUserIds(guild: Guild, staffRoleIds: string[]):
   return [...ids];
 }
 
-export async function addMembersToThread(thread: ThreadChannel, userIds: string[]): Promise<void> {
+export async function addMembersToThread(
+  thread: ThreadChannel,
+  userIds: string[],
+): Promise<void> {
   for (let i = 0; i < userIds.length; i++) {
     const userId = userIds[i]!;
     try {
       await thread.members.add(userId);
     } catch (err) {
-      console.warn(`[tickets] Failed to add user ${userId} to thread ${thread.id}:`, err);
+      console.warn(
+        `[tickets] Failed to add user ${userId} to thread ${thread.id}:`,
+        err,
+      );
     }
     if (i < userIds.length - 1) {
       await sleep(THREAD_MEMBER_ADD_DELAY_MS);

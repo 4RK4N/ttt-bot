@@ -91,15 +91,15 @@ Channel and role fields in the web editor are validated as Discord IDs (numeric 
 
 Every production module follows the same shape:
 
-| Location | File | Role |
-|----------|------|------|
-| `shared/modules/<name>/` | `types.ts` | `createModuleConfig`, defaults, `config()`, `texts()`, `resolve*()` |
-| `shared/modules/<name>/` | `config-io.ts` | IO boundary — **handlers import from here** |
-| `shared/modules/<name>/` | `web-plugin.json` | Web editor fields (optional) |
-| `shared/modules/<name>/` | `validate.ts` | Row validation for object-lists (panel modules) |
-| `shared/modules/<name>/` | `panel.ts` | Publish payload (panel modules) |
-| `bot/src/modules/<name>/` | `index.ts` | `CommandModule` export only |
-| `bot/src/modules/<name>/` | `handlers.ts` | Event/command handlers (recommended) |
+| Location                  | File              | Role                                                                |
+| ------------------------- | ----------------- | ------------------------------------------------------------------- |
+| `shared/modules/<name>/`  | `types.ts`        | `createModuleConfig`, defaults, `config()`, `texts()`, `resolve*()` |
+| `shared/modules/<name>/`  | `config-io.ts`    | IO boundary — **handlers import from here**                         |
+| `shared/modules/<name>/`  | `web-plugin.json` | Web editor fields (optional)                                        |
+| `shared/modules/<name>/`  | `validate.ts`     | Row validation for object-lists (panel modules)                     |
+| `shared/modules/<name>/`  | `panel.ts`        | Publish payload (panel modules)                                     |
+| `bot/src/modules/<name>/` | `index.ts`        | `CommandModule` export only                                         |
+| `bot/src/modules/<name>/` | `handlers.ts`     | Event/command handlers (recommended)                                |
 
 **Simple modules:** `config-io.ts` re-exports reads.
 **Panel modules:** add `createConfigIo` for publish-time config patches (`published`, `panelMessageId`, …).
@@ -119,12 +119,12 @@ See the [module template README](bot/src/examples/module-template/README.md) for
 
 ## Intents & permissions (quick reference)
 
-| Module | Privileged intent | Other requirements |
-|--------|-------------------|-------------------|
-| welcome-message | Server Members | — |
-| pic-repost-commands | — | Thread permissions in channel |
-| links-pics-vids-autothread | Message Content | — |
-| tickets | Server Members | Manage Threads, Manage Roles |
-| reaction-roles | — (reactions: standard) | Manage Roles |
-| moderation-log | Server Members | View Audit Log (moderator on kick/ban) |
-| custom-embeds | — | Embed Links |
+| Module                     | Privileged intent       | Other requirements                     |
+| -------------------------- | ----------------------- | -------------------------------------- |
+| welcome-message            | Server Members          | —                                      |
+| pic-repost-commands        | —                       | Thread permissions in channel          |
+| links-pics-vids-autothread | Message Content         | —                                      |
+| tickets                    | Server Members          | Manage Threads, Manage Roles           |
+| reaction-roles             | — (reactions: standard) | Manage Roles                           |
+| moderation-log             | Server Members          | View Audit Log (moderator on kick/ban) |
+| custom-embeds              | —                       | Embed Links                            |

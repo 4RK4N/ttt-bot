@@ -1,9 +1,9 @@
-import type { WebPluginSubField } from '../../../plugin-types.js';
-import type { EditorContext } from '../context.js';
-import { SubField } from '../Field.js';
+import type { WebPluginSubField } from "../../../plugin-types.js";
+import type { EditorContext } from "../context.js";
+import { SubField } from "../Field.js";
 
 function fieldValueStr(value: unknown): string {
-  return value != null ? String(value) : '';
+  return value != null ? String(value) : "";
 }
 
 export function OptionListField({
@@ -25,18 +25,25 @@ export function OptionListField({
   rowIndex: number;
   disabled?: boolean;
 }) {
-  const items = (Array.isArray(value) ? value : []) as Record<string, unknown>[];
+  const items = (Array.isArray(value) ? value : []) as Record<
+    string,
+    unknown
+  >[];
   const listId = `optlist-${namespace}-${fieldKey}-${rowIndex}-${f.key}`;
 
   return (
-    <div class={`mb-3 field${disabled ? ' disabled' : ''}`}>
+    <div class={`mb-3 field${disabled ? " disabled" : ""}`}>
       <label class="form-label">{f.label}</label>
       {f.help ? <div class="form-text text-secondary">{f.help}</div> : null}
       <div class="vstack gap-3" id={listId}>
         {items.map((item, optIndex) => (
           <div class="card">
             <div class="card-body">
-              <input type="hidden" name={`${name}[${optIndex}].id`} value={fieldValueStr(item.id)} />
+              <input
+                type="hidden"
+                name={`${name}[${optIndex}].id`}
+                value={fieldValueStr(item.id)}
+              />
               {(f.optionFields ?? []).map((sub) => (
                 <SubField
                   f={sub}
@@ -101,7 +108,11 @@ export function OptionListRowsOnly({
       {items.map((item, optIndex) => (
         <div class="card">
           <div class="card-body">
-            <input type="hidden" name={`${name}[${optIndex}].id`} value={fieldValueStr(item.id)} />
+            <input
+              type="hidden"
+              name={`${name}[${optIndex}].id`}
+              value={fieldValueStr(item.id)}
+            />
             {(f.optionFields ?? []).map((sub) => (
               <SubField
                 f={sub}

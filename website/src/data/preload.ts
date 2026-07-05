@@ -1,5 +1,5 @@
-import type { ImageMetadata } from 'astro';
-import { getImage } from 'astro:assets';
+import type { ImageMetadata } from "astro";
+import { getImage } from "astro:assets";
 
 export async function buildResponsivePreload(
   src: ImageMetadata,
@@ -8,10 +8,10 @@ export async function buildResponsivePreload(
 ) {
   const srcset = (
     await Promise.all(
-      widths.map((w) => getImage({ src, width: w, format: 'webp' })),
+      widths.map((w) => getImage({ src, width: w, format: "webp" })),
     )
   )
     .map((img, i) => `${img.src} ${widths[i]}w`)
-    .join(', ');
+    .join(", ");
   return { srcset, sizes };
 }

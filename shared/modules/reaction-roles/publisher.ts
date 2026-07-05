@@ -1,16 +1,19 @@
-import { createPanelPublisher } from '../../core/panelPublisher.js';
-import { getPanelConfig, resolvePanel, updatePanel } from './config-io.js';
-import { publishPanel, type DiscordApiContext } from './panel.js';
+import { createPanelPublisher } from "../../core/panelPublisher.js";
+import { getPanelConfig, resolvePanel, updatePanel } from "./config-io.js";
+import { publishPanel, type DiscordApiContext } from "./panel.js";
 
 const panelPublisher = createPanelPublisher({
   resolve: resolvePanel,
   getConfig: getPanelConfig,
   update: updatePanel,
   publishPanel,
-  entityLabel: 'panel',
+  entityLabel: "panel",
 });
 
-export async function publishRolePanel(ctx: DiscordApiContext, panelId: string): Promise<void> {
+export async function publishRolePanel(
+  ctx: DiscordApiContext,
+  panelId: string,
+): Promise<void> {
   return panelPublisher.publish(ctx, panelId);
 }
 

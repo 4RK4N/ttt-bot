@@ -1,10 +1,12 @@
-import { createModuleConfig } from '../../core/moduleConfig.js';
-import { DEFAULT_THREAD_FIRST_MESSAGE } from '../../core/threads.js';
+import { createModuleConfig } from "../../core/moduleConfig.js";
+import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 export interface PicTexts {
   disabled: string;
   noImages: string;
   notImages: string;
+  messageTooLong: string;
+  attachmentTooLarge: string;
   downloadFailed: string;
   cannotPost: string;
   postFailed: string;
@@ -24,24 +26,33 @@ export const CONFIG_DEFAULTS: PicConfig = {
 
 // Code defaults; data/pic-repost-commands/texts.json overrides these.
 export const TEXT_DEFAULTS: PicTexts = {
-  disabled: 'This command is currently disabled.',
-  noImages: 'You need to attach at least one image.',
-  notImages: 'These attachments are not images: {names}. Please attach image files only.',
+  disabled: "This command is currently disabled.",
+  noImages: "You need to attach at least one image.",
+  notImages:
+    "These attachments are not images: {names}. Please attach image files only.",
+  messageTooLong:
+    "Your message is too long. Please keep it under 2000 characters.",
+  attachmentTooLarge:
+    "One or more images are too large: {names}. Please use smaller files.",
   downloadFailed:
-    'Could not download one of your images. Please try again with a smaller or different file.',
-  cannotPost: 'I cannot post in this channel.',
+    "Could not download one of your images. Please try again with a smaller or different file.",
+  cannotPost: "I cannot post in this channel.",
   postFailed:
-    'I could not post in this channel. This is usually a file size limit or missing ' +
+    "I could not post in this channel. This is usually a file size limit or missing " +
     '"Send Messages"/"Attach Files" permission.',
-  attribution: '{message}\n\nby {mention}',
-  postedSuccess: 'Posted {count} {images} to this channel.',
+  attribution: "{message}\n\nby {mention}",
+  postedSuccess: "Posted {count} {images} to this channel.",
   threadNote:
-    '\n\nNote: I could not create the comments thread. I may be missing the ' +
+    "\n\nNote: I could not create the comments thread. I may be missing the " +
     '"Create Public Threads" / "Send Messages in Threads" permission in this channel.',
   threadFirstMessage: DEFAULT_THREAD_FIRST_MESSAGE,
 };
 
-const module = createModuleConfig('pic-repost-commands', CONFIG_DEFAULTS, TEXT_DEFAULTS);
+const module = createModuleConfig(
+  "pic-repost-commands",
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+);
 
 export const NAMESPACE = module.NAMESPACE;
 export const config = module.config;

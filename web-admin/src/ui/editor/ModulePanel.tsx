@@ -1,17 +1,23 @@
-import type { EditorModule } from '../../plugin-types.js';
-import type { PanelProps } from './context.js';
-import { Field } from './Field.js';
-import { EnabledToggle } from './enabled-ui.js';
+import type { EditorModule } from "../../plugin-types.js";
+import type { PanelProps } from "./context.js";
+import { Field } from "./Field.js";
+import { EnabledToggle } from "./enabled-ui.js";
 
 export function ModulePanel({ mod, ctx, expanded, status }: PanelProps) {
   const statusHtml = status ? (
-    <span class={status.ok ? 'text-success' : 'text-danger'}>{status.message}</span>
+    <span class={status.ok ? "text-success" : "text-danger"}>
+      {status.message}
+    </span>
   ) : (
     <span class="text-secondary" />
   );
 
   return (
-    <section class="module-panel" data-ns={mod.namespace} id={`htmx-panel-${mod.namespace}`}>
+    <section
+      class="module-panel"
+      data-ns={mod.namespace}
+      id={`htmx-panel-${mod.namespace}`}
+    >
       <form
         id={`panel-form-${mod.namespace}`}
         hx-put={`/htmx/modules/${mod.namespace}`}
@@ -23,7 +29,9 @@ export function ModulePanel({ mod, ctx, expanded, status }: PanelProps) {
           <h2 class="mb-0">{mod.title}</h2>
           <EnabledToggle namespace={mod.namespace} enabled={mod.enabled} />
         </div>
-        {mod.description ? <p class="text-secondary mb-3">{mod.description}</p> : null}
+        {mod.description ? (
+          <p class="text-secondary mb-3">{mod.description}</p>
+        ) : null}
         {mod.fields.map((f) => (
           <Field
             f={f}

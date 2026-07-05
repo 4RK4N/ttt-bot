@@ -1,5 +1,5 @@
-import type { WebConfig } from './config.js';
-import { DISCORD_API } from './discord.js';
+import type { WebConfig } from "./config.js";
+import { DISCORD_API } from "./discord.js";
 
 export interface GuildRole {
   id: string;
@@ -28,17 +28,19 @@ export async function listGuildRoles(cfg: WebConfig): Promise<GuildRole[]> {
   });
 
   if (!res.ok) {
-    throw new Error(`Discord API returned HTTP ${res.status} when listing roles.`);
+    throw new Error(
+      `Discord API returned HTTP ${res.status} when listing roles.`,
+    );
   }
 
   const raw = (await res.json()) as RawRole[];
   const roles = raw
     .filter(
-      (r): r is Required<Pick<RawRole, 'id' | 'name'>> & RawRole =>
-        typeof r.id === 'string' &&
-        typeof r.name === 'string' &&
-        r.name !== '@everyone' &&
-        r.managed !== true
+      (r): r is Required<Pick<RawRole, "id" | "name">> & RawRole =>
+        typeof r.id === "string" &&
+        typeof r.name === "string" &&
+        r.name !== "@everyone" &&
+        r.managed !== true,
     )
     .sort((a, b) => (b.position ?? 0) - (a.position ?? 0))
     .map((r) => ({ id: r.id, name: r.name, color: r.color ?? 0 }));

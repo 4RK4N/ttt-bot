@@ -1,7 +1,7 @@
-import type { EmbedBuilder } from 'discord.js';
-import { buildEmbed } from '../../../../shared/core/embedBuilder.js';
-import { format } from '../../../../shared/core/texts.js';
-import type { ModLogTexts } from '../../../../shared/modules/moderation-log/types.js';
+import type { EmbedBuilder } from "discord.js";
+import { buildEmbed } from "../../../../shared/core/embedBuilder.js";
+import { format } from "../../../../shared/core/texts.js";
+import type { ModLogTexts } from "../../../../shared/modules/moderation-log/types.js";
 
 const MAX_CONTENT_LENGTH = 1_000;
 
@@ -20,7 +20,7 @@ interface UserLike {
 
 export function resolveDeleteAuthor(
   texts: ModLogTexts,
-  author: UserLike | null | undefined
+  author: UserLike | null | undefined,
 ): ResolvedDeleteAuthor {
   if (author) {
     return {
@@ -42,7 +42,7 @@ export function buildMessageDeletedEmbed(
   channelId: string,
   messageId: string,
   content: string | null,
-  timestamp: Date
+  timestamp: Date,
 ): EmbedBuilder {
   const header = format(texts.messageDeleted, {
     author: author.mention,
@@ -66,36 +66,63 @@ export function buildMessageDeletedEmbed(
 export function buildMemberLeftEmbed(
   texts: ModLogTexts,
   user: UserLike,
-  timestamp: Date
+  timestamp: Date,
 ): EmbedBuilder {
-  return buildMemberEmbed(texts.memberLeft, texts.footerUserId, texts, user, timestamp);
+  return buildMemberEmbed(
+    texts.memberLeft,
+    texts.footerUserId,
+    texts,
+    user,
+    timestamp,
+  );
 }
 
 export function buildMemberKickedEmbed(
   texts: ModLogTexts,
   user: UserLike,
   timestamp: Date,
-  executorId: string | null
+  executorId: string | null,
 ): EmbedBuilder {
-  return buildMemberEmbed(texts.memberKicked, texts.footerUserId, texts, user, timestamp, executorId);
+  return buildMemberEmbed(
+    texts.memberKicked,
+    texts.footerUserId,
+    texts,
+    user,
+    timestamp,
+    executorId,
+  );
 }
 
 export function buildMemberBannedEmbed(
   texts: ModLogTexts,
   user: UserLike,
   timestamp: Date,
-  executorId: string | null
+  executorId: string | null,
 ): EmbedBuilder {
-  return buildMemberEmbed(texts.memberBanned, texts.footerUserId, texts, user, timestamp, executorId);
+  return buildMemberEmbed(
+    texts.memberBanned,
+    texts.footerUserId,
+    texts,
+    user,
+    timestamp,
+    executorId,
+  );
 }
 
 export function buildMemberUnbannedEmbed(
   texts: ModLogTexts,
   user: UserLike,
   timestamp: Date,
-  executorId: string | null
+  executorId: string | null,
 ): EmbedBuilder {
-  return buildMemberEmbed(texts.memberUnbanned, texts.footerUserId, texts, user, timestamp, executorId);
+  return buildMemberEmbed(
+    texts.memberUnbanned,
+    texts.footerUserId,
+    texts,
+    user,
+    timestamp,
+    executorId,
+  );
 }
 
 function buildMemberEmbed(
@@ -104,7 +131,7 @@ function buildMemberEmbed(
   texts: ModLogTexts,
   user: UserLike,
   timestamp: Date,
-  executorId: string | null = null
+  executorId: string | null = null,
 ): EmbedBuilder {
   const vars: Record<string, string> = {
     mention: `<@${user.id}>`,

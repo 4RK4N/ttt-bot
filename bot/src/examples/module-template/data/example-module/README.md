@@ -27,10 +27,10 @@ host — bind-mounted to `/app/data` inside the bot and web-editor containers
 
 ## Config vs texts
 
-| File | Contents |
-|------|----------|
+| File          | Contents                                                                                |
+| ------------- | --------------------------------------------------------------------------------------- |
 | `config.json` | Settings: `enabled`, `channelId` (Discord snowflake), panel list rows for panel modules |
-| `texts.json` | User-facing copy edited in the web editor |
+| `texts.json`  | User-facing copy edited in the web editor                                               |
 
 The web editor validates `channel` / `role` fields as numeric Discord IDs on save.
 

@@ -1,10 +1,9 @@
-import { getConfig, getTexts } from './texts.js';
+import { getConfig, getTexts } from "./texts.js";
 
-export function createModuleConfig<TConfig extends object, TTexts extends object>(
-  namespace: string,
-  configDefaults: TConfig,
-  textDefaults: TTexts
-) {
+export function createModuleConfig<
+  TConfig extends object,
+  TTexts extends object,
+>(namespace: string, configDefaults: TConfig, textDefaults: TTexts) {
   return {
     NAMESPACE: namespace,
     CONFIG_DEFAULTS: configDefaults,
@@ -24,7 +23,7 @@ export function resolveKeyedItem<
   id: string,
   textsMap: Record<string, TTexts>,
   defaultTexts: TTexts,
-  merge?: (row: TConfig, texts: TTexts) => TResolved
+  merge?: (row: TConfig, texts: TTexts) => TResolved,
 ): TResolved | undefined {
   const row = list.find((item) => item.id === id);
   if (!row) return undefined;

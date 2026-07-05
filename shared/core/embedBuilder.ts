@@ -1,4 +1,4 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from "discord.js";
 
 const MAX_TITLE = 256;
 const MAX_DESCRIPTION = 4096;
@@ -23,7 +23,9 @@ export interface BuildEmbedOptions {
  * and timestamp optional. Never sets color, thumbnail, or image.
  */
 export function buildEmbed(options: BuildEmbedOptions): EmbedBuilder {
-  const embed = new EmbedBuilder().setDescription(options.description.slice(0, MAX_DESCRIPTION));
+  const embed = new EmbedBuilder().setDescription(
+    options.description.slice(0, MAX_DESCRIPTION),
+  );
 
   if (options.title) {
     embed.setTitle(options.title.slice(0, MAX_TITLE));

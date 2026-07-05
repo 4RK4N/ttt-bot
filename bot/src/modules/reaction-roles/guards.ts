@@ -1,14 +1,24 @@
-import type { MessageComponentInteraction } from 'discord.js';
-import { replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { isModuleEnabled } from '../../../../shared/core/texts.js';
-import { NAMESPACE, resolvePanel, texts } from '../../../../shared/modules/reaction-roles/config-io.js';
-import type { ReactionType, ResolvedRolePanel } from '../../../../shared/modules/reaction-roles/types.js';
+import type { MessageComponentInteraction } from "discord.js";
+import { replyEphemeral } from "../../../../shared/core/discordInteractions.js";
+import { isModuleEnabled } from "../../../../shared/core/texts.js";
+import {
+  NAMESPACE,
+  resolvePanel,
+  texts,
+} from "../../../../shared/modules/reaction-roles/config-io.js";
+import type {
+  ReactionType,
+  ResolvedRolePanel,
+} from "../../../../shared/modules/reaction-roles/types.js";
 
 export type PanelGuardResult =
   | { ok: true; panel: ResolvedRolePanel; t: ReturnType<typeof texts> }
   | { ok: false };
 
-function matchesReactionType(panel: ResolvedRolePanel, allowed: ReactionType | ReactionType[]): boolean {
+function matchesReactionType(
+  panel: ResolvedRolePanel,
+  allowed: ReactionType | ReactionType[],
+): boolean {
   const types = Array.isArray(allowed) ? allowed : [allowed];
   return types.includes(panel.reactionType);
 }
@@ -20,7 +30,7 @@ export async function guardPublishedPanel(
   options: {
     reactionType: ReactionType | ReactionType[];
     requireGuild?: boolean;
-  }
+  },
 ): Promise<PanelGuardResult> {
   const t = texts();
 
@@ -40,7 +50,9 @@ export async function guardPublishedPanel(
     return { ok: false };
   }
 
-  if (!isActivePanelMessage(panel, interaction.channelId, interaction.message.id)) {
+  if (
+    !isActivePanelMessage(panel, interaction.channelId, interaction.message.id)
+  ) {
     await replyEphemeral(interaction, t.invalidInteraction);
     return { ok: false };
   }
@@ -57,10 +69,11 @@ export async function guardPublishedPanel(
 export function isActivePanelMessage(
   panel: ResolvedRolePanel,
   channelId: string | null,
-  messageId: string | undefined
+  messageId: string | undefined,
 ): boolean {
   if (!panel.panelMessageId || !messageId) return false;
   if (panel.panelMessageId !== messageId) return false;
-  if (panel.channelId && channelId && panel.channelId !== channelId) return false;
+  if (panel.channelId && channelId && panel.channelId !== channelId)
+    return false;
   return true;
 }

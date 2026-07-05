@@ -1,8 +1,8 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { DATA_DIR } from './core/texts.js';
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { DATA_DIR } from "./core/texts.js";
 
-const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
+const CONFIG_FILE = path.join(DATA_DIR, "config.json");
 
 interface RawConfig {
   discordToken?: string;
@@ -17,12 +17,12 @@ interface RawConfig {
 
 function loadRaw(): RawConfig {
   try {
-    return JSON.parse(readFileSync(CONFIG_FILE, 'utf8')) as RawConfig;
+    return JSON.parse(readFileSync(CONFIG_FILE, "utf8")) as RawConfig;
   } catch (err) {
     throw new Error(
       `Could not read configuration from "${CONFIG_FILE}". ` +
-      'Copy "data/config.example.json" to "data/config.json" and fill in the values. ' +
-      `(${(err as Error).message})`
+        'Copy "data/config.example.json" to "data/config.json" and fill in the values. ' +
+        `(${(err as Error).message})`,
     );
   }
 }
@@ -30,7 +30,9 @@ function loadRaw(): RawConfig {
 const raw = loadRaw();
 
 function trimmedOrUndefined(value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
+  return typeof value === "string" && value.trim() !== ""
+    ? value.trim()
+    : undefined;
 }
 
 function required(key: keyof RawConfig): string {
@@ -38,15 +40,20 @@ function required(key: keyof RawConfig): string {
   if (!value) {
     throw new Error(
       `Missing required config value "${key}" in "${CONFIG_FILE}". ` +
-      'See "data/config.example.json" for the expected shape.'
+        'See "data/config.example.json" for the expected shape.',
     );
   }
   return value;
 }
 
 function optionalPort(value: unknown, fallback: number): number {
-  const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
-  return Number.isInteger(parsed) && parsed > 0 && parsed < 65536 ? parsed : fallback;
+  const parsed =
+    typeof value === "number"
+      ? value
+      : Number.parseInt(String(value ?? ""), 10);
+  return Number.isInteger(parsed) && parsed > 0 && parsed < 65536
+    ? parsed
+    : fallback;
 }
 
 export interface Config {
@@ -64,12 +71,12 @@ export interface Config {
 }
 
 export const config: Config = {
-  discordToken: required('discordToken'),
-  clientId: required('clientId'),
+  discordToken: required("discordToken"),
+  clientId: required("clientId"),
   // Optional: when set, slash commands register to this guild instantly (great for dev).
   guildId: trimmedOrUndefined(raw.guildId),
   // Bot/display name shown in the web editor title; falls back to "TTT".
-  botName: trimmedOrUndefined(raw.botName) ?? 'TTT',
+  botName: trimmedOrUndefined(raw.botName) ?? "TTT",
   // OAuth client secret used by the web editor to exchange the auth code.
   clientSecret: trimmedOrUndefined(raw.clientSecret),
   // Secret used to sign the web editor's session cookies.

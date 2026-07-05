@@ -1,16 +1,16 @@
 export type WebFieldType =
-  | 'text'
-  | 'textarea'
-  | 'channel'
-  | 'channel-multi'
-  | 'role'
-  | 'role-multi'
-  | 'boolean'
-  | 'select'
-  | 'option-list'
-  | 'object-list';
+  | "text"
+  | "textarea"
+  | "channel"
+  | "channel-multi"
+  | "role"
+  | "role-multi"
+  | "boolean"
+  | "select"
+  | "option-list"
+  | "object-list";
 
-export type WebFieldStore = 'texts' | 'config';
+export type WebFieldStore = "texts" | "config";
 
 export interface WebPluginSelectOption {
   value: string;
@@ -22,7 +22,7 @@ export type WebPluginVisibleWhen = Record<string, string[]>;
 export interface WebPluginSubField {
   key: string;
   label: string;
-  type: Exclude<WebFieldType, 'object-list'>;
+  type: Exclude<WebFieldType, "object-list">;
   store?: WebFieldStore;
   help?: string;
   options?: WebPluginSelectOption[];

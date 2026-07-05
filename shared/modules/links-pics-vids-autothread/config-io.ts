@@ -5,4 +5,4 @@ export {
   config,
   texts,
   channelIds,
-} from './types.js';
+} from "./types.js";

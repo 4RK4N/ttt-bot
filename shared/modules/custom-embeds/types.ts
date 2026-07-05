@@ -1,6 +1,9 @@
-import { createModuleConfig, resolveKeyedItem } from '../../core/moduleConfig.js';
+import {
+  createModuleConfig,
+  resolveKeyedItem,
+} from "../../core/moduleConfig.js";
 
-export const NAMESPACE = 'custom-embeds';
+export const NAMESPACE = "custom-embeds";
 
 export interface EmbedPanelConfig {
   id: string;
@@ -18,7 +21,7 @@ export interface EmbedPanelTexts {
   footer: string;
 }
 
-export interface ResolvedEmbedPanel extends EmbedPanelConfig, EmbedPanelTexts { }
+export interface ResolvedEmbedPanel extends EmbedPanelConfig, EmbedPanelTexts {}
 
 export interface CustomEmbedsConfig {
   enabled?: boolean;
@@ -30,11 +33,11 @@ export interface CustomEmbedsTexts {
 }
 
 export const DEFAULT_PANEL_TEXTS: EmbedPanelTexts = {
-  panelTitle: '',
-  panelDescription: '',
-  authorName: '',
-  authorIconUrl: '',
-  footer: '',
+  panelTitle: "",
+  panelDescription: "",
+  authorName: "",
+  authorIconUrl: "",
+  footer: "",
 };
 
 export const TEXT_DEFAULTS: CustomEmbedsTexts = {
@@ -61,6 +64,6 @@ export function resolveEmbedPanel(id: string): ResolvedEmbedPanel | undefined {
       ...row,
       ...copy,
       showTimestamp: row.showTimestamp === true,
-    })
+    }),
   );
 }

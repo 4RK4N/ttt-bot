@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { invalidateModuleCache, moduleDataPath } from './texts.js';
-import { writeJsonAtomic } from './jsonWrite.js';
+import { readFileSync } from "node:fs";
+import { invalidateModuleCache, moduleDataPath } from "./texts.js";
+import { writeJsonAtomic } from "./jsonWrite.js";
 
 export interface ConfigIo<T extends { id: string }> {
   updateItem: (id: string, patch: Partial<T>) => Promise<T | undefined>;
@@ -10,12 +10,12 @@ export interface ConfigIo<T extends { id: string }> {
 export function createConfigIo<T extends { id: string }>(
   namespace: string,
   listKey: string,
-  defaults: object
+  defaults: object,
 ): ConfigIo<T> {
   function readRawConfig(): Record<string, unknown> {
-    const file = moduleDataPath(namespace, 'config.json');
+    const file = moduleDataPath(namespace, "config.json");
     try {
-      return { ...defaults, ...JSON.parse(readFileSync(file, 'utf8')) };
+      return { ...defaults, ...JSON.parse(readFileSync(file, "utf8")) };
     } catch {
       return { ...(defaults as Record<string, unknown>) };
     }
@@ -26,7 +26,10 @@ export function createConfigIo<T extends { id: string }>(
     return Array.isArray(raw) ? (raw as T[]) : [];
   }
 
-  async function updateItem(id: string, patch: Partial<T>): Promise<T | undefined> {
+  async function updateItem(
+    id: string,
+    patch: Partial<T>,
+  ): Promise<T | undefined> {
     const current = readRawConfig();
     const list = readList();
     const index = list.findIndex((item) => item.id === id);
@@ -36,7 +39,7 @@ export function createConfigIo<T extends { id: string }>(
     const nextList = list.slice();
     nextList[index] = updated;
 
-    await writeJsonAtomic(moduleDataPath(namespace, 'config.json'), {
+    await writeJsonAtomic(moduleDataPath(namespace, "config.json"), {
       ...current,
       [listKey]: nextList,
     });

@@ -12,10 +12,12 @@ system so new features can be added without refactoring the core.
 Copy the reference template — it is **not loaded by the bot** (only `bot/src/modules/*/index.ts` is).
 
 1. **Copy source files**
+
    ```text
    bot/src/examples/module-template/  →  bot/src/modules/<name>/   (handlers, index.ts)
    shared/modules/example-module/     →  shared/modules/<name>/     (types, config-io, web-plugin.json, …)
    ```
+
    Use kebab-case for `<name>` (e.g. `my-feature`). Delete unused files (`panel.ts`, `validate.ts` for simple modules).
 
 2. **Set the namespace** in `shared/modules/<name>/types.ts` — `createModuleConfig('<name>', …)` must match the folder name and data path.
@@ -43,15 +45,15 @@ No core changes needed — [`moduleLoader.ts`](bot/src/moduleLoader.ts) discover
 
 ## Modules (summary)
 
-| Module | What it does |
-|--------|----------------|
-| [welcome-message](MODULES.md#welcome-message) | Welcome card + rules on join |
-| [pic-repost-commands](MODULES.md#pic-repost-commands-pic-post) | `/pic` / `/post` image repost + thread |
+| Module                                                              | What it does                           |
+| ------------------------------------------------------------------- | -------------------------------------- |
+| [welcome-message](MODULES.md#welcome-message)                       | Welcome card + rules on join           |
+| [pic-repost-commands](MODULES.md#pic-repost-commands-pic-post)      | `/pic` / `/post` image repost + thread |
 | [links-pics-vids-autothread](MODULES.md#links-pics-vids-autothread) | Auto comments threads in pics channels |
-| [tickets](MODULES.md#tickets) | Private-thread ticket panels |
-| [reaction-roles](MODULES.md#reaction-roles) | Button/emoji/dropdown role panels |
-| [moderation-log](MODULES.md#moderation-log) | Message/member event logging |
-| [custom-embeds](MODULES.md#custom-embeds) | Static embed info panels |
+| [tickets](MODULES.md#tickets)                                       | Private-thread ticket panels           |
+| [reaction-roles](MODULES.md#reaction-roles)                         | Button/emoji/dropdown role panels      |
+| [moderation-log](MODULES.md#moderation-log)                         | Message/member event logging           |
+| [custom-embeds](MODULES.md#custom-embeds)                           | Static embed info panels               |
 
 Runtime settings and copy live in `data/<module>/`. Edit via the web editor or by hand —
 the bot hot-reloads on the next event.
@@ -89,7 +91,9 @@ With Docker: `./scripts/build.sh` for deploy (see [INSTALL.md § Part 4](INSTALL
 1. Node.js 24+
 2. `npm install`
 3. [Developer Portal](https://discord.com/developers/applications): bot token + client ID; invite with Administrator (see [INSTALL.md](INSTALL.md))
-4. `cp data/config.example.json data/config.json` — fill `discordToken`, `clientId`
+4. `cp data/config.example.json data/config.json` — fill in:
+   - **Bot (required):** `discordToken`, `clientId`
+   - **Web editor (required for `npm run web`):** also `clientSecret`, `sessionSecret`, `oauthRedirectUri`, `guildId` — see [INSTALL.md](INSTALL.md) for OAuth setup
 5. Seed module data: copy each `data/<module>/*.example.json` → `config.json` / `texts.json` ([MODULES.md](MODULES.md#data-layout))
 
 ## Deploy slash commands

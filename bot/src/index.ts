@@ -1,13 +1,21 @@
-import { Client, Events, GatewayIntentBits, MessageFlags, Partials, type Interaction } from 'discord.js';
-import { config } from '../../shared/config.js';
-import { loadModules } from './moduleLoader.js';
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  MessageFlags,
+  Partials,
+  type Interaction,
+} from "discord.js";
+import { config } from "../../shared/config.js";
+import { loadModules } from "./moduleLoader.js";
 
 // Generic fallback shown when a command handler throws. Not module-specific, so
 // it stays in code rather than a module's texts.json.
-const COMMAND_ERROR_MESSAGE = 'Something went wrong while handling your command. Please try again.';
+const COMMAND_ERROR_MESSAGE =
+  "Something went wrong while handling your command. Please try again.";
 
 const COMPONENT_ERROR_MESSAGE =
-  'Something went wrong while handling that interaction. Please try again.';
+  "Something went wrong while handling that interaction. Please try again.";
 
 async function main(): Promise<void> {
   // GuildMembers + Partials.GuildMember: member join/leave (incl. uncached removes).
@@ -33,7 +41,7 @@ async function main(): Promise<void> {
     try {
       await init(client);
     } catch (err) {
-      console.error('Failed to initialize a module:', err);
+      console.error("Failed to initialize a module:", err);
     }
   }
 
@@ -43,29 +51,42 @@ async function main(): Promise<void> {
 
   client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     if (interaction.isMessageComponent()) {
-      const route = componentRoutes.find((r) => interaction.customId.startsWith(r.prefix));
+      const route = componentRoutes.find((r) =>
+        interaction.customId.startsWith(r.prefix),
+      );
       if (!route) return;
 
       try {
         await route.handle(interaction);
       } catch (err) {
-        console.error(`Error handling component "${interaction.customId}":`, err);
+        console.error(
+          `Error handling component "${interaction.customId}":`,
+          err,
+        );
         const message = COMPONENT_ERROR_MESSAGE;
         try {
           if (interaction.deferred || interaction.replied) {
             // deferUpdate() — never editReply; that would wipe the channel panel message.
             const panelSafe =
-              interaction.isMessageComponent() && interaction.deferred && !interaction.ephemeral;
+              interaction.isMessageComponent() &&
+              interaction.deferred &&
+              !interaction.ephemeral;
             if (panelSafe) {
-              await interaction.followUp({ content: message, flags: MessageFlags.Ephemeral });
+              await interaction.followUp({
+                content: message,
+                flags: MessageFlags.Ephemeral,
+              });
             } else {
               await interaction.editReply({ content: message });
             }
           } else {
-            await interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
+            await interaction.reply({
+              content: message,
+              flags: MessageFlags.Ephemeral,
+            });
           }
         } catch (replyErr) {
-          console.error('Failed to send component error response:', replyErr);
+          console.error("Failed to send component error response:", replyErr);
         }
       }
       return;
@@ -88,10 +109,13 @@ async function main(): Promise<void> {
         if (interaction.deferred || interaction.replied) {
           await interaction.editReply(message);
         } else {
-          await interaction.reply({ content: message, flags: MessageFlags.Ephemeral });
+          await interaction.reply({
+            content: message,
+            flags: MessageFlags.Ephemeral,
+          });
         }
       } catch (replyErr) {
-        console.error('Failed to send error response:', replyErr);
+        console.error("Failed to send error response:", replyErr);
       }
     }
   });
@@ -108,26 +132,26 @@ async function main(): Promise<void> {
     console.log(`Received ${signal}; shutting down...`);
 
     const forceExit = setTimeout(() => {
-      console.warn('Shutdown timed out; forcing exit.');
+      console.warn("Shutdown timed out; forcing exit.");
       process.exit(0);
     }, 5000);
     forceExit.unref();
 
     void Promise.resolve(client.destroy())
-      .catch((err) => console.error('Error during shutdown:', err))
+      .catch((err) => console.error("Error during shutdown:", err))
       .finally(() => {
         clearTimeout(forceExit);
         process.exit(0);
       });
   };
 
-  process.once('SIGTERM', () => shutdown('SIGTERM'));
-  process.once('SIGINT', () => shutdown('SIGINT'));
+  process.once("SIGTERM", () => shutdown("SIGTERM"));
+  process.once("SIGINT", () => shutdown("SIGINT"));
 
   await client.login(config.discordToken);
 }
 
 main().catch((err) => {
-  console.error('Fatal startup error:', err);
+  console.error("Fatal startup error:", err);
   process.exit(1);
 });

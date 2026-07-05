@@ -1,17 +1,19 @@
-import { FAVICON_HREF, OVERRIDES_CSS, TABLER_CSS } from './css-urls.js';
+import { FAVICON_HREF, OVERRIDES_CSS, TABLER_CSS } from "./css-urls.js";
 
 export function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 export function loginPage(botName: string, message?: string): string {
   const title = escapeHtml(`${botName} Admin Interface`);
-  const note = message ? `<div class="alert alert-danger">${escapeHtml(message)}</div>` : '';
+  const note = message
+    ? `<div class="alert alert-danger">${escapeHtml(message)}</div>`
+    : "";
   return `<!doctype html>
 <html lang="en" data-bs-theme="dark"><head>
 <meta charset="utf-8" />

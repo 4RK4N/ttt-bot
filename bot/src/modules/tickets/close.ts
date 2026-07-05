@@ -1,13 +1,14 @@
+import { type ButtonInteraction, type GuildMember } from "discord.js";
+import { replyEphemeral } from "../../../../shared/core/discordInteractions.js";
+import { finalizeTicketClose, resolveOpenerUserId } from "./finalize-close.js";
+import { guardTicketThreadAction } from "./guards.js";
 import {
-  type ButtonInteraction,
-  type GuildMember,
-} from 'discord.js';
-import { replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { finalizeTicketClose, resolveOpenerUserId } from './finalize-close.js';
-import { guardTicketThreadAction } from './guards.js';
-import { buildConfirmRow, CLOSE_CONFIRM_PREFIX, CLOSE_PREFIX } from '../../../../shared/modules/tickets/panel.js';
-import { canStaffOrAdmin } from './permissions.js';
-import { texts } from '../../../../shared/modules/tickets/config-io.js';
+  buildConfirmRow,
+  CLOSE_CONFIRM_PREFIX,
+  CLOSE_PREFIX,
+} from "../../../../shared/modules/tickets/panel.js";
+import { canStaffOrAdmin } from "./permissions.js";
+import { texts } from "../../../../shared/modules/tickets/config-io.js";
 
 interface ParsedCloseCustomId {
   threadId: string;
@@ -20,20 +21,20 @@ function parseCloseCustomId(customId: string): ParsedCloseCustomId | null {
   const prefix = confirm ? CLOSE_CONFIRM_PREFIX : CLOSE_PREFIX;
   if (!customId.startsWith(prefix)) return null;
 
-  const segments = customId.slice(prefix.length).split(':');
+  const segments = customId.slice(prefix.length).split(":");
   if (segments.length < 2) return null;
 
   const threadId = segments[0];
   if (segments.length >= 3) {
     return { threadId, typeId: segments[1], openerUserId: segments[2] };
   }
-  return { threadId, typeId: segments.slice(1).join(':') };
+  return { threadId, typeId: segments.slice(1).join(":") };
 }
 
 function canCloseTicket(
   interaction: ButtonInteraction,
   openerUserId: string | null,
-  staffRoleIds: string[]
+  staffRoleIds: string[],
 ): boolean {
   if (openerUserId && interaction.user.id === openerUserId) return true;
 
@@ -42,16 +43,28 @@ function canCloseTicket(
   return canStaffOrAdmin(member, staffRoleIds);
 }
 
-export async function handleCloseTicket(interaction: ButtonInteraction): Promise<void> {
+export async function handleCloseTicket(
+  interaction: ButtonInteraction,
+): Promise<void> {
   const parsed = parseCloseCustomId(interaction.customId);
-  if (!parsed) return;
+  if (!parsed) {
+    await replyEphemeral(interaction, texts().invalidInteraction);
+    return;
+  }
 
   const isConfirm = interaction.customId.startsWith(CLOSE_CONFIRM_PREFIX);
-  const guarded = await guardTicketThreadAction(interaction, parsed.typeId, parsed.threadId);
+  const guarded = await guardTicketThreadAction(
+    interaction,
+    parsed.typeId,
+    parsed.threadId,
+  );
   if (!guarded.ok) return;
 
   const { ticketType, thread, t } = guarded.ctx;
-  const openerUserId = await resolveOpenerUserId(thread, parsed.openerUserId);
+  const { openerUserId, welcomeMessage } = await resolveOpenerUserId(
+    thread,
+    parsed.openerUserId,
+  );
 
   if (!canCloseTicket(interaction, openerUserId, ticketType.staffRoleIds)) {
     await replyEphemeral(interaction, t.noPermission);
@@ -60,14 +73,14 @@ export async function handleCloseTicket(interaction: ButtonInteraction): Promise
 
   const closePayload = parsed.openerUserId
     ? `${parsed.threadId}:${parsed.typeId}:${parsed.openerUserId}`
-    : `${parsed.threadId}:${parsed.typeId}:${openerUserId ?? ''}`;
+    : `${parsed.threadId}:${parsed.typeId}:${openerUserId ?? ""}`;
 
   if (!isConfirm) {
     const row = buildConfirmRow(
       `${CLOSE_CONFIRM_PREFIX}${closePayload}`,
       `tickets:close-cancel:${parsed.threadId}`,
       ticketType.confirmCloseYes,
-      ticketType.confirmCloseNo
+      ticketType.confirmCloseNo,
     );
 
     await replyEphemeral(interaction, {
@@ -85,14 +98,22 @@ export async function handleCloseTicket(interaction: ButtonInteraction): Promise
   await interaction.deferUpdate();
 
   try {
-    await finalizeTicketClose(thread, parsed.typeId, ticketType, ticketType.ticketClosed);
+    await finalizeTicketClose(
+      thread,
+      parsed.typeId,
+      ticketType,
+      ticketType.ticketClosed,
+      welcomeMessage,
+    );
   } catch (err) {
-    console.error('[tickets] Failed to close ticket:', err);
+    console.error("[tickets] Failed to close ticket:", err);
     await replyEphemeral(interaction, t.closeError);
   }
 }
 
-export async function handleCloseCancel(interaction: ButtonInteraction): Promise<void> {
+export async function handleCloseCancel(
+  interaction: ButtonInteraction,
+): Promise<void> {
   await interaction.update({
     content: texts().closeCancelled,
     components: [],

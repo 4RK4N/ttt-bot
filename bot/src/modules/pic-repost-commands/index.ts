@@ -6,38 +6,56 @@ import {
   type ChatInputCommandInteraction,
   type Attachment,
   type SlashCommandOptionsOnlyBuilder,
-} from 'discord.js';
-import type { CommandModule } from '../../moduleLoader.js';
+} from "discord.js";
+import type { CommandModule } from "../../moduleLoader.js";
 import {
   buildThreadName,
   startAndPopulateCommentsThread,
-} from '../../../../shared/core/threads.js';
-import { format, isModuleEnabled } from '../../../../shared/core/texts.js';
-import { NAMESPACE, texts } from '../../../../shared/modules/pic-repost-commands/config-io.js';
+} from "../../../../shared/core/threads.js";
+import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
+import { resolveDisplayName } from "../../../../shared/core/memberDisplayNames.js";
+import {
+  NAMESPACE,
+  texts,
+} from "../../../../shared/modules/pic-repost-commands/config-io.js";
 
 const MAX_IMAGES = 10;
+const MAX_MESSAGE_LENGTH = 2000;
+/** Conservative pre-download cap; server upload limits may be lower. */
+const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 
 function buildCommand(name: string): SlashCommandOptionsOnlyBuilder {
   const builder = new SlashCommandBuilder()
     .setName(name)
-    .setDescription('Re-post your images to this channel with attribution (avoids false auto-mod bans).')
+    .setDescription(
+      "Re-post your images to this channel with attribution (avoids false auto-mod bans).",
+    )
     .addStringOption((opt) =>
-      opt.setName('message').setDescription('Text to include with your images.').setRequired(true)
+      opt
+        .setName("message")
+        .setDescription("Text to include with your images.")
+        .setRequired(true),
     );
 
   for (let i = 1; i <= MAX_IMAGES; i++) {
     builder.addAttachmentOption((opt) =>
       opt
         .setName(`image${i}`)
-        .setDescription(i === 1 ? 'Image to post (required).' : `Additional image ${i} (optional).`)
-        .setRequired(i === 1)
+        .setDescription(
+          i === 1
+            ? "Image to post (required)."
+            : `Additional image ${i} (optional).`,
+        )
+        .setRequired(i === 1),
     );
   }
 
   return builder;
 }
 
-async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
+async function execute(
+  interaction: ChatInputCommandInteraction,
+): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   const t = texts();
@@ -47,12 +65,17 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
     return;
   }
 
-  const message = interaction.options.getString('message', true);
+  const message = interaction.options.getString("message", true);
 
-  const displayName =
-    (interaction.member instanceof GuildMember ? interaction.member.displayName : undefined) ??
-    interaction.user.displayName ??
-    interaction.user.username;
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    await interaction.editReply(t.messageTooLong);
+    return;
+  }
+
+  const displayName = resolveDisplayName(
+    interaction.member instanceof GuildMember ? interaction.member : null,
+    interaction.user,
+  );
 
   const attachments: Attachment[] = [];
   for (let i = 1; i <= MAX_IMAGES; i++) {
@@ -66,11 +89,21 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
   }
 
   const nonImages = attachments.filter(
-    (a) => !(a.contentType && a.contentType.startsWith('image/'))
+    (a) => !(a.contentType && a.contentType.startsWith("image/")),
   );
   if (nonImages.length > 0) {
     await interaction.editReply(
-      format(t.notImages, { names: nonImages.map((a) => a.name).join(', ') })
+      format(t.notImages, { names: nonImages.map((a) => a.name).join(", ") }),
+    );
+    return;
+  }
+
+  const oversized = attachments.filter((a) => a.size > MAX_ATTACHMENT_BYTES);
+  if (oversized.length > 0) {
+    await interaction.editReply(
+      format(t.attachmentTooLarge, {
+        names: oversized.map((a) => a.name).join(", "),
+      }),
     );
     return;
   }
@@ -81,11 +114,13 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
       attachments.map(async (attachment) => {
         const res = await fetch(attachment.url);
         if (!res.ok) {
-          throw new Error(`Failed to download "${attachment.name}" (HTTP ${res.status}).`);
+          throw new Error(
+            `Failed to download "${attachment.name}" (HTTP ${res.status}).`,
+          );
         }
         const buffer = Buffer.from(await res.arrayBuffer());
         return new AttachmentBuilder(buffer, { name: attachment.name });
-      })
+      }),
     );
   } catch (err) {
     console.error(`[${NAMESPACE}] Failed to download attachment(s):`, err);
@@ -93,7 +128,10 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
     return;
   }
 
-  const content = format(t.attribution, { message, mention: `<@${interaction.user.id}>` });
+  const content = format(t.attribution, {
+    message,
+    mention: `<@${interaction.user.id}>`,
+  });
 
   if (!interaction.channel || !interaction.channel.isSendable()) {
     await interaction.editReply(t.cannotPost);
@@ -126,16 +164,16 @@ async function execute(interaction: ChatInputCommandInteraction): Promise<void> 
 
   const success = format(t.postedSuccess, {
     count: files.length,
-    images: files.length === 1 ? 'image' : 'images',
+    images: files.length === 1 ? "image" : "images",
   });
-  await interaction.editReply(success + (threadFailed ? t.threadNote : ''));
+  await interaction.editReply(success + (threadFailed ? t.threadNote : ""));
 }
 
 const picRepostModule: CommandModule = {
   name: NAMESPACE,
   commands: [
-    { data: buildCommand('pic'), execute },
-    { data: buildCommand('post'), execute },
+    { data: buildCommand("pic"), execute },
+    { data: buildCommand("post"), execute },
   ],
 };
 

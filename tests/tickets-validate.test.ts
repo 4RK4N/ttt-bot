@@ -1,0 +1,63 @@
+import { describe, expect, it } from "vitest";
+import { validateTicketType } from "../shared/modules/tickets/validate.js";
+import type { ResolvedTicketType } from "../shared/modules/tickets/types.js";
+
+function baseTicketType(
+  overrides: Partial<ResolvedTicketType> = {},
+): ResolvedTicketType {
+  return {
+    id: "support",
+    published: true,
+    emoji: "🎫",
+    channelId: "123456789012345678",
+    panelMessageId: "",
+    staffRoleIds: ["111111111111111111"],
+    deniedRoleIds: [],
+    openButtonLabel: "Open ticket",
+    panelTitle: "Support",
+    panelDescription: "Get help",
+    ticketWelcome: "Hi {mention}",
+    closeButtonLabel: "Close",
+    confirmClosePrompt: "Close this ticket?",
+    confirmCloseYes: "Yes",
+    confirmCloseNo: "No",
+    ticketClosed: "Closed.",
+    deleteButtonLabel: "Delete",
+    confirmDeletePrompt: "Delete permanently?",
+    confirmDeleteYes: "Yes",
+    confirmDeleteNo: "No",
+    ticketDeleted: "Deleted.",
+    alreadyOpen: "Already open.",
+    openSuccess: "Created {thread}",
+    roleDenied: "Denied.",
+    roleActionButtonLabel: "Grant role",
+    roleActionConfirmation: "Done.",
+    ...overrides,
+  };
+}
+
+describe("validateTicketType", () => {
+  it("accepts a complete ticket type", () => {
+    expect(() => validateTicketType(baseTicketType())).not.toThrow();
+  });
+
+  it("requires staff roles", () => {
+    expect(() =>
+      validateTicketType(baseTicketType({ staffRoleIds: [] })),
+    ).toThrow(/staff role/i);
+  });
+
+  it("requires open button label", () => {
+    expect(() =>
+      validateTicketType(baseTicketType({ openButtonLabel: "  " })),
+    ).toThrow(/open button/i);
+  });
+
+  it("requires close confirmation labels", () => {
+    expect(() =>
+      validateTicketType(
+        baseTicketType({ confirmClosePrompt: "", confirmCloseYes: "Yes" }),
+      ),
+    ).toThrow(/close confirmation/i);
+  });
+});

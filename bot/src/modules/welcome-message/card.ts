@@ -1,17 +1,30 @@
-import { createCanvas, GlobalFonts, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
-import { moduleDataPath } from '../../../../shared/core/texts.js';
+import {
+  createCanvas,
+  GlobalFonts,
+  loadImage,
+  type SKRSContext2D,
+} from "@napi-rs/canvas";
+import { moduleDataPath } from "../../../../shared/core/texts.js";
 
 // Assets live in the runtime data dir (data/welcome-message/), so they can be
 // swapped without a rebuild and are not tied to the compiled output.
-const BACKGROUND_PATH = moduleDataPath('welcome-message', 'media', 'background.png');
-const FONT_PATH = moduleDataPath('welcome-message', 'fonts', 'DancingScript.ttf');
-const FONT_FAMILY = 'Dancing Script';
+const BACKGROUND_PATH = moduleDataPath(
+  "welcome-message",
+  "media",
+  "background.png",
+);
+const FONT_PATH = moduleDataPath(
+  "welcome-message",
+  "fonts",
+  "DancingScript.ttf",
+);
+const FONT_FAMILY = "Dancing Script";
 
 if (!GlobalFonts.has(FONT_FAMILY)) {
   GlobalFonts.registerFromPath(FONT_PATH, FONT_FAMILY);
 }
 
-const SUBTITLE = 'Welcome to Tiny Temptation Tubs';
+const SUBTITLE = "Welcome to Tiny Temptation Tubs";
 
 // Opacity of the uniform dark tint laid over the background (0 = none, 1 = black).
 const BACKGROUND_DIM = 0.18;
@@ -28,7 +41,7 @@ function fitFontSize(
   weight: number,
   startPx: number,
   minPx: number,
-  maxWidth: number
+  maxWidth: number,
 ): number {
   let size = startPx;
   ctx.font = `${weight} ${size}px "${FONT_FAMILY}"`;
@@ -53,7 +66,7 @@ export async function renderWelcomeCard({
   const height = background.height;
 
   const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   ctx.drawImage(background, 0, 0, width, height);
 
@@ -79,21 +92,27 @@ export async function renderWelcomeCard({
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.closePath();
   ctx.clip();
-  ctx.drawImage(avatar, centerX - radius, centerY - radius, radius * 2, radius * 2);
+  ctx.drawImage(
+    avatar,
+    centerX - radius,
+    centerY - radius,
+    radius * 2,
+    radius * 2,
+  );
   ctx.restore();
 
   // Light-purple ring around the avatar.
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.lineWidth = Math.max(3, height * 0.012);
-  ctx.strokeStyle = 'rgba(216, 191, 240, 0.95)';
+  ctx.strokeStyle = "rgba(216, 191, 240, 0.95)";
   ctx.stroke();
 
   // Shared text styling: centered with a strong drop shadow so the text stays
   // readable over both the bright (logo) and busy parts of the background.
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
   ctx.shadowBlur = height * 0.038;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = height * 0.009;
@@ -101,15 +120,29 @@ export async function renderWelcomeCard({
   const maxTextWidth = width * 0.9;
 
   const nameLine = `${displayName} just joined`;
-  const nameSize = fitFontSize(ctx, nameLine, 700, height * 0.14, height * 0.06, maxTextWidth);
+  const nameSize = fitFontSize(
+    ctx,
+    nameLine,
+    700,
+    height * 0.14,
+    height * 0.06,
+    maxTextWidth,
+  );
   ctx.font = `700 ${nameSize}px "${FONT_FAMILY}"`;
-  ctx.fillStyle = '#e9d8f7';
+  ctx.fillStyle = "#e9d8f7";
   ctx.fillText(nameLine, centerX, height * 0.76);
 
-  const subSize = fitFontSize(ctx, SUBTITLE, 400, height * 0.08, height * 0.04, maxTextWidth);
+  const subSize = fitFontSize(
+    ctx,
+    SUBTITLE,
+    400,
+    height * 0.08,
+    height * 0.04,
+    maxTextWidth,
+  );
   ctx.font = `400 ${subSize}px "${FONT_FAMILY}"`;
-  ctx.fillStyle = '#e9d8f7';
+  ctx.fillStyle = "#e9d8f7";
   ctx.fillText(SUBTITLE, centerX, height * 0.9);
 
-  return canvas.encode('png');
+  return canvas.encode("png");
 }

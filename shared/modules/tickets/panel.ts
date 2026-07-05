@@ -1,27 +1,26 @@
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { buildEmbed } from "../../core/embedBuilder.js";
+import { parseEmoji } from "../../core/discordEmoji.js";
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-} from 'discord.js';
-import { buildEmbed } from '../../core/embedBuilder.js';
-import { parseEmoji } from '../../core/discordEmoji.js';
-import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-import { resolveTicketType } from './config-io.js';
+  publishDiscordMessage,
+  type DiscordApiContext,
+} from "../../core/panelPublish.js";
+import { resolveTicketType } from "./config-io.js";
 
 export type { DiscordApiContext };
 
-export const OPEN_PREFIX = 'tickets:open:';
-export const CLOSE_PREFIX = 'tickets:close:';
-export const CLOSE_CONFIRM_PREFIX = 'tickets:close-confirm:';
-export const DELETE_PREFIX = 'tickets:delete:';
-export const DELETE_CONFIRM_PREFIX = 'tickets:delete-confirm:';
-export const ROLE_ACTION_PREFIX = 'tickets:role-action:';
+export const OPEN_PREFIX = "tickets:open:";
+export const CLOSE_PREFIX = "tickets:close:";
+export const CLOSE_CONFIRM_PREFIX = "tickets:close-confirm:";
+export const DELETE_PREFIX = "tickets:delete:";
+export const DELETE_CONFIRM_PREFIX = "tickets:delete-confirm:";
+export const ROLE_ACTION_PREFIX = "tickets:role-action:";
 
 export function buildConfirmRow(
   yesCustomId: string,
   noCustomId: string,
   yesLabel: string,
-  noLabel: string
+  noLabel: string,
 ): ActionRowBuilder<ButtonBuilder> {
   const yes = new ButtonBuilder()
     .setCustomId(yesCustomId)
@@ -52,7 +51,11 @@ export function buildPanelPayload(typeId: string) {
 
   const parsedEmoji = parseEmoji(ticketType.emoji);
   if (parsedEmoji) {
-    button.setEmoji(parsedEmoji.id ? { id: parsedEmoji.id, name: parsedEmoji.name } : parsedEmoji);
+    button.setEmoji(
+      parsedEmoji.id
+        ? { id: parsedEmoji.id, name: parsedEmoji.name }
+        : parsedEmoji,
+    );
   }
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
@@ -67,7 +70,7 @@ export async function publishPanel(
   ctx: DiscordApiContext,
   typeId: string,
   channelId: string,
-  existingMessageId?: string
+  existingMessageId?: string,
 ): Promise<string> {
   const payload = buildPanelPayload(typeId);
   return publishDiscordMessage(ctx, channelId, payload, existingMessageId);

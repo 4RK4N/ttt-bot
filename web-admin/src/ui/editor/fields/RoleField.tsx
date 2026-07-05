@@ -1,6 +1,6 @@
-import type { GuildRole } from '../../../plugin-types.js';
-import { FieldWrap, fieldValueStr } from './shared.js';
-import type { SubFieldProps } from './shared.js';
+import type { GuildRole } from "../../../plugin-types.js";
+import { FieldWrap, fieldValueStr } from "./shared.js";
+import type { SubFieldProps } from "./shared.js";
 
 function roleOptions(roles: GuildRole[], value: string) {
   const opts = [
@@ -22,14 +22,23 @@ function roleOptions(roles: GuildRole[], value: string) {
 }
 
 export function RoleField({ f, value, name, ctx, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+  const id = name.replace(/[[\].]/g, "-");
   const strVal = fieldValueStr(value);
 
   if (ctx.rolesError) {
     return (
       <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-        <input class="form-control" type="text" id={id} name={name} value={strVal} disabled={disabled} />
-        <div class="form-text text-danger">{ctx.rolesError} Enter id manually.</div>
+        <input
+          class="form-control"
+          type="text"
+          id={id}
+          name={name}
+          value={strVal}
+          disabled={disabled}
+        />
+        <div class="form-text text-danger">
+          {ctx.rolesError} Enter id manually.
+        </div>
       </FieldWrap>
     );
   }
@@ -43,8 +52,14 @@ export function RoleField({ f, value, name, ctx, disabled }: SubFieldProps) {
   );
 }
 
-export function RoleMultiField({ f, value, name, ctx, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+export function RoleMultiField({
+  f,
+  value,
+  name,
+  ctx,
+  disabled,
+}: SubFieldProps) {
+  const id = name.replace(/[[\].]/g, "-");
   const selected = Array.isArray(value) ? value.map(String) : [];
 
   if (ctx.rolesError) {
@@ -55,7 +70,7 @@ export function RoleMultiField({ f, value, name, ctx, disabled }: SubFieldProps)
           type="text"
           id={id}
           name={name}
-          value={selected.join(', ')}
+          value={selected.join(", ")}
           disabled={disabled}
         />
         <div class="form-text text-danger">

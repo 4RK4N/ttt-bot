@@ -12,14 +12,14 @@
   width: 100%;
 }
 
-.page>header.navbar {
+.page > header.navbar {
   position: sticky;
   top: 0;
   z-index: 1020;
   flex-shrink: 0;
 }
 
-.page>header.navbar .btn {
+.page > header.navbar .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +89,8 @@
   overflow-y: auto;
   border-radius: 0 !important;
   background-color: var(--tblr-navbar-bg, var(--tblr-bg-surface));
-  box-shadow: inset calc(-1 * var(--tblr-navbar-border-width, 1px)) 0 0 0 var(--tblr-navbar-border-color, var(--tblr-border-color)) !important;
+  box-shadow: inset calc(-1 * var(--tblr-navbar-border-width, 1px)) 0 0 0
+    var(--tblr-navbar-border-color, var(--tblr-border-color)) !important;
 }
 
 .navbar-vertical .container-fluid,
@@ -142,7 +143,7 @@
 }
 
 /* Legacy wrapper from older EditorBody markup */
-.page-wrapper>.d-flex {
+.page-wrapper > .d-flex {
   display: flex;
   flex: 1 1 auto;
   flex-direction: row;
@@ -158,9 +159,8 @@
 }
 
 @media (max-width: 720px) {
-
   .page-wrapper,
-  .page-wrapper>.d-flex {
+  .page-wrapper > .d-flex {
     flex-direction: column;
   }
 

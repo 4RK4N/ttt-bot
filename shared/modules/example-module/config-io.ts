@@ -21,7 +21,7 @@ export {
   config,
   texts,
   targetChannelId,
-} from './types.js';
+} from "./types.js";
 
 // --- Panel module (uncomment; remove simple barrel above) ---------------------
 /*

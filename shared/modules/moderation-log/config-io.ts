@@ -5,4 +5,4 @@ export {
   config,
   texts,
   logChannelId,
-} from './types.js';
+} from "./types.js";

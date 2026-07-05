@@ -62,7 +62,7 @@ function buildWidths(profile: BuildWidthProfile): number[] {
 
 /** srcset widths for header logo. */
 export function headerLogoWidths(): number[] {
-  return buildWidths('headerLogo');
+  return buildWidths("headerLogo");
 }
 
 const GRID_GAP_REM = 0.75; // gap-3
@@ -78,8 +78,8 @@ export function remScaledSizes(rem: number): string {
 }
 
 const REM_WIDTH_PROFILES: Partial<Record<number, BuildWidthProfile>> = {
-  [HERO_REM]: 'hero',
-  [PARTNER_REM]: 'partner',
+  [HERO_REM]: "hero",
+  [PARTNER_REM]: "partner",
 };
 
 /** srcset widths for a rem-width element (hero circle or partner logo). */
@@ -93,31 +93,31 @@ export function remScaledWidths(rem: number): number[] {
 
 /** Portrait gallery sizes — calc() tracks rem scaling and column max-width. */
 export const PORTRAIT_GALLERY_SIZES =
-  '(max-width: 640px) calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2), ' +
-  '(max-width: 1024px) calc((min(100vw, 36rem) - 3rem - 1.5rem) / 3), ' +
-  'calc((min(100vw, 36rem) - 3rem - 3rem) / 5)';
+  "(max-width: 640px) calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2), " +
+  "(max-width: 1024px) calc((min(100vw, 36rem) - 3rem - 1.5rem) / 3), " +
+  "calc((min(100vw, 36rem) - 3rem - 3rem) / 5)";
 
 /** srcset widths for portrait gallery cells. */
 export function portraitGalleryWidths(): number[] {
-  return buildWidths('portraitGallery');
+  return buildWidths("portraitGallery");
 }
 
 /** Full content column — w-full images inside max-w-[36rem] px-6 sections. */
-export const CONTENT_COLUMN_SIZES = 'calc(min(100vw, 36rem) - 3rem)';
+export const CONTENT_COLUMN_SIZES = "calc(min(100vw, 36rem) - 3rem)";
 
 /** srcset widths for full-width content column images. */
 export function contentColumnWidths(): number[] {
-  return buildWidths('contentColumn');
+  return buildWidths("contentColumn");
 }
 
 /** Landscape gallery sizes — 1 col below sm, 2 cols at sm+. */
 export const LANDSCAPE_GALLERY_SIZES =
-  '(max-width: 640px) calc(min(100vw, 36rem) - 3rem), ' +
-  'calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2)';
+  "(max-width: 640px) calc(min(100vw, 36rem) - 3rem), " +
+  "calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2)";
 
 /** srcset widths for landscape gallery cells. */
 export function landscapeGalleryWidths(): number[] {
-  return buildWidths('landscapeGallery');
+  return buildWidths("landscapeGallery");
 }
 
 /** Events card: full column below NARROW_CONTENT_BP, max-w-[24rem] above. */
@@ -127,13 +127,15 @@ export function cardImageSizes(): string {
 
 /** srcset widths for events card image. */
 export function cardImageWidths(): number[] {
-  return buildWidths('cardImage');
+  return buildWidths("cardImage");
 }
 
 const GRID_GAP_PX = remPx(GRID_GAP_REM);
 
 /** 2-col landscape grid cell in content column */
-export const LANDSCAPE_CELL_PX = Math.round((CONTENT_COLUMN_PX - GRID_GAP_PX) / 2);
+export const LANDSCAPE_CELL_PX = Math.round(
+  (CONTENT_COLUMN_PX - GRID_GAP_PX) / 2,
+);
 
 /** 5-col portrait grid cell at lg */
 export const PORTRAIT_CELL_LG_PX = Math.floor(

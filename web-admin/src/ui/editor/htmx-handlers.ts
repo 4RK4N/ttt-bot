@@ -1,9 +1,12 @@
-import type { WebPlugin, WebPluginField } from '../../plugin-types.js';
-import { formBodyToValues } from './form-parse.js';
+import type { WebPlugin, WebPluginField } from "../../plugin-types.js";
+import { formBodyToValues } from "./form-parse.js";
 
 type FormBody = Record<string, string | File>;
 
-export function valuesFromForm(plugin: WebPlugin, body: FormBody): Record<string, unknown> {
+export function valuesFromForm(
+  plugin: WebPlugin,
+  body: FormBody,
+): Record<string, unknown> {
   return formBodyToValues(plugin, body);
 }
 
@@ -17,9 +20,12 @@ export function getObjectListItems(
   return Array.isArray(raw) ? (raw as Record<string, unknown>[]) : [];
 }
 
-export function findObjectListField(plugin: WebPlugin, fieldKey: string): WebPluginField | null {
+export function findObjectListField(
+  plugin: WebPlugin,
+  fieldKey: string,
+): WebPluginField | null {
   const field = plugin.fields.find((f) => f.key === fieldKey);
-  if (!field || field.type !== 'object-list') return null;
+  if (!field || field.type !== "object-list") return null;
   return field;
 }
 
@@ -35,7 +41,10 @@ function rowKey(item: Record<string, unknown>, index: number): string {
   return id && String(id).trim() ? String(id).trim() : `__idx__${index}`;
 }
 
-export function rowKeyForItem(item: Record<string, unknown>, index: number): string {
+export function rowKeyForItem(
+  item: Record<string, unknown>,
+  index: number,
+): string {
   return rowKey(item, index);
 }
 
@@ -58,9 +67,11 @@ export function getOptionListItems(
 }
 
 export function defaultOptionItem(): Record<string, unknown> {
-  return { id: '', roleId: '', emoji: '', label: '' };
+  return { id: "", roleId: "", emoji: "", label: "" };
 }
 
-export function defaultObjectItem(field: WebPluginField): Record<string, unknown> {
-  return structuredClone(field.defaultItem ?? { id: '', published: false });
+export function defaultObjectItem(
+  field: WebPluginField,
+): Record<string, unknown> {
+  return structuredClone(field.defaultItem ?? { id: "", published: false });
 }

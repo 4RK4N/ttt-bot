@@ -9,14 +9,21 @@ import {
   type GuildMember,
   type TextChannel,
   type ThreadChannel,
-} from 'discord.js';
-import { format, isModuleEnabled } from '../../../../shared/core/texts.js';
-import { THREAD_AUTO_ARCHIVE_MINUTES } from '../../../../shared/core/threads.js';
-import { buildTicketThreadName, isClosedTicketThread } from './names.js';
-import { CLOSE_PREFIX, ROLE_ACTION_PREFIX } from '../../../../shared/modules/tickets/panel.js';
-import { memberHasAnyRole } from '../../../../shared/core/discordInteractions.js';
-import { addMembersToThread, collectStaffUserIds } from './thread-members.js';
-import { resolveTicketType, texts, NAMESPACE } from '../../../../shared/modules/tickets/config-io.js';
+} from "discord.js";
+import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
+import { THREAD_AUTO_ARCHIVE_MINUTES } from "../../../../shared/core/threads.js";
+import { buildTicketThreadName, isClosedTicketThread } from "./names.js";
+import {
+  CLOSE_PREFIX,
+  ROLE_ACTION_PREFIX,
+} from "../../../../shared/modules/tickets/panel.js";
+import { memberHasAnyRole } from "../../../../shared/core/discordInteractions.js";
+import { addMembersToThread, collectStaffUserIds } from "./thread-members.js";
+import {
+  resolveTicketType,
+  texts,
+  NAMESPACE,
+} from "../../../../shared/modules/tickets/config-io.js";
 
 const openInFlight = new Set<string>();
 
@@ -31,18 +38,24 @@ function threadLink(guildId: string, threadId: string): string {
 /** Returns an open ticket thread id for this user in the channel, if any. */
 async function findOpenTicketThreadId(
   channel: TextChannel,
-  userId: string
+  userId: string,
 ): Promise<string | null> {
   const active = await channel.threads.fetchActive();
   for (const thread of active.threads.values()) {
-    if (thread.locked || isClosedTicketThread(thread.name, thread.locked ?? false)) continue;
+    if (
+      thread.locked ||
+      isClosedTicketThread(thread.name, thread.locked ?? false)
+    )
+      continue;
     const members = await thread.members.fetch();
     if (members.has(userId)) return thread.id;
   }
   return null;
 }
 
-export async function handleOpenTicket(interaction: ButtonInteraction): Promise<void> {
+export async function handleOpenTicket(
+  interaction: ButtonInteraction,
+): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   const t = texts();
@@ -52,7 +65,7 @@ export async function handleOpenTicket(interaction: ButtonInteraction): Promise<
     return;
   }
 
-  const typeId = interaction.customId.slice('tickets:open:'.length);
+  const typeId = interaction.customId.slice("tickets:open:".length);
   const ticketType = resolveTicketType(typeId);
 
   if (!ticketType || !ticketType.published) {
@@ -98,10 +111,15 @@ export async function handleOpenTicket(interaction: ButtonInteraction): Promise<
   let thread: ThreadChannel | undefined;
 
   try {
-    const existingThreadId = await findOpenTicketThreadId(textChannel, interaction.user.id);
+    const existingThreadId = await findOpenTicketThreadId(
+      textChannel,
+      interaction.user.id,
+    );
     if (existingThreadId && interaction.guildId) {
       const link = threadLink(interaction.guildId, existingThreadId);
-      await interaction.editReply(format(ticketType.alreadyOpen, { thread: link }));
+      await interaction.editReply(
+        format(ticketType.alreadyOpen, { thread: link }),
+      );
       return;
     }
 
@@ -112,20 +130,28 @@ export async function handleOpenTicket(interaction: ButtonInteraction): Promise<
       name: threadName,
       type: ChannelType.PrivateThread,
       invitable: false,
-      autoArchiveDuration: THREAD_AUTO_ARCHIVE_MINUTES as ThreadAutoArchiveDuration,
+      autoArchiveDuration:
+        THREAD_AUTO_ARCHIVE_MINUTES as ThreadAutoArchiveDuration,
     });
 
     const guild = interaction.guild;
     if (guild) {
-      const staffUserIds = await collectStaffUserIds(guild, ticketType.staffRoleIds);
-      const staffFirst = staffUserIds.filter((id) => id !== interaction.user.id);
+      const staffUserIds = await collectStaffUserIds(
+        guild,
+        ticketType.staffRoleIds,
+      );
+      const staffFirst = staffUserIds.filter(
+        (id) => id !== interaction.user.id,
+      );
       await addMembersToThread(thread, staffFirst);
     }
 
     await addMembersToThread(thread, [interaction.user.id]);
 
     const closeButton = new ButtonBuilder()
-      .setCustomId(`${CLOSE_PREFIX}${thread.id}:${typeId}:${interaction.user.id}`)
+      .setCustomId(
+        `${CLOSE_PREFIX}${thread.id}:${typeId}:${interaction.user.id}`,
+      )
       .setLabel(ticketType.closeButtonLabel.slice(0, 80))
       .setStyle(ButtonStyle.Danger);
 
@@ -133,27 +159,36 @@ export async function handleOpenTicket(interaction: ButtonInteraction): Promise<
     if (ticketType.roleActionRoleId) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId(`${ROLE_ACTION_PREFIX}${thread.id}:${typeId}:${interaction.user.id}`)
+          .setCustomId(
+            `${ROLE_ACTION_PREFIX}${thread.id}:${typeId}:${interaction.user.id}`,
+          )
           .setLabel(ticketType.roleActionButtonLabel.slice(0, 80))
-          .setStyle(ButtonStyle.Success)
+          .setStyle(ButtonStyle.Success),
       );
     }
     row.addComponents(closeButton);
 
     await thread.send({
-      content: format(ticketType.ticketWelcome, { mention: `<@${interaction.user.id}>` }),
+      content: format(ticketType.ticketWelcome, {
+        mention: `<@${interaction.user.id}>`,
+      }),
       components: [row],
     });
 
     const link = threadLink(interaction.guildId!, thread.id);
-    await interaction.editReply(format(ticketType.openSuccess, { thread: link }));
+    await interaction.editReply(
+      format(ticketType.openSuccess, { thread: link }),
+    );
   } catch (err) {
-    console.error('[tickets] Failed to open ticket:', err);
+    console.error("[tickets] Failed to open ticket:", err);
     if (thread) {
       try {
         await thread.delete();
       } catch (cleanupErr) {
-        console.warn(`[tickets] Failed to clean up thread ${thread.id} after open error:`, cleanupErr);
+        console.warn(
+          `[tickets] Failed to clean up thread ${thread.id} after open error:`,
+          cleanupErr,
+        );
       }
     }
     await interaction.editReply(t.openError);

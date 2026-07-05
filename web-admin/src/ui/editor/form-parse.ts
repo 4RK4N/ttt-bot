@@ -1,10 +1,18 @@
-import type { WebPlugin, WebPluginField, WebPluginSubField } from '../../plugin-types.js';
-import { isFieldVisible } from '../../editor-logic.js';
+import type {
+  WebPlugin,
+  WebPluginField,
+  WebPluginSubField,
+} from "../../plugin-types.js";
+import { isFieldVisible } from "../../editor-logic.js";
 
 type FormBody = Record<string, string | string[] | File>;
 
-function setNestedArray(obj: Record<string, unknown>, path: string, value: string): void {
-  const segments = path.split('.');
+function setNestedArray(
+  obj: Record<string, unknown>,
+  path: string,
+  value: string,
+): void {
+  const segments = path.split(".");
   let cur: Record<string, unknown> | unknown[] = obj;
 
   for (let i = 0; i < segments.length; i++) {
@@ -23,7 +31,7 @@ function setNestedArray(obj: Record<string, unknown>, path: string, value: strin
         (arr[idx] as unknown[]).push(value);
         return;
       }
-      if (arr[idx] == null || typeof arr[idx] !== 'object') arr[idx] = {};
+      if (arr[idx] == null || typeof arr[idx] !== "object") arr[idx] = {};
       cur = arr[idx] as Record<string, unknown>;
       continue;
     }
@@ -36,13 +44,18 @@ function setNestedArray(obj: Record<string, unknown>, path: string, value: strin
     }
 
     const parent = cur as Record<string, unknown>;
-    if (parent[seg] == null || typeof parent[seg] !== 'object') parent[seg] = {};
+    if (parent[seg] == null || typeof parent[seg] !== "object")
+      parent[seg] = {};
     cur = parent[seg] as Record<string, unknown>;
   }
 }
 
-function appendFormValue(root: Record<string, unknown>, key: string, raw: string): void {
-  if (key.endsWith('[]')) {
+function appendFormValue(
+  root: Record<string, unknown>,
+  key: string,
+  raw: string,
+): void {
+  if (key.endsWith("[]")) {
     setNestedArray(root, key.slice(0, -2), raw);
     return;
   }
@@ -62,8 +75,8 @@ function appendFormValue(root: Record<string, unknown>, key: string, raw: string
       if (isLast) {
         cur[idx] = raw;
       } else {
-        if (cur[idx] == null || typeof cur[idx] !== 'object') {
-          cur[idx] = /^\[\d+\]$/.test(parts[i + 1] ?? '') ? [] : {};
+        if (cur[idx] == null || typeof cur[idx] !== "object") {
+          cur[idx] = /^\[\d+\]$/.test(parts[i + 1] ?? "") ? [] : {};
         }
         cur = cur[idx] as Record<string, unknown> | unknown[];
       }
@@ -73,9 +86,9 @@ function appendFormValue(root: Record<string, unknown>, key: string, raw: string
     if (isLast) {
       (cur as Record<string, unknown>)[part] = raw;
     } else {
-      const nextIsIndex = /^\[\d+\]$/.test(parts[i + 1] ?? '');
+      const nextIsIndex = /^\[\d+\]$/.test(parts[i + 1] ?? "");
       const parent = cur as Record<string, unknown>;
-      if (parent[part] == null || typeof parent[part] !== 'object') {
+      if (parent[part] == null || typeof parent[part] !== "object") {
         parent[part] = nextIsIndex ? [] : {};
       }
       cur = parent[part] as Record<string, unknown> | unknown[];
@@ -91,12 +104,12 @@ export function parseBracketForm(body: FormBody): Record<string, unknown> {
     if (raw instanceof File) continue;
     if (Array.isArray(raw)) {
       for (const v of raw) {
-        if (typeof v === 'string') appendFormValue(root, key, v);
+        if (typeof v === "string") appendFormValue(root, key, v);
       }
       continue;
     }
-    if (typeof raw !== 'string') continue;
-    if (key === '_csrf') continue;
+    if (typeof raw !== "string") continue;
+    if (key === "_csrf") continue;
     appendFormValue(root, key, raw);
   }
 
@@ -109,30 +122,34 @@ function parseScalarField(
 ): unknown {
   const raw = tree[f.key];
 
-  if (f.type === 'boolean') {
-    if (raw === undefined || raw === '' || raw === 'false') return false;
-    return raw === 'true' || raw === 'on' || raw === true;
+  if (f.type === "boolean") {
+    if (raw === undefined || raw === "" || raw === "false") return false;
+    return raw === "true" || raw === "on" || raw === true;
   }
-  if (f.type === 'channel-multi' || f.type === 'role-multi') {
-    if (Array.isArray(raw)) return raw.filter((v): v is string => typeof v === 'string');
-    if (typeof raw === 'string' && raw !== '') return [raw];
+  if (f.type === "channel-multi" || f.type === "role-multi") {
+    if (Array.isArray(raw))
+      return raw.filter((v): v is string => typeof v === "string");
+    if (typeof raw === "string" && raw !== "") return [raw];
     return [];
   }
-  if (f.type === 'option-list') {
+  if (f.type === "option-list") {
     return parseOptionList(f as WebPluginSubField, raw);
   }
-  if (typeof raw === 'string') return raw;
-  return '';
+  if (typeof raw === "string") return raw;
+  return "";
 }
 
-function parseOptionList(f: WebPluginSubField, raw: unknown): Record<string, unknown>[] {
+function parseOptionList(
+  f: WebPluginSubField,
+  raw: unknown,
+): Record<string, unknown>[] {
   if (!Array.isArray(raw)) return [];
   const rows: Record<string, unknown>[] = [];
   for (const entry of raw) {
-    if (typeof entry !== 'object' || entry === null) continue;
+    if (typeof entry !== "object" || entry === null) continue;
     const row = entry as Record<string, unknown>;
     const out: Record<string, unknown> = {};
-    if (typeof row.id === 'string') out.id = row.id;
+    if (typeof row.id === "string") out.id = row.id;
     for (const sub of f.optionFields ?? []) {
       out[sub.key] = parseScalarField(sub, row);
     }
@@ -141,12 +158,15 @@ function parseOptionList(f: WebPluginSubField, raw: unknown): Record<string, unk
   return rows;
 }
 
-function parseObjectListRow(field: WebPluginField, raw: unknown): Record<string, unknown> {
-  if (typeof raw !== 'object' || raw === null) return {};
+function parseObjectListRow(
+  field: WebPluginField,
+  raw: unknown,
+): Record<string, unknown> {
+  if (typeof raw !== "object" || raw === null) return {};
   const row = raw as Record<string, unknown>;
   const out: Record<string, unknown> = {};
-  if (typeof row.id === 'string') out.id = row.id;
-  if (row.published === true || row.published === 'true') out.published = true;
+  if (typeof row.id === "string") out.id = row.id;
+  if (row.published === true || row.published === "true") out.published = true;
 
   const subReaders = (field.itemFields ?? []).map((sub) => ({
     key: sub.key,
@@ -157,10 +177,11 @@ function parseObjectListRow(field: WebPluginField, raw: unknown): Record<string,
   for (const sub of field.itemFields ?? []) {
     const visible = isFieldVisible(sub, subReaders);
     if (!visible && sub.clearWhenHidden) {
-      if (sub.type === 'boolean') out[sub.key] = false;
-      else if (sub.type === 'channel-multi' || sub.type === 'role-multi') out[sub.key] = [];
-      else if (sub.type === 'option-list') out[sub.key] = [];
-      else out[sub.key] = '';
+      if (sub.type === "boolean") out[sub.key] = false;
+      else if (sub.type === "channel-multi" || sub.type === "role-multi")
+        out[sub.key] = [];
+      else if (sub.type === "option-list") out[sub.key] = [];
+      else out[sub.key] = "";
     } else {
       out[sub.key] = parseScalarField(sub, row);
     }
@@ -177,7 +198,7 @@ export function formBodyToValues(
   const out: Record<string, unknown> = {};
 
   for (const f of plugin.fields) {
-    if (f.type === 'object-list') {
+    if (f.type === "object-list") {
       const raw = tree[f.key];
       if (!Array.isArray(raw)) {
         out[f.key] = [];

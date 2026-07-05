@@ -9,10 +9,10 @@ import {
   type PartialMessage,
   type TextBasedChannel,
   type TextChannel,
-} from 'discord.js';
-import type { CommandModule } from '../../moduleLoader.js';
-import { isModuleEnabled } from '../../../../shared/core/texts.js';
-import { findRecentBan, findRecentKick, findRecentUnban } from './audit.js';
+} from "discord.js";
+import type { CommandModule } from "../../moduleLoader.js";
+import { isModuleEnabled } from "../../../../shared/core/texts.js";
+import { findRecentBan, findRecentKick, findRecentUnban } from "./audit.js";
 import {
   buildMemberBannedEmbed,
   buildMemberKickedEmbed,
@@ -20,8 +20,13 @@ import {
   buildMemberUnbannedEmbed,
   buildMessageDeletedEmbed,
   resolveDeleteAuthor,
-} from './embeds.js';
-import { NAMESPACE, config, logChannelId, texts } from '../../../../shared/modules/moderation-log/config-io.js';
+} from "./embeds.js";
+import {
+  NAMESPACE,
+  config,
+  logChannelId,
+  texts,
+} from "../../../../shared/modules/moderation-log/config-io.js";
 
 const recentBans = new Set<string>();
 const BAN_DEDUPE_MS = 10_000;
@@ -47,7 +52,9 @@ async function postLog(client: Client, embed: EmbedBuilder): Promise<void> {
 
   const channel = await client.channels.fetch(channelId).catch(() => null);
   if (!channel?.isTextBased() || channel.isDMBased()) {
-    console.warn(`[moderation-log] Log channel "${channelId}" is not a guild text channel.`);
+    console.warn(
+      `[moderation-log] Log channel "${channelId}" is not a guild text channel.`,
+    );
     return;
   }
 
@@ -55,12 +62,12 @@ async function postLog(client: Client, embed: EmbedBuilder): Promise<void> {
 }
 
 function isGuildTextChannel(channel: TextBasedChannel): boolean {
-  return !channel.isDMBased() && 'guild' in channel && channel.guild !== null;
+  return !channel.isDMBased() && "guild" in channel && channel.guild !== null;
 }
 
 async function handleMessageDelete(
   message: Message | PartialMessage,
-  bulkChannel?: TextBasedChannel
+  bulkChannel?: TextBasedChannel,
 ): Promise<void> {
   if (!isModuleEnabled(NAMESPACE)) return;
   if (!config().logMessageDeleted) return;
@@ -69,7 +76,8 @@ async function handleMessageDelete(
   if (!logChannel) return;
 
   const sourceChannel = bulkChannel ?? message.channel;
-  if (!sourceChannel?.isTextBased() || !isGuildTextChannel(sourceChannel)) return;
+  if (!sourceChannel?.isTextBased() || !isGuildTextChannel(sourceChannel))
+    return;
   if (sourceChannel.id === logChannel) return;
 
   const t = texts();
@@ -83,7 +91,7 @@ async function handleMessageDelete(
     sourceChannel.id,
     message.id,
     content,
-    timestamp
+    timestamp,
   );
 
   await postLog(message.client, embed);
@@ -91,12 +99,14 @@ async function handleMessageDelete(
 
 async function handleMessageDeleteBulk(
   messages: ReadonlyMap<string, Message | PartialMessage>,
-  channel: TextBasedChannel
+  channel: TextBasedChannel,
 ): Promise<void> {
   const items = [...messages.values()];
   for (let i = 0; i < items.length; i += BULK_DELETE_BATCH) {
     const batch = items.slice(i, i + BULK_DELETE_BATCH);
-    await Promise.all(batch.map((message) => handleMessageDelete(message, channel)));
+    await Promise.all(
+      batch.map((message) => handleMessageDelete(message, channel)),
+    );
     if (i + BULK_DELETE_BATCH < items.length) {
       await delay(BULK_DELETE_DELAY_MS);
     }
@@ -112,7 +122,12 @@ async function handleGuildBanAdd(ban: GuildBan): Promise<void> {
   if (!logChannelId()) return;
 
   const audit = await findRecentBan(ban.guild, ban.user.id);
-  const embed = buildMemberBannedEmbed(texts(), ban.user, new Date(), audit?.executorId ?? null);
+  const embed = buildMemberBannedEmbed(
+    texts(),
+    ban.user,
+    new Date(),
+    audit?.executorId ?? null,
+  );
   await postLog(ban.client, embed);
 }
 
@@ -122,14 +137,23 @@ async function handleGuildBanRemove(ban: GuildBan): Promise<void> {
   if (!logChannelId()) return;
 
   const audit = await findRecentUnban(ban.guild, ban.user.id);
-  const embed = buildMemberUnbannedEmbed(texts(), ban.user, new Date(), audit?.executorId ?? null);
+  const embed = buildMemberUnbannedEmbed(
+    texts(),
+    ban.user,
+    new Date(),
+    audit?.executorId ?? null,
+  );
   await postLog(ban.client, embed);
 }
 
 async function resolveRemovedMember(
-  member: GuildMember | PartialGuildMember
-): Promise<{ guild: GuildMember['guild']; user: NonNullable<GuildMember['user']> } | null> {
-  const guildId = member.guild?.id ?? ('guildId' in member ? member.guildId : undefined);
+  member: GuildMember | PartialGuildMember,
+): Promise<{
+  guild: GuildMember["guild"];
+  user: NonNullable<GuildMember["user"]>;
+} | null> {
+  const guildId =
+    member.guild?.id ?? ("guildId" in member ? member.guildId : undefined);
   if (!guildId) return null;
 
   const guild =
@@ -140,14 +164,17 @@ async function resolveRemovedMember(
   if (!guild) return null;
 
   const user =
-    member.user ?? (await member.client.users.fetch(member.id).catch(() => null));
+    member.user ??
+    (await member.client.users.fetch(member.id).catch(() => null));
 
   if (!user) return null;
 
   return { guild, user };
 }
 
-async function handleGuildMemberRemove(member: GuildMember | PartialGuildMember): Promise<void> {
+async function handleGuildMemberRemove(
+  member: GuildMember | PartialGuildMember,
+): Promise<void> {
   if (!isModuleEnabled(NAMESPACE)) return;
   if (!logChannelId()) return;
   if (wasRecentBan(member.id)) return;
@@ -165,7 +192,7 @@ async function handleGuildMemberRemove(member: GuildMember | PartialGuildMember)
     if (kickEntry) {
       await postLog(
         member.client,
-        buildMemberKickedEmbed(t, user, timestamp, kickEntry.executorId)
+        buildMemberKickedEmbed(t, user, timestamp, kickEntry.executorId),
       );
       return;
     }
@@ -181,38 +208,38 @@ const moderationLogModule: CommandModule = {
   init(client: Client): void {
     if (!logChannelId()) {
       console.warn(
-        '[moderation-log] No channelId configured in ' +
-        'data/moderation-log/config.json; moderation logging is disabled.'
+        "[moderation-log] No channelId configured in " +
+          "data/moderation-log/config.json; moderation logging is disabled.",
       );
     }
 
     client.on(Events.MessageDelete, (message) => {
       void handleMessageDelete(message).catch((err) => {
-        console.error('[moderation-log] MessageDelete handler error:', err);
+        console.error("[moderation-log] MessageDelete handler error:", err);
       });
     });
 
     client.on(Events.MessageBulkDelete, (messages, channel) => {
       void handleMessageDeleteBulk(messages, channel).catch((err) => {
-        console.error('[moderation-log] MessageBulkDelete handler error:', err);
+        console.error("[moderation-log] MessageBulkDelete handler error:", err);
       });
     });
 
     client.on(Events.GuildBanAdd, (ban) => {
       void handleGuildBanAdd(ban).catch((err) => {
-        console.error('[moderation-log] GuildBanAdd handler error:', err);
+        console.error("[moderation-log] GuildBanAdd handler error:", err);
       });
     });
 
     client.on(Events.GuildBanRemove, (ban) => {
       void handleGuildBanRemove(ban).catch((err) => {
-        console.error('[moderation-log] GuildBanRemove handler error:', err);
+        console.error("[moderation-log] GuildBanRemove handler error:", err);
       });
     });
 
     client.on(Events.GuildMemberRemove, (member) => {
       void handleGuildMemberRemove(member).catch((err) => {
-        console.error('[moderation-log] GuildMemberRemove handler error:', err);
+        console.error("[moderation-log] GuildMemberRemove handler error:", err);
       });
     });
   },

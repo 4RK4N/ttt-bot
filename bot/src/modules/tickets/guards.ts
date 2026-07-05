@@ -1,9 +1,13 @@
-import type { ButtonInteraction, ThreadChannel } from 'discord.js';
-import { replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { isModuleEnabled } from '../../../../shared/core/texts.js';
-import { isClosedTicketThread } from './names.js';
-import { NAMESPACE, resolveTicketType, texts } from '../../../../shared/modules/tickets/config-io.js';
-import type { ResolvedTicketType } from '../../../../shared/modules/tickets/types.js';
+import type { ButtonInteraction, ThreadChannel } from "discord.js";
+import { replyEphemeral } from "../../../../shared/core/discordInteractions.js";
+import { isModuleEnabled } from "../../../../shared/core/texts.js";
+import { isClosedTicketThread } from "./names.js";
+import {
+  NAMESPACE,
+  resolveTicketType,
+  texts,
+} from "../../../../shared/modules/tickets/config-io.js";
+import type { ResolvedTicketType } from "../../../../shared/modules/tickets/types.js";
 
 export interface TicketThreadGuardOptions {
   /** When true, reject closed/locked ticket threads. */
@@ -17,15 +21,14 @@ export interface TicketThreadContext {
 }
 
 export type TicketThreadGuardResult =
-  | { ok: true; ctx: TicketThreadContext }
-  | { ok: false };
+  { ok: true; ctx: TicketThreadContext } | { ok: false };
 
 /** Shared preamble for ticket thread button actions (close/delete/role-action). */
 export async function guardTicketThreadAction(
   interaction: ButtonInteraction,
   typeId: string,
   expectedThreadId: string,
-  options?: TicketThreadGuardOptions
+  options?: TicketThreadGuardOptions,
 ): Promise<TicketThreadGuardResult> {
   const t = texts();
 
@@ -55,7 +58,10 @@ export async function guardTicketThreadAction(
     return { ok: false };
   }
 
-  if (options?.requireOpen && isClosedTicketThread(channel.name, channel.locked === true)) {
+  if (
+    options?.requireOpen &&
+    isClosedTicketThread(channel.name, channel.locked === true)
+  ) {
     await replyEphemeral(interaction, t.invalidInteraction);
     return { ok: false };
   }

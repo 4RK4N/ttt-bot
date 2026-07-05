@@ -1,73 +1,113 @@
-import { parsePanelBaseFields } from '../../core/panelFields.js';
-import { toStringArray } from '../../core/strings.js';
-import type { ResolvedTicketType } from './types.js';
+import { parsePanelBaseFields } from "../../core/panelFields.js";
+import { toStringArray } from "../../core/strings.js";
+import type { ResolvedTicketType } from "./types.js";
 
 export function validateTicketType(ticketType: ResolvedTicketType): void {
   if (!ticketType.openButtonLabel.trim()) {
-    throw new Error('Open button label is required.');
+    throw new Error("Open button label is required.");
   }
 
   if (!ticketType.panelTitle.trim()) {
-    throw new Error('Panel title is required.');
+    throw new Error("Panel title is required.");
   }
 
   if (ticketType.staffRoleIds.length === 0) {
-    throw new Error('At least one staff role is required.');
+    throw new Error("At least one staff role is required.");
   }
 
   if (!ticketType.closeButtonLabel.trim()) {
-    throw new Error('Close button label is required.');
+    throw new Error("Close button label is required.");
   }
 
   if (!ticketType.deleteButtonLabel.trim()) {
-    throw new Error('Delete button label is required.');
+    throw new Error("Delete button label is required.");
   }
 
-  if (!ticketType.confirmClosePrompt.trim() || !ticketType.confirmCloseYes.trim()) {
-    throw new Error('Close confirmation prompt and yes label are required.');
+  if (
+    !ticketType.confirmClosePrompt.trim() ||
+    !ticketType.confirmCloseYes.trim()
+  ) {
+    throw new Error("Close confirmation prompt and yes label are required.");
   }
 
-  if (!ticketType.confirmDeletePrompt.trim() || !ticketType.confirmDeleteYes.trim()) {
-    throw new Error('Delete confirmation prompt and yes label are required.');
+  if (
+    !ticketType.confirmDeletePrompt.trim() ||
+    !ticketType.confirmDeleteYes.trim()
+  ) {
+    throw new Error("Delete confirmation prompt and yes label are required.");
   }
 }
 
 export function validateTicketTypeRow(
   configRow: Record<string, unknown>,
-  textRow: Record<string, unknown>
+  textRow: Record<string, unknown>,
 ): void {
   const base = parsePanelBaseFields(configRow, textRow);
   const ticketType: ResolvedTicketType = {
     ...base,
-    emoji: typeof configRow.emoji === 'string' ? configRow.emoji : '',
-    channelId: typeof configRow.channelId === 'string' ? configRow.channelId : '',
+    emoji: typeof configRow.emoji === "string" ? configRow.emoji : "",
+    channelId:
+      typeof configRow.channelId === "string" ? configRow.channelId : "",
     staffRoleIds: toStringArray(configRow.staffRoleIds),
     deniedRoleIds: toStringArray(configRow.deniedRoleIds),
     roleActionRoleId:
-      typeof configRow.roleActionRoleId === 'string'
+      typeof configRow.roleActionRoleId === "string"
         ? configRow.roleActionRoleId.trim() || undefined
         : undefined,
-    openButtonLabel: typeof textRow.openButtonLabel === 'string' ? textRow.openButtonLabel : '',
-    ticketWelcome: typeof textRow.ticketWelcome === 'string' ? textRow.ticketWelcome : '',
-    closeButtonLabel: typeof textRow.closeButtonLabel === 'string' ? textRow.closeButtonLabel : '',
+    openButtonLabel:
+      typeof textRow.openButtonLabel === "string"
+        ? textRow.openButtonLabel
+        : "",
+    ticketWelcome:
+      typeof textRow.ticketWelcome === "string" ? textRow.ticketWelcome : "",
+    closeButtonLabel:
+      typeof textRow.closeButtonLabel === "string"
+        ? textRow.closeButtonLabel
+        : "",
     confirmClosePrompt:
-      typeof textRow.confirmClosePrompt === 'string' ? textRow.confirmClosePrompt : '',
-    confirmCloseYes: typeof textRow.confirmCloseYes === 'string' ? textRow.confirmCloseYes : '',
-    confirmCloseNo: typeof textRow.confirmCloseNo === 'string' ? textRow.confirmCloseNo : '',
-    ticketClosed: typeof textRow.ticketClosed === 'string' ? textRow.ticketClosed : '',
-    deleteButtonLabel: typeof textRow.deleteButtonLabel === 'string' ? textRow.deleteButtonLabel : '',
+      typeof textRow.confirmClosePrompt === "string"
+        ? textRow.confirmClosePrompt
+        : "",
+    confirmCloseYes:
+      typeof textRow.confirmCloseYes === "string"
+        ? textRow.confirmCloseYes
+        : "",
+    confirmCloseNo:
+      typeof textRow.confirmCloseNo === "string" ? textRow.confirmCloseNo : "",
+    ticketClosed:
+      typeof textRow.ticketClosed === "string" ? textRow.ticketClosed : "",
+    deleteButtonLabel:
+      typeof textRow.deleteButtonLabel === "string"
+        ? textRow.deleteButtonLabel
+        : "",
     confirmDeletePrompt:
-      typeof textRow.confirmDeletePrompt === 'string' ? textRow.confirmDeletePrompt : '',
-    confirmDeleteYes: typeof textRow.confirmDeleteYes === 'string' ? textRow.confirmDeleteYes : '',
-    confirmDeleteNo: typeof textRow.confirmDeleteNo === 'string' ? textRow.confirmDeleteNo : '',
-    ticketDeleted: typeof textRow.ticketDeleted === 'string' ? textRow.ticketDeleted : '',
-    alreadyOpen: typeof textRow.alreadyOpen === 'string' ? textRow.alreadyOpen : '',
-    openSuccess: typeof textRow.openSuccess === 'string' ? textRow.openSuccess : '',
-    roleDenied: typeof textRow.roleDenied === 'string' ? textRow.roleDenied : '',
+      typeof textRow.confirmDeletePrompt === "string"
+        ? textRow.confirmDeletePrompt
+        : "",
+    confirmDeleteYes:
+      typeof textRow.confirmDeleteYes === "string"
+        ? textRow.confirmDeleteYes
+        : "",
+    confirmDeleteNo:
+      typeof textRow.confirmDeleteNo === "string"
+        ? textRow.confirmDeleteNo
+        : "",
+    ticketDeleted:
+      typeof textRow.ticketDeleted === "string" ? textRow.ticketDeleted : "",
+    alreadyOpen:
+      typeof textRow.alreadyOpen === "string" ? textRow.alreadyOpen : "",
+    openSuccess:
+      typeof textRow.openSuccess === "string" ? textRow.openSuccess : "",
+    roleDenied:
+      typeof textRow.roleDenied === "string" ? textRow.roleDenied : "",
     roleActionButtonLabel:
-      typeof textRow.roleActionButtonLabel === 'string' ? textRow.roleActionButtonLabel : '',
+      typeof textRow.roleActionButtonLabel === "string"
+        ? textRow.roleActionButtonLabel
+        : "",
     roleActionConfirmation:
-      typeof textRow.roleActionConfirmation === 'string' ? textRow.roleActionConfirmation : '',
+      typeof textRow.roleActionConfirmation === "string"
+        ? textRow.roleActionConfirmation
+        : "",
   };
 
   validateTicketType(ticketType);

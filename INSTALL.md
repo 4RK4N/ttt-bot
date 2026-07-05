@@ -42,6 +42,7 @@ so you do not need to open any firewall ports or set up a reverse proxy.
    single trusted self-hosted bot on your server. Keep `discordToken` secret — anyone
    with the token has full server access through the bot.
    Pick your server and authorize.
+
 5. (Recommended for fast command updates) Enable Developer Mode in Discord
    (User Settings -> Advanced -> Developer Mode), then right-click your server icon
    -> **Copy Server ID**. This is your optional `guildId`.
@@ -109,16 +110,16 @@ copy it to `config.json` or `texts.json` and edit.
 }
 ```
 
-| Field | Required | Description |
-| ----- | -------- | ----------- |
-| `discordToken` | **Yes** | Bot token from the Developer Portal (Bot -> Reset Token). Keep it secret. |
-| `clientId` | **Yes** | Application (client) ID from General Information. |
-| `guildId` | No | A server ID for instant, guild-scoped slash command registration during development. Empty = register globally (can take ~1 hour to propagate). Also **required for the web editor** (the admin check runs against this server). |
-| `botName` | No | Display name shown in the web editor's title (`<botName> Admin Interface`). Defaults to `TTT`. |
-| `clientSecret` | Editor only | OAuth2 client secret (Developer Portal -> OAuth2 -> Client Secret -> Reset). |
-| `sessionSecret` | Editor only | Long random string used to sign the editor's session cookies. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. |
-| `oauthRedirectUri` | Editor only | OAuth2 redirect URL, added verbatim under Developer Portal -> OAuth2 -> Redirects. Use the editor's public `/callback` URL (https makes the cookie `Secure`). For local dev: `http://localhost:8088/callback`. |
-| `webPort` | No | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too. |
+| Field              | Required    | Description                                                                                                                                                                                                                      |
+| ------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `discordToken`     | **Yes**     | Bot token from the Developer Portal (Bot -> Reset Token). Keep it secret.                                                                                                                                                        |
+| `clientId`         | **Yes**     | Application (client) ID from General Information.                                                                                                                                                                                |
+| `guildId`          | No          | A server ID for instant, guild-scoped slash command registration during development. Empty = register globally (can take ~1 hour to propagate). Also **required for the web editor** (the admin check runs against this server). |
+| `botName`          | No          | Display name shown in the web editor's title (`<botName> Admin Interface`). Defaults to `TTT`.                                                                                                                                   |
+| `clientSecret`     | Editor only | OAuth2 client secret (Developer Portal -> OAuth2 -> Client Secret -> Reset).                                                                                                                                                     |
+| `sessionSecret`    | Editor only | Long random string used to sign the editor's session cookies. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.                                                                      |
+| `oauthRedirectUri` | Editor only | OAuth2 redirect URL, added verbatim under Developer Portal -> OAuth2 -> Redirects. Use the editor's public `/callback` URL (https makes the cookie `Secure`). For local dev: `http://localhost:8088/callback`.                   |
+| `webPort`          | No          | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too.                                                        |
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
 `webPort`) plus `guildId` are only needed if you run the browser-based editor;
@@ -230,13 +231,13 @@ Set `channelId` to the channel where log embeds are posted. Leave it empty (`""`
 disable the module, or set `"enabled": false` to turn it off while keeping the channel
 configured. Each event type has its own boolean toggle:
 
-| Config key | Default | Event |
-| ---------- | ------- | ----- |
-| `logMessageDeleted` | `true` | A message is deleted (including bulk deletes) |
-| `logMemberLeft` | `true` | A member leaves voluntarily |
-| `logMemberKicked` | `true` | A member is kicked (detected via audit log) |
-| `logMemberBanned` | `true` | A member is banned |
-| `logMemberUnbanned` | `true` | A member is unbanned |
+| Config key          | Default | Event                                         |
+| ------------------- | ------- | --------------------------------------------- |
+| `logMessageDeleted` | `true`  | A message is deleted (including bulk deletes) |
+| `logMemberLeft`     | `true`  | A member leaves voluntarily                   |
+| `logMemberKicked`   | `true`  | A member is kicked (detected via audit log)   |
+| `logMemberBanned`   | `true`  | A member is banned                            |
+| `logMemberUnbanned` | `true`  | A member is unbanned                          |
 
 Kick, ban, and unban logs include the moderator when Discord's audit log provides an
 executor within ~5 seconds of the event. The bot needs **View Audit Log** for that;
@@ -298,12 +299,12 @@ share one [`Dockerfile`](Dockerfile) (single `npm ci`), website has its own
 ([`website/Dockerfile`](website/Dockerfile)). Builds use layer cache by default;
 changed source re-runs only the affected steps.
 
-| Flag | Effect |
-| ---- | ------ |
-| *(none)* | Compact build progress (default) |
-| `-v` | Full step-by-step output (`--progress plain`) |
-| `--no-cache` | Ignore layer cache; full rebuild |
-| `-v --no-cache` | Both |
+| Flag            | Effect                                        |
+| --------------- | --------------------------------------------- |
+| _(none)_        | Compact build progress (default)              |
+| `-v`            | Full step-by-step output (`--progress plain`) |
+| `--no-cache`    | Ignore layer cache; full rebuild              |
+| `-v --no-cache` | Both                                          |
 
 ```bash
 chmod +x scripts/build.sh   # once, on Linux/macOS
@@ -378,18 +379,18 @@ Now go to your Discord server and try `/pic` or `/post`.
 Static multi-page site built with **Astro 7 + Tailwind CSS**. The site is **built inside the
 `ttt-website` Docker image** (see `website/Dockerfile`) and served by nginx.
 
-| Path | Purpose |
-| ---- | ------- |
-| `website/src/pages/` | One `.astro` file per page (DE + EN) |
-| `website/src/layouts/`, `website/src/components/` | Shared layout (topbar, drawer) and components (gallery, timer) |
-| `website/src/data/nav.ts` | Navigation labels and DE↔EN path mapping |
-| `website/src/styles/global.css` | Tailwind theme + shared text styles |
-| `website/src/assets/` | Page images (logo, icons, gallery, background) — optimized to WebP at build via Astro `<Image>` |
-| `website/public/` | Fixed-URL assets only: `robots.txt`, favicon, apple-touch-icon, OG share image |
-| `website/astro.config.mjs` | `@astrojs/sitemap` generates `sitemap-index.xml` at build time |
-| `website/dist/` | Local `npm run build` output (gitignored); dev preview only — production uses files baked into the image |
-| `website/Dockerfile` | Multi-stage: `npm ci` + `astro build`, then nginx |
-| `website/nginx.conf` | nginx config (clean URLs, gzip, caching); `listen 8089` |
+| Path                                              | Purpose                                                                                                  |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `website/src/pages/`                              | One `.astro` file per page (DE + EN)                                                                     |
+| `website/src/layouts/`, `website/src/components/` | Shared layout (topbar, drawer) and components (gallery, timer)                                           |
+| `website/src/data/nav.ts`                         | Navigation labels and DE↔EN path mapping                                                                 |
+| `website/src/styles/global.css`                   | Tailwind theme + shared text styles                                                                      |
+| `website/src/assets/`                             | Page images (logo, icons, gallery, background) — optimized to WebP at build via Astro `<Image>`          |
+| `website/public/`                                 | Fixed-URL assets only: `robots.txt`, favicon, apple-touch-icon, OG share image                           |
+| `website/astro.config.mjs`                        | `@astrojs/sitemap` generates `sitemap-index.xml` at build time                                           |
+| `website/dist/`                                   | Local `npm run build` output (gitignored); dev preview only — production uses files baked into the image |
+| `website/Dockerfile`                              | Multi-stage: `npm ci` + `astro build`, then nginx                                                        |
+| `website/nginx.conf`                              | nginx config (clean URLs, gzip, caching); `listen 8089`                                                  |
 
 **Site images:** keep `website/src/assets/` **in git** (do not gitignore). Logo, gallery, icons, and background are source content — the Docker build runs `astro build` and needs them on disk after `git pull`. Only `website/dist/` and `website/.astro/` are build output and stay gitignored. `website/public/` holds four fixed-URL files (favicon, share image, etc.) only.
 
@@ -413,9 +414,9 @@ Browser ──HTTPS──► Caddy (caddy-docker-proxy, ports 80/443 on host)
                       └── HTTP ──► ttt-website:8089 (nginx, internal Docker network)
 ```
 
-| Layer | Role |
-| ----- | ---- |
-| **Caddy** | Public entrypoint. Terminates TLS (Let's Encrypt cert for `ttt-ffxiv.eu`), redirects HTTP→HTTPS, proxies to the container. |
+| Layer     | Role                                                                                                                                      |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Caddy** | Public entrypoint. Terminates TLS (Let's Encrypt cert for `ttt-ffxiv.eu`), redirects HTTP→HTTPS, proxies to the container.                |
 | **nginx** | Serves the built site (baked into the image at build time) on **port 8089 inside the container only**. Plain HTTP — no certificates here. |
 
 The `caddy:` and `caddy.reverse_proxy: "{{upstreams 8089}}"` labels on `ttt-website`
@@ -436,16 +437,16 @@ and redirects plain HTTP to HTTPS — no SSL config in nginx required.
 
 ## Everyday commands
 
-| Action                         | Command                                  |
-| ------------------------------ | ---------------------------------------- |
-| View logs                      | `docker compose logs -f ttt-discord-bot` |
-| Stop the bot                   | `docker compose down`                    |
-| Start the bot                  | `docker compose up -d`                   |
-| Restart the bot                | `docker compose restart ttt-discord-bot` |
-| Rebuild after code changes     | `./scripts/build.sh` (optional `-v`, `--no-cache`) |
-| Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
+| Action                         | Command                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| View logs                      | `docker compose logs -f ttt-discord-bot`                                                      |
+| Stop the bot                   | `docker compose down`                                                                         |
+| Start the bot                  | `docker compose up -d`                                                                        |
+| Restart the bot                | `docker compose restart ttt-discord-bot`                                                      |
+| Rebuild after code changes     | `./scripts/build.sh` (optional `-v`, `--no-cache`)                                            |
+| Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy`                                      |
 | Rebuild web editor after edits | `docker compose build ttt-web-editor && docker compose up -d --force-recreate ttt-web-editor` |
-| Rebuild website after edits    | `docker compose build ttt-website && docker compose up -d --force-recreate ttt-website` |
+| Rebuild website after edits    | `docker compose build ttt-website && docker compose up -d --force-recreate ttt-website`       |
 
 ### Updating to new code
 
@@ -515,6 +516,7 @@ docker logs -f ttt-discord-bot
   sudo nano ./data/welcome-message/config.json
   sudo chown 1000:1000 ./data/welcome-message/config.json
   ```
+
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The
   bot reports this back to the user privately.
 

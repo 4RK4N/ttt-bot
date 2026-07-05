@@ -1,8 +1,11 @@
-import { EmbedBuilder } from 'discord.js';
-import { buildEmbed } from '../../core/embedBuilder.js';
-import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
-import { resolveEmbedPanel } from './config-io.js';
-import { validateEmbedPanel } from './validate.js';
+import { EmbedBuilder } from "discord.js";
+import { buildEmbed } from "../../core/embedBuilder.js";
+import {
+  publishDiscordMessage,
+  type DiscordApiContext,
+} from "../../core/panelPublish.js";
+import { resolveEmbedPanel } from "./config-io.js";
+import { validateEmbedPanel } from "./validate.js";
 
 export type { DiscordApiContext };
 
@@ -25,7 +28,7 @@ export function buildPanelPayload(panelId: string) {
     timestamp: panel.showTimestamp ? new Date() : undefined,
   });
 
-  const payload: { embeds: ReturnType<EmbedBuilder['toJSON']>[] } = {
+  const payload: { embeds: ReturnType<EmbedBuilder["toJSON"]>[] } = {
     embeds: [embed.toJSON()],
   };
 
@@ -36,7 +39,7 @@ export async function publishPanel(
   ctx: DiscordApiContext,
   panelId: string,
   channelId: string,
-  existingMessageId?: string
+  existingMessageId?: string,
 ): Promise<string> {
   const { payload } = buildPanelPayload(panelId);
   return publishDiscordMessage(ctx, channelId, payload, existingMessageId);

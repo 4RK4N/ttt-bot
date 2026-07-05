@@ -1,5 +1,4 @@
 @layer base {
-
   /* Responsive root scale — 24px desktop; layout.ts tracks the same breakpoints. */
   html {
     font-size: 24px;
@@ -45,7 +44,7 @@
 
   /* Fixed page background (--page-bg-image set in Base.astro) */
   body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     z-index: -1;

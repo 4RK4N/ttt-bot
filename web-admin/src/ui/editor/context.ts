@@ -1,4 +1,9 @@
-import type { EditorModule, GuildChannel, GuildRole, WebPlugin } from '../../plugin-types.js';
+import type {
+  EditorModule,
+  GuildChannel,
+  GuildRole,
+  WebPlugin,
+} from "../../plugin-types.js";
 
 export interface EditorContext {
   csrfToken: string;

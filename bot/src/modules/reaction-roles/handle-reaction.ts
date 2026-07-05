@@ -4,17 +4,23 @@ import {
   type MessageReaction,
   type PartialMessageReaction,
   type User,
-} from 'discord.js';
-import { isModuleEnabled } from '../../../../shared/core/texts.js';
-import { isOnCooldown, touchCooldown } from './cooldown.js';
-import { matchOptionByReaction } from '../../../../shared/modules/reaction-roles/panel.js';
-import { tryAssignRole, tryRemoveRole } from '../../../../shared/core/discordRoles.js';
-import { findPanelByMessageId, NAMESPACE } from '../../../../shared/modules/reaction-roles/config-io.js';
+} from "discord.js";
+import { isModuleEnabled } from "../../../../shared/core/texts.js";
+import { isOnCooldown, touchCooldown } from "./cooldown.js";
+import { matchOptionByReaction } from "../../../../shared/modules/reaction-roles/panel.js";
+import {
+  tryAssignRole,
+  tryRemoveRole,
+} from "../../../../shared/core/discordRoles.js";
+import {
+  findPanelByMessageId,
+  NAMESPACE,
+} from "../../../../shared/modules/reaction-roles/config-io.js";
 
 async function handleReaction(
   reaction: MessageReaction | PartialMessageReaction,
   user: User | { id: string; bot?: boolean },
-  added: boolean
+  added: boolean,
 ): Promise<void> {
   if (user.bot) return;
   if (!isModuleEnabled(NAMESPACE)) return;
@@ -38,7 +44,7 @@ async function handleReaction(
   if (!message.guild) return;
 
   const panel = findPanelByMessageId(message.id);
-  if (!panel || panel.reactionType !== 'emoji') return;
+  if (!panel || panel.reactionType !== "emoji") return;
 
   if (message.channelId !== panel.channelId) return;
 
@@ -64,7 +70,7 @@ async function handleReaction(
     const result = await tryAssignRole(member, option.roleId);
     if (!result.ok) {
       console.warn(
-        `[reaction-roles] Emoji add failed panel=${panel.id} user=${user.id} role=${option.roleId}`
+        `[reaction-roles] Emoji add failed panel=${panel.id} user=${user.id} role=${option.roleId}`,
       );
       try {
         await reaction.users.remove(user.id);
@@ -81,7 +87,7 @@ async function handleReaction(
   const result = await tryRemoveRole(member, option.roleId);
   if (!result.ok) {
     console.warn(
-      `[reaction-roles] Emoji remove failed panel=${panel.id} user=${user.id} role=${option.roleId}`
+      `[reaction-roles] Emoji remove failed panel=${panel.id} user=${user.id} role=${option.roleId}`,
     );
   }
 }
@@ -91,7 +97,7 @@ export function registerReactionHandlers(client: Client): void {
     try {
       await handleReaction(reaction, user, true);
     } catch (err) {
-      console.error('[reaction-roles] MessageReactionAdd error:', err);
+      console.error("[reaction-roles] MessageReactionAdd error:", err);
     }
   });
 
@@ -99,7 +105,7 @@ export function registerReactionHandlers(client: Client): void {
     try {
       await handleReaction(reaction, user, false);
     } catch (err) {
-      console.error('[reaction-roles] MessageReactionRemove error:', err);
+      console.error("[reaction-roles] MessageReactionRemove error:", err);
     }
   });
 }

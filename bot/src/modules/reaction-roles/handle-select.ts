@@ -1,11 +1,17 @@
-import { type GuildMember, type StringSelectMenuInteraction } from 'discord.js';
-import { memberHasAnyRole, replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { tryAssignRole, tryRemoveRole } from '../../../../shared/core/discordRoles.js';
-import { isOnCooldown, touchCooldown } from './cooldown.js';
-import { guardPublishedPanel } from './guards.js';
-import { formatEphemeralMessage } from './respond.js';
-import { SEL_PREFIX } from '../../../../shared/modules/reaction-roles/panel.js';
-import { texts } from '../../../../shared/modules/reaction-roles/config-io.js';
+import { type GuildMember, type StringSelectMenuInteraction } from "discord.js";
+import {
+  memberHasAnyRole,
+  replyEphemeral,
+} from "../../../../shared/core/discordInteractions.js";
+import {
+  tryAssignRole,
+  tryRemoveRole,
+} from "../../../../shared/core/discordRoles.js";
+import { isOnCooldown, touchCooldown } from "./cooldown.js";
+import { guardPublishedPanel } from "./guards.js";
+import { formatEphemeralMessage } from "./respond.js";
+import { SEL_PREFIX } from "../../../../shared/modules/reaction-roles/panel.js";
+import { texts } from "../../../../shared/modules/reaction-roles/config-io.js";
 
 function parseSelectCustomId(customId: string): string | null {
   if (!customId.startsWith(SEL_PREFIX)) return null;
@@ -13,18 +19,21 @@ function parseSelectCustomId(customId: string): string | null {
   return panelId || null;
 }
 
-type AppliedChange = { roleId: string; action: 'add' | 'remove' };
+type AppliedChange = { roleId: string; action: "add" | "remove" };
 
-async function rollbackChanges(member: GuildMember, applied: AppliedChange[]): Promise<void> {
+async function rollbackChanges(
+  member: GuildMember,
+  applied: AppliedChange[],
+): Promise<void> {
   for (let i = applied.length - 1; i >= 0; i--) {
     const { roleId, action } = applied[i];
-    if (action === 'add') await tryRemoveRole(member, roleId);
+    if (action === "add") await tryRemoveRole(member, roleId);
     else await tryAssignRole(member, roleId);
   }
 }
 
 export async function handleSelectInteraction(
-  interaction: StringSelectMenuInteraction
+  interaction: StringSelectMenuInteraction,
 ): Promise<void> {
   const panelId = parseSelectCustomId(interaction.customId);
   if (!panelId) {
@@ -33,19 +42,24 @@ export async function handleSelectInteraction(
   }
 
   const guarded = await guardPublishedPanel(interaction, panelId, {
-    reactionType: ['dropdown', 'dropdown-single'],
+    reactionType: ["dropdown", "dropdown-single"],
   });
   if (!guarded.ok) return;
 
   const { panel, t } = guarded;
 
-  const guildMember = await interaction.guild?.members.fetch(interaction.user.id);
+  const guildMember = await interaction.guild?.members.fetch(
+    interaction.user.id,
+  );
   if (!guildMember) {
     await replyEphemeral(interaction, t.roleError);
     return;
   }
 
-  if (isOnCooldown(interaction.user.id, panel.id)) return;
+  if (isOnCooldown(interaction.user.id, panel.id)) {
+    await replyEphemeral(interaction, t.cooldown);
+    return;
+  }
   touchCooldown(interaction.user.id, panel.id);
 
   const validOptionIds = new Set(panel.roleOptions.map((o) => o.id));
@@ -72,26 +86,36 @@ export async function handleSelectInteraction(
         if (isSelected && !hasRole) {
           const result = await tryAssignRole(guildMember, opt.roleId);
           if (!result.ok) {
-            throw new Error(result.reason === 'hierarchy' ? t.roleHierarchyError : t.roleError);
+            throw new Error(
+              result.reason === "hierarchy"
+                ? t.roleHierarchyError
+                : t.roleError,
+            );
           }
-          applied.push({ roleId: opt.roleId, action: 'add' });
+          applied.push({ roleId: opt.roleId, action: "add" });
           const name = interaction.guild?.roles.cache.get(opt.roleId)?.name;
           if (name) changedRoleNames.push(name);
         } else if (!isSelected && hasRole) {
           const result = await tryRemoveRole(guildMember, opt.roleId);
           if (!result.ok) {
-            throw new Error(result.reason === 'hierarchy' ? t.roleHierarchyError : t.roleError);
+            throw new Error(
+              result.reason === "hierarchy"
+                ? t.roleHierarchyError
+                : t.roleError,
+            );
           }
-          applied.push({ roleId: opt.roleId, action: 'remove' });
+          applied.push({ roleId: opt.roleId, action: "remove" });
           const name = interaction.guild?.roles.cache.get(opt.roleId)?.name;
           if (name) changedRoleNames.push(name);
         }
       } else if (isSelected && !hasRole) {
         const result = await tryAssignRole(guildMember, opt.roleId);
         if (!result.ok) {
-          throw new Error(result.reason === 'hierarchy' ? t.roleHierarchyError : t.roleError);
+          throw new Error(
+            result.reason === "hierarchy" ? t.roleHierarchyError : t.roleError,
+          );
         }
-        applied.push({ roleId: opt.roleId, action: 'add' });
+        applied.push({ roleId: opt.roleId, action: "add" });
         const name = interaction.guild?.roles.cache.get(opt.roleId)?.name;
         if (name) changedRoleNames.push(name);
       }
@@ -105,7 +129,7 @@ export async function handleSelectInteraction(
 
   const message = formatEphemeralMessage(panel, {
     mention: `<@${interaction.user.id}>`,
-    role: changedRoleNames.join(', '),
+    role: changedRoleNames.join(", "),
   });
   if (message) {
     await replyEphemeral(interaction, message);

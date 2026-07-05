@@ -1,4 +1,4 @@
-import { AuditLogEvent, type Guild } from 'discord.js';
+import { AuditLogEvent, type Guild } from "discord.js";
 
 /** How far back to match an audit entry to a gateway event. */
 const AUDIT_WINDOW_MS = 5_000;
@@ -13,9 +13,9 @@ export interface ModerationAuditEntry {
  */
 export async function findRecentKick(
   guild: Guild,
-  userId: string
+  userId: string,
 ): Promise<ModerationAuditEntry | null> {
-  return findRecentAuditEntry(guild, userId, AuditLogEvent.MemberKick, 'kick');
+  return findRecentAuditEntry(guild, userId, AuditLogEvent.MemberKick, "kick");
 }
 
 /**
@@ -24,9 +24,9 @@ export async function findRecentKick(
  */
 export async function findRecentBan(
   guild: Guild,
-  userId: string
+  userId: string,
 ): Promise<ModerationAuditEntry | null> {
-  return findRecentAuditEntry(guild, userId, AuditLogEvent.MemberBanAdd, 'ban');
+  return findRecentAuditEntry(guild, userId, AuditLogEvent.MemberBanAdd, "ban");
 }
 
 /**
@@ -35,16 +35,21 @@ export async function findRecentBan(
  */
 export async function findRecentUnban(
   guild: Guild,
-  userId: string
+  userId: string,
 ): Promise<ModerationAuditEntry | null> {
-  return findRecentAuditEntry(guild, userId, AuditLogEvent.MemberBanRemove, 'unban');
+  return findRecentAuditEntry(
+    guild,
+    userId,
+    AuditLogEvent.MemberBanRemove,
+    "unban",
+  );
 }
 
 async function findRecentAuditEntry(
   guild: Guild,
   userId: string,
   type: AuditLogEvent,
-  label: string
+  label: string,
 ): Promise<ModerationAuditEntry | null> {
   try {
     const logs = await guild.fetchAuditLogs({ type, limit: 5 });

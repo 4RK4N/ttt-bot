@@ -1,5 +1,5 @@
-import type { WebPluginSubField } from '../../../plugin-types.js';
-import type { EditorContext } from '../context.js';
+import type { WebPluginSubField } from "../../../plugin-types.js";
+import type { EditorContext } from "../context.js";
 
 export interface SubFieldProps {
   f: WebPluginSubField;
@@ -10,7 +10,7 @@ export interface SubFieldProps {
 }
 
 export interface TopFieldProps {
-  f: import('../../../plugin-types.js').WebPluginField;
+  f: import("../../../plugin-types.js").WebPluginField;
   value: unknown;
   ctx: EditorContext;
   namespace: string;
@@ -18,7 +18,7 @@ export interface TopFieldProps {
 }
 
 export function fieldValueStr(value: unknown): string {
-  return value != null ? String(value) : '';
+  return value != null ? String(value) : "";
 }
 
 export function Help({ text }: { text?: string }) {
@@ -40,7 +40,7 @@ export function FieldWrap({
   disabled?: boolean;
 }) {
   return (
-    <div class={`mb-3 field${disabled ? ' disabled' : ''}`}>
+    <div class={`mb-3 field${disabled ? " disabled" : ""}`}>
       <label class="form-label" for={id}>
         {label}
       </label>

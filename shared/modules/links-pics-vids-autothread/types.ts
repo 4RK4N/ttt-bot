@@ -1,5 +1,5 @@
-import { createModuleConfig } from '../../core/moduleConfig.js';
-import { DEFAULT_THREAD_FIRST_MESSAGE } from '../../core/threads.js';
+import { createModuleConfig } from "../../core/moduleConfig.js";
+import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 export interface AutoThreadTexts {
   threadFirstMessage: string;
@@ -18,7 +18,11 @@ export const TEXT_DEFAULTS: AutoThreadTexts = {
   threadFirstMessage: DEFAULT_THREAD_FIRST_MESSAGE,
 };
 
-const module = createModuleConfig('links-pics-vids-autothread', CONFIG_DEFAULTS, TEXT_DEFAULTS);
+const module = createModuleConfig(
+  "links-pics-vids-autothread",
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+);
 
 export const NAMESPACE = module.NAMESPACE;
 export const config = module.config;

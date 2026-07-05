@@ -1,6 +1,6 @@
-import type { GuildChannel } from '../../../plugin-types.js';
-import { FieldWrap, fieldValueStr } from './shared.js';
-import type { SubFieldProps } from './shared.js';
+import type { GuildChannel } from "../../../plugin-types.js";
+import { FieldWrap, fieldValueStr } from "./shared.js";
+import type { SubFieldProps } from "./shared.js";
 
 function channelOptions(channels: GuildChannel[], value: string) {
   const opts = [
@@ -29,13 +29,20 @@ export function ChannelField({
   disabled,
   ...extra
 }: SubFieldProps & Record<string, unknown>) {
-  const id = name.replace(/[[\].]/g, '-');
+  const id = name.replace(/[[\].]/g, "-");
   const strVal = fieldValueStr(value);
 
   if (ctx.channelsError) {
     return (
       <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-        <input class="form-control" type="text" id={id} name={name} value={strVal} disabled={disabled} />
+        <input
+          class="form-control"
+          type="text"
+          id={id}
+          name={name}
+          value={strVal}
+          disabled={disabled}
+        />
         <div class="form-text text-danger">
           {ctx.channelsError} Enter id manually.
         </div>
@@ -45,15 +52,27 @@ export function ChannelField({
 
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <select class="form-select" id={id} name={name} disabled={disabled} {...extra}>
+      <select
+        class="form-select"
+        id={id}
+        name={name}
+        disabled={disabled}
+        {...extra}
+      >
         {channelOptions(ctx.channels, strVal)}
       </select>
     </FieldWrap>
   );
 }
 
-export function ChannelMultiField({ f, value, name, ctx, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+export function ChannelMultiField({
+  f,
+  value,
+  name,
+  ctx,
+  disabled,
+}: SubFieldProps) {
+  const id = name.replace(/[[\].]/g, "-");
   const selected = Array.isArray(value) ? value.map(String) : [];
 
   if (ctx.channelsError) {
@@ -64,7 +83,7 @@ export function ChannelMultiField({ f, value, name, ctx, disabled }: SubFieldPro
           type="text"
           id={id}
           name={name}
-          value={selected.join(', ')}
+          value={selected.join(", ")}
           disabled={disabled}
         />
         <div class="form-text text-danger">

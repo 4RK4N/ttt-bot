@@ -4,7 +4,10 @@
  * When enabling panel types in types.ts + config-io.ts, import resolveExamplePanel
  * from config-io and match the signature used by real modules (tickets/panel.ts).
  */
-import { publishDiscordMessage, type DiscordApiContext } from '../../core/panelPublish.js';
+import {
+  publishDiscordMessage,
+  type DiscordApiContext,
+} from "../../core/panelPublish.js";
 
 type ResolvedExamplePanel = {
   id: string;
@@ -15,7 +18,7 @@ type ResolvedExamplePanel = {
 
 export type { DiscordApiContext };
 
-export const EXAMPLE_BTN_PREFIX = 'example-module:btn:';
+export const EXAMPLE_BTN_PREFIX = "example-module:btn:";
 
 export function buildPanelPayload(panel: ResolvedExamplePanel) {
   return {
@@ -24,7 +27,10 @@ export function buildPanelPayload(panel: ResolvedExamplePanel) {
   };
 }
 
-export async function publishPanel(ctx: DiscordApiContext, panel: ResolvedExamplePanel) {
+export async function publishPanel(
+  ctx: DiscordApiContext,
+  panel: ResolvedExamplePanel,
+) {
   return publishDiscordMessage(ctx, panel.channelId, buildPanelPayload(panel));
 }
 

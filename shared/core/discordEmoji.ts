@@ -1,5 +1,7 @@
 /** Parses emoji string for ButtonBuilder.setEmoji / select menu options. */
-export function parseEmoji(emoji: string): { name: string; id?: string } | undefined {
+export function parseEmoji(
+  emoji: string,
+): { name: string; id?: string } | undefined {
   const trimmed = emoji.trim();
   if (!trimmed) return undefined;
   const custom = trimmed.match(/^<a?:(\w+):(\d+)>$/);
@@ -15,7 +17,7 @@ export function parseCustomEmojiId(emoji: string): string | undefined {
 /** Stable key matching a live Discord reaction emoji. */
 export function reactionMatchKey(
   emojiName: string | null,
-  emojiId: string | null
+  emojiId: string | null,
 ): string | undefined {
   if (emojiId) return `custom:${emojiId}`;
   if (emojiName) return `unicode:${emojiName}`;

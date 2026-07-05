@@ -1,14 +1,14 @@
-const THREAD_NAME_MAX = 100;
-const CLOSED_PREFIX = '[CLOSED] ';
+import { stripCustomEmoji } from "../../../../shared/core/threads.js";
 
-const CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
+const THREAD_NAME_MAX = 100;
+const CLOSED_PREFIX = "[CLOSED] ";
 
 function sanitizeSegment(value: string): string {
-  return value.replace(CUSTOM_EMOJI_REGEX, '').replace(/\s+/g, ' ').trim();
+  return stripCustomEmoji(value);
 }
 
 function pad2(n: number): string {
-  return String(n).padStart(2, '0');
+  return String(n).padStart(2, "0");
 }
 
 /** Formats a date as `YYYY.MM.DD HH:mm` (local time). */
@@ -25,7 +25,7 @@ export function buildTicketThreadName(displayName: string, date: Date): string {
   const maxNameLen = THREAD_NAME_MAX - suffix.length;
   let name = sanitizeSegment(displayName);
   if (name.length > maxNameLen) {
-    name = name.slice(0, Math.max(0, maxNameLen - 3)) + '...';
+    name = name.slice(0, Math.max(0, maxNameLen - 3)) + "...";
   }
   return `${name}${suffix}`;
 }
@@ -34,7 +34,8 @@ export function buildTicketThreadName(displayName: string, date: Date): string {
 export function buildClosedThreadName(openName: string): string {
   const base = sanitizeSegment(openName);
   const maxBase = THREAD_NAME_MAX - CLOSED_PREFIX.length;
-  const trimmed = base.length <= maxBase ? base : base.slice(0, maxBase - 3) + '...';
+  const trimmed =
+    base.length <= maxBase ? base : base.slice(0, maxBase - 3) + "...";
   return CLOSED_PREFIX + trimmed;
 }
 

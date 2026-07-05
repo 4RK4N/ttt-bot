@@ -1,4 +1,4 @@
-import { discordBotFetch } from './discordApi.js';
+import { discordBotFetch } from "./discordApi.js";
 
 export interface DiscordApiContext {
   botToken: string;
@@ -20,13 +20,13 @@ export async function publishDiscordMessage(
   channelId: string,
   payload: DiscordMessagePayload,
   existingMessageId?: string,
-  afterPublish?: (messageId: string) => Promise<void>
+  afterPublish?: (messageId: string) => Promise<void>,
 ): Promise<string> {
   if (existingMessageId) {
     const editRes = await discordBotFetch(
       ctx.botToken,
       `/channels/${channelId}/messages/${existingMessageId}`,
-      { method: 'PATCH', body: JSON.stringify(payload) }
+      { method: "PATCH", body: JSON.stringify(payload) },
     );
     if (editRes.ok) {
       if (afterPublish) await afterPublish(existingMessageId);
@@ -37,16 +37,20 @@ export async function publishDiscordMessage(
     }
   }
 
-  const createRes = await discordBotFetch(ctx.botToken, `/channels/${channelId}/messages`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  const createRes = await discordBotFetch(
+    ctx.botToken,
+    `/channels/${channelId}/messages`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+  );
   if (!createRes.ok) {
     throw new Error(`Failed to post panel message (HTTP ${createRes.status}).`);
   }
 
   const body = (await createRes.json()) as { id?: string };
-  if (!body.id) throw new Error('Discord did not return a message id.');
+  if (!body.id) throw new Error("Discord did not return a message id.");
 
   if (afterPublish) await afterPublish(body.id);
   return body.id;

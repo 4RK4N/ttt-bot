@@ -1,10 +1,10 @@
-import type { SessionUser } from '../auth.js';
-import type { WebPlugin } from '../plugin-types.js';
-import { readEnabled } from '../store.js';
-import type { WebConfig } from '../config.js';
-import { buildEditorModule, loadEditorContext } from './editor/data.js';
-import { EditorBody, EditorLayout } from './editor/layout.js';
-import { ModulePanel } from './editor/ModulePanel.js';
+import type { SessionUser } from "../auth.js";
+import type { WebPlugin } from "../plugin-types.js";
+import { readEnabled } from "../store.js";
+import type { WebConfig } from "../config.js";
+import { buildEditorModule, loadEditorContext } from "./editor/data.js";
+import { EditorBody, EditorLayout } from "./editor/layout.js";
+import { ModulePanel } from "./editor/ModulePanel.js";
 
 export async function EditorPage({
   cfg,
@@ -21,7 +21,9 @@ export async function EditorPage({
 }) {
   const ctx = await loadEditorContext(cfg, csrfToken);
   const activePlugin =
-    plugins.find((p) => p.namespace === (activeNamespace ?? plugins[0]?.namespace)) ?? plugins[0];
+    plugins.find(
+      (p) => p.namespace === (activeNamespace ?? plugins[0]?.namespace),
+    ) ?? plugins[0];
   const mod = activePlugin ? buildEditorModule(activePlugin) : null;
 
   const pluginList = plugins.map((p) => ({
@@ -40,7 +42,7 @@ export async function EditorPage({
     >
       <EditorBody
         plugins={pluginList}
-        activeNamespace={activePlugin?.namespace ?? ''}
+        activeNamespace={activePlugin?.namespace ?? ""}
         panel={panel}
       />
     </EditorLayout>

@@ -9,14 +9,22 @@ export interface PanelBaseFields {
 
 export function parsePanelBaseFields(
   configRow: Record<string, unknown>,
-  textRow: Record<string, unknown>
+  textRow: Record<string, unknown>,
 ): PanelBaseFields {
   return {
-    id: typeof configRow.id === 'string' ? configRow.id : '',
+    id: typeof configRow.id === "string" ? configRow.id : "",
     published: configRow.published === true,
-    panelMessageId: typeof configRow.panelMessageId === 'string' ? configRow.panelMessageId : '',
-    channelId: typeof configRow.channelId === 'string' ? configRow.channelId : '',
-    panelTitle: typeof textRow.panelTitle === 'string' ? textRow.panelTitle : '',
-    panelDescription: typeof textRow.panelDescription === 'string' ? textRow.panelDescription : '',
+    panelMessageId:
+      typeof configRow.panelMessageId === "string"
+        ? configRow.panelMessageId
+        : "",
+    channelId:
+      typeof configRow.channelId === "string" ? configRow.channelId : "",
+    panelTitle:
+      typeof textRow.panelTitle === "string" ? textRow.panelTitle : "",
+    panelDescription:
+      typeof textRow.panelDescription === "string"
+        ? textRow.panelDescription
+        : "",
   };
 }

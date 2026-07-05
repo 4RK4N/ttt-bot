@@ -1,8 +1,8 @@
-import { FieldWrap, fieldValueStr } from './shared.js';
-import type { SubFieldProps } from './shared.js';
+import { FieldWrap, fieldValueStr } from "./shared.js";
+import type { SubFieldProps } from "./shared.js";
 
 export function TextField({ f, value, name, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+  const id = name.replace(/[[\].]/g, "-");
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
       <input
@@ -18,10 +18,16 @@ export function TextField({ f, value, name, disabled }: SubFieldProps) {
 }
 
 export function TextareaField({ f, value, name, disabled }: SubFieldProps) {
-  const id = name.replace(/[[\].]/g, '-');
+  const id = name.replace(/[[\].]/g, "-");
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <textarea class="form-control" id={id} name={name} rows={4} disabled={disabled}>
+      <textarea
+        class="form-control"
+        id={id}
+        name={name}
+        rows={4}
+        disabled={disabled}
+      >
         {fieldValueStr(value)}
       </textarea>
     </FieldWrap>

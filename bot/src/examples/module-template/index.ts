@@ -9,17 +9,20 @@ import {
   type ChatInputCommandInteraction,
   type Client,
   type MessageComponentInteraction,
-} from 'discord.js';
-import type { CommandModule, ComponentRoute } from '../../moduleLoader.js';
-import { replyEphemeral } from '../../../../shared/core/discordInteractions.js';
-import { NAMESPACE, targetChannelId } from '../../../../shared/modules/example-module/config-io.js';
+} from "discord.js";
+import type { CommandModule, ComponentRoute } from "../../moduleLoader.js";
+import { replyEphemeral } from "../../../../shared/core/discordInteractions.js";
+import {
+  NAMESPACE,
+  targetChannelId,
+} from "../../../../shared/modules/example-module/config-io.js";
 import {
   disabledReply,
   greetingForUser,
   isExampleEnabled,
   replyDisabledEphemeral,
   shouldHandleMessage,
-} from './handlers.js';
+} from "./handlers.js";
 
 // =============================================================================
 // Pattern A: init — event listeners
@@ -28,7 +31,7 @@ import {
 function initExample(client: Client): void {
   if (!targetChannelId()) {
     console.warn(
-      `[${NAMESPACE}] No channelId in data/${NAMESPACE}/config.json — module idle.`
+      `[${NAMESPACE}] No channelId in data/${NAMESPACE}/config.json — module idle.`,
     );
     return;
   }
@@ -47,7 +50,7 @@ function initExample(client: Client): void {
 // =============================================================================
 
 async function executeExampleCommand(
-  interaction: ChatInputCommandInteraction
+  interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -61,8 +64,10 @@ async function executeExampleCommand(
 
 const exampleCommand = {
   data: new SlashCommandBuilder()
-    .setName('example')
-    .setDescription('Example slash command — remove or rename before shipping.'),
+    .setName("example")
+    .setDescription(
+      "Example slash command — remove or rename before shipping.",
+    ),
   execute: executeExampleCommand,
 };
 
@@ -71,7 +76,7 @@ const exampleCommand = {
 // =============================================================================
 
 async function handleExampleComponent(
-  interaction: MessageComponentInteraction
+  interaction: MessageComponentInteraction,
 ): Promise<void> {
   if (!interaction.isButton()) return;
 

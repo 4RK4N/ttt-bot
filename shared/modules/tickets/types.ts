@@ -1,6 +1,9 @@
-import { createModuleConfig, resolveKeyedItem } from '../../core/moduleConfig.js';
+import {
+  createModuleConfig,
+  resolveKeyedItem,
+} from "../../core/moduleConfig.js";
 
-export const NAMESPACE = 'tickets';
+export const NAMESPACE = "tickets";
 
 export interface TicketTypeConfig {
   id: string;
@@ -35,7 +38,7 @@ export interface TicketTypeTexts {
   roleActionConfirmation: string;
 }
 
-export interface ResolvedTicketType extends TicketTypeConfig, TicketTypeTexts { }
+export interface ResolvedTicketType extends TicketTypeConfig, TicketTypeTexts {}
 
 export interface TicketsConfig {
   enabled?: boolean;
@@ -65,46 +68,50 @@ export interface TicketsTexts {
 }
 
 export const DEFAULT_TYPE_TEXTS: TicketTypeTexts = {
-  openButtonLabel: 'Open ticket',
-  panelTitle: 'Support',
-  panelDescription: 'Click the button below to open a private ticket.',
-  ticketWelcome: 'Hi {mention}, describe your issue and staff will assist you.',
-  closeButtonLabel: 'Close ticket',
-  confirmClosePrompt: 'Are you sure you want to close this ticket?',
-  confirmCloseYes: 'Yes, close',
-  confirmCloseNo: 'Cancel',
-  ticketClosed: 'This ticket has been closed.',
-  deleteButtonLabel: 'DELETE',
-  confirmDeletePrompt: 'Delete this closed ticket permanently?',
-  confirmDeleteYes: 'Yes, delete',
-  confirmDeleteNo: 'Cancel',
-  ticketDeleted: 'Ticket deleted.',
-  alreadyOpen: 'You already have an open ticket in this category.',
-  openSuccess: 'Your ticket was created: {thread}',
-  roleDenied: 'You cannot open a ticket in this category.',
-  roleActionButtonLabel: 'Grant role',
-  roleActionConfirmation: '{mention} was given {role}.',
+  openButtonLabel: "Open ticket",
+  panelTitle: "Support",
+  panelDescription: "Click the button below to open a private ticket.",
+  ticketWelcome: "Hi {mention}, describe your issue and staff will assist you.",
+  closeButtonLabel: "Close ticket",
+  confirmClosePrompt: "Are you sure you want to close this ticket?",
+  confirmCloseYes: "Yes, close",
+  confirmCloseNo: "Cancel",
+  ticketClosed: "This ticket has been closed.",
+  deleteButtonLabel: "DELETE",
+  confirmDeletePrompt: "Delete this closed ticket permanently?",
+  confirmDeleteYes: "Yes, delete",
+  confirmDeleteNo: "Cancel",
+  ticketDeleted: "Ticket deleted.",
+  alreadyOpen: "You already have an open ticket in this category.",
+  openSuccess: "Your ticket was created: {thread}",
+  roleDenied: "You cannot open a ticket in this category.",
+  roleActionButtonLabel: "Grant role",
+  roleActionConfirmation: "{mention} was given {role}.",
 };
 
 export const TEXT_DEFAULTS: TicketsTexts = {
-  disabled: 'Tickets are currently disabled.',
+  disabled: "Tickets are currently disabled.",
   noPermission: "You don't have permission to close this ticket.",
   noDeletePermission: "You don't have permission to delete this ticket.",
-  deleteNotClosed: 'Only closed tickets can be deleted.',
-  categoryUnpublished: 'This ticket category is not available right now.',
-  channelNotConfigured: 'This ticket category is not configured yet.',
-  invalidChannel: 'The configured ticket channel is invalid.',
-  openError: 'Something went wrong while opening your ticket. Please try again.',
-  closeError: 'Something went wrong while closing this ticket.',
-  deleteError: 'Something went wrong while deleting this ticket.',
-  closeCancelled: 'Close cancelled.',
-  deleteCancelled: 'Delete cancelled.',
-  threadContextRequired: 'This action must be used inside a ticket thread.',
-  invalidInteraction: 'This button does not match the current ticket thread.',
-  openInProgress: 'Your ticket is being opened — please wait a moment.',
-  roleActionError: 'Could not assign the role. Please try again or contact an admin.',
-  roleActionHierarchyError: 'I cannot assign that role — it is above my highest role.',
-  roleActionOpenerMissing: 'Could not find the ticket opener to assign the role.',
+  deleteNotClosed: "Only closed tickets can be deleted.",
+  categoryUnpublished: "This ticket category is not available right now.",
+  channelNotConfigured: "This ticket category is not configured yet.",
+  invalidChannel: "The configured ticket channel is invalid.",
+  openError:
+    "Something went wrong while opening your ticket. Please try again.",
+  closeError: "Something went wrong while closing this ticket.",
+  deleteError: "Something went wrong while deleting this ticket.",
+  closeCancelled: "Close cancelled.",
+  deleteCancelled: "Delete cancelled.",
+  threadContextRequired: "This action must be used inside a ticket thread.",
+  invalidInteraction: "This button does not match the current ticket thread.",
+  openInProgress: "Your ticket is being opened — please wait a moment.",
+  roleActionError:
+    "Could not assign the role. Please try again or contact an admin.",
+  roleActionHierarchyError:
+    "I cannot assign that role — it is above my highest role.",
+  roleActionOpenerMissing:
+    "Could not find the ticket opener to assign the role.",
   types: {},
 };
 
@@ -130,6 +137,6 @@ export function resolveTicketType(id: string): ResolvedTicketType | undefined {
       staffRoleIds: row.staffRoleIds ?? [],
       deniedRoleIds: row.deniedRoleIds ?? [],
       roleActionRoleId: row.roleActionRoleId?.trim() || undefined,
-    })
+    }),
   );
 }

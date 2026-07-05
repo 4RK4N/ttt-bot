@@ -6,4 +6,4 @@ export {
   texts,
   welcomeChannelId,
   rulesChannelLink,
-} from './types.js';
+} from "./types.js";
