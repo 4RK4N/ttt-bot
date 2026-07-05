@@ -2,7 +2,7 @@
 export const SITE_URL = "https://ttt-ffxiv.eu";
 
 /** Next scheduled event — Unix timestamp (seconds). */
-export const EVENT_TIMESTAMP = 1783188000;
+export const EVENT_TIMESTAMP = 1783792800;
 
 export const SERVER_LINE = "Light, Alpha, Lavender Beds, W2, P51";
 
