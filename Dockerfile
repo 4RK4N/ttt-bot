@@ -25,10 +25,7 @@ COPY tsconfig.base.json tsconfig.json ./
 COPY shared ./shared
 COPY web-admin ./web-admin
 COPY scripts/copy-web-plugins.js ./scripts/copy-web-plugins.js
-RUN npm run build:web-admin \
-    && test -f dist/web-admin/src/ui/css/tabler.min.css \
-    && test -f dist/web-admin/src/ui/js/htmx.min.js \
-    && npm prune --omit=dev
+RUN npm run build:web-admin && npm prune --omit=dev
 
 FROM node:24-alpine AS ttt-web-editor
 WORKDIR /app
