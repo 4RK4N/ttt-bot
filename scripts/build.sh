@@ -36,7 +36,7 @@ compose_build() {
   "${compose[@]}" build "${cache_flag[@]}" "$@"
 }
 
-# Bot + editor share deps in Dockerfile; one bake pass reuses npm ci.
+# Bot + editor share Dockerfile: one tsc pass (build-all) and one prod npm ci (deps-prod).
 compose_build ttt-discord-bot ttt-web-editor
 compose_build ttt-website
 docker compose up -d --force-recreate
