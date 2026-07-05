@@ -293,22 +293,25 @@ Run from the repo root (where `docker-compose.yml` lives). The committed `.env` 
 `COMPOSE_BAKE=true` — keep that enabled so builds go through Bake/Buildx and the
 `nproc` ulimits in `docker-compose.yml` take effect.
 
-Use [`scripts/build.sh`](scripts/build.sh) for full-stack deploy builds. It builds images
-**one at a time** (sequential), always passes **`--no-cache`**, and uses **`--progress plain`** for
-uncollapsed build logs.
+Use [`scripts/build.sh`](scripts/build.sh) for full-stack deploy builds. Bot and editor
+share one [`Dockerfile`](Dockerfile) (single `npm ci`), website has its own. Builds use
+layer cache by default; changed source re-runs only the affected steps. **`--progress plain`**
+for uncollapsed build logs.
 
 ```bash
 chmod +x scripts/build.sh   # once, on Linux/macOS
 ./scripts/build.sh
 ```
 
+Force a full rebuild (no layer cache): `NO_CACHE=1 ./scripts/build.sh`
+
 This builds and recreates:
 
-- **`ttt-discord-bot:1.0.0`** — multi-stage Node 24: compile TypeScript (`npm run build:bot` → `dist/bot/`), runtime image with production dependencies only (`bot/Dockerfile`).
-- **`ttt-web-editor:1.0.0`** — separate compile + runtime image (`npm run build:web-admin` → `dist/web-admin/`, `node dist/web-admin/src/server.js`; `web-admin/Dockerfile`).
+- **`ttt-discord-bot:1.0.0`** — multi-stage Node 24: compile TypeScript (`npm run build:bot` → `dist/bot/`), runtime image with production dependencies only.
+- **`ttt-web-editor:1.0.0`** — same root `Dockerfile`, separate target (`npm run build:web-admin` → `dist/web-admin/`).
 - **`ttt-website:1.0.0`** — multi-stage: Astro static site (`website/`), served by nginx on port **8089** inside the container.
 
-Use **`--no-cache`** on deploy builds so HTML/CSS/JS are not served from stale image layers.
+Runtime config lives in the mounted `./data` volume — not copied into images at build time.
 
 ---
 
@@ -385,7 +388,7 @@ Static multi-page site built with **Astro 7 + Tailwind CSS**. The site is **buil
 After **website** source changes, rebuild and restart the website service:
 
 ```bash
-docker compose build --no-cache ttt-website && docker compose up -d --force-recreate ttt-website
+docker compose build ttt-website && docker compose up -d --force-recreate ttt-website
 ```
 
 For a full stack deploy (bot + web editor + website), use `./scripts/build.sh` (same as Part 4).
@@ -437,8 +440,8 @@ and redirects plain HTTP to HTTPS — no SSL config in nginx required.
 | Restart the bot                | `docker compose restart ttt-discord-bot` |
 | Rebuild after code changes     | `./scripts/build.sh` |
 | Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
-| Rebuild web editor after edits | `docker compose build --no-cache ttt-web-editor && docker compose up -d --force-recreate ttt-web-editor` |
-| Rebuild website after edits    | `docker compose build --no-cache ttt-website && docker compose up -d --force-recreate ttt-website` |
+| Rebuild web editor after edits | `docker compose build ttt-web-editor && docker compose up -d --force-recreate ttt-web-editor` |
+| Rebuild website after edits    | `docker compose build ttt-website && docker compose up -d --force-recreate ttt-website` |
 
 ### Updating to new code
 
@@ -457,10 +460,10 @@ If you prefer not to use Compose:
 
 ```bash
 # Bot
-docker build -f bot/Dockerfile -t ttt-discord-bot:1.0.0 .
+docker build -f Dockerfile --target ttt-discord-bot -t ttt-discord-bot:1.0.0 .
 
 # Web editor
-docker build -f web-admin/Dockerfile -t ttt-web-editor:1.0.0 .
+docker build -f Dockerfile --target ttt-web-editor -t ttt-web-editor:1.0.0 .
 
 # Website
 docker build -f website/Dockerfile -t ttt-website:1.0.0 website/
