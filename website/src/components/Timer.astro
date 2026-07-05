@@ -33,7 +33,7 @@ const isOpen = targetMs <= now;
   data-timestamp={timestamp}
   data-open-message={openMessage}
   aria-live="polite"
-  class="flex w-full max-w-[36rem] flex-col items-center"
+  class="flex w-full max-w-full flex-col items-center sm:max-w-[36rem]"
 >
   {
     isOpen ? (
@@ -41,19 +41,20 @@ const isOpen = targetMs <= now;
         {openMessage}
       </p>
     ) : (
-      <div class="flex w-full items-stretch justify-center font-averia font-bold">
+      <div class="flex w-full min-w-0 items-stretch justify-center font-averia font-bold">
         {labels.map((label, i) => (
           <>
-            {i > 0 && (
-              <div class="mx-4 w-px self-stretch bg-white/40 sm:mx-8" />
-            )}
-            <div class="flex flex-col items-center py-4">
+            {i > 0 && <div class="timer-separator" aria-hidden="true" />}
+            <div class="timer-unit flex flex-col items-center py-2 sm:py-4">
               <span class="timer-digit-panel">
-                <span data-digit class="timer-digit text-[2.5em] leading-none">
+                <span
+                  data-digit
+                  class="timer-digit text-[1.45em] leading-none sm:text-[2.5em]"
+                >
                   {initialDigits[i]}
                 </span>
               </span>
-              <span class="mt-3 text-[0.625rem] uppercase tracking-[0.225rem] text-white">
+              <span class="timer-label mt-1.5 text-[0.45rem] uppercase tracking-[0.06rem] text-white sm:mt-3 sm:text-[0.625rem] sm:tracking-[0.225rem]">
                 {label}
               </span>
             </div>

@@ -6,8 +6,8 @@ export const siteName = "Tiny Temptation Tubs";
 
 /** Default meta / Open Graph description per language. */
 export const siteDescription: Record<Lang, string> = {
-  en: `Step inside, leave your worries behind. A cozy FFXIV roleplay bathhouse on ${SERVER_LINE}.`,
-  de: `Tritt ein und lege die Last des Alltags ab. Ein gemütliches FFXIV-RP-Badehaus auf ${SERVER_LINE}.`,
+  en: `Step inside, leave your worries behind. A cozy FFXIV roleplay bathhouse on ${SERVER_LINE.en}.`,
+  de: `Tritt ein und lege die Last des Alltags ab. Ein gemütliches FFXIV-RP-Badehaus auf ${SERVER_LINE.de}.`,
 };
 
 export interface NavItem {

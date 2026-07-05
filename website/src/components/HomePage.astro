@@ -50,14 +50,12 @@ const lcpPreload = await buildResponsivePreload(
       />
     </div>
     <h1 class="page-heading">
-      <span class="page-heading__text" data-text="Tiny Temptation Tubs"
-        >Tiny Temptation Tubs</span
-      >
+      <span class="page-heading__text">Tiny Temptation Tubs</span>
     </h1>
     <h2>{copy.openingHeading}</h2>
     <Timer lang={lang} timestamp={EVENT_TIMESTAMP} />
+    <h3 class="location-heading">{SERVER_LINE[lang]}</h3>
     <ContentPanel>
-      <p class="subtitle-text mb-4">{SERVER_LINE}</p>
       <p class="hand-text hand-text--home">
         {
           copy.introLines.map((line, i) => (
