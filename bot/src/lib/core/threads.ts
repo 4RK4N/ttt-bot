@@ -14,7 +14,7 @@ export const THREAD_AUTO_ARCHIVE_MINUTES = 10080; // 7 days
 // Custom (server) emoji are sent as "<:name:id>" or "<a:name:id>". They render as
 // literal text in thread names, so we strip them. Standard unicode emoji are kept.
 const CUSTOM_EMOJI_REGEX = /<a?:\w+:\d+>/g;
-const USER_MENTION_REGEX = /<@!?(\d+)>/g;
+export const USER_MENTION_REGEX = /<@!?(\d{17,20})>/g;
 
 /** Strips custom Discord emoji markup and collapses whitespace. */
 export function stripCustomEmoji(text: string): string {
@@ -150,11 +150,12 @@ export async function startAndPopulateCommentsThread(
 export async function deleteCommentsThreadForMessage(
   message: Message | PartialMessage,
   logPrefix: string,
+  options?: { skipMessageRefetch?: boolean },
 ): Promise<void> {
   if (!message.hasThread) return;
 
   let thread = message.thread;
-  if (!thread) {
+  if (!thread && !options?.skipMessageRefetch) {
     try {
       const fresh = await message.fetch();
       thread = fresh.thread ?? null;

@@ -1,6 +1,5 @@
 import type { Message, PartialMessage } from "discord.js";
-
-const USER_MENTION_REGEX = /<@!?(\d{17,20})>/g;
+import { USER_MENTION_REGEX } from "../../core/threads.js";
 
 function resolveMentionedUserIds(message: Message | PartialMessage): string[] {
   const fromApi = [...message.mentions.users.keys()];

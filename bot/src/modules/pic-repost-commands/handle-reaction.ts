@@ -47,9 +47,11 @@ async function handleDeleteReaction(
   }
 
   const message = reaction.message;
+  let messageFetched = false;
   if (message.partial) {
     try {
       await message.fetch();
+      messageFetched = true;
     } catch {
       return;
     }
@@ -88,7 +90,9 @@ async function handleDeleteReaction(
   }
 
   try {
-    await deleteCommentsThreadForMessage(message, `[${NAMESPACE}]`);
+    await deleteCommentsThreadForMessage(message, `[${NAMESPACE}]`, {
+      skipMessageRefetch: messageFetched,
+    });
     await message.delete();
   } catch (err) {
     const code = (err as { code?: number }).code;

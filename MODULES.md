@@ -28,7 +28,7 @@ The author can delete their repost by reacting with the configured delete emoji 
 - **Texts:** disabled notice, errors, thread opener, attribution caption
 - **Tokens:** `{message}`, `{mention}`, `{deleteEmoji}` in attribution; `{count}`, `{images}` in success reply
 - **Delete auth:** author from user mention in caption (`{mention}` after `{message}`); last mention by default, or first when `deleteAuthorLastMention` is off
-- **Permissions:** Send Messages, Attach Files, Manage Messages (strip non-author reactions + delete), Create Public Threads (thread optional)
+- **Permissions:** Send Messages, Attach Files, Manage Messages (strip non-author reactions + delete post), Create Public Threads, Manage Threads (create/delete comments thread)
 
 ### links-pics-vids-autothread
 
@@ -130,7 +130,7 @@ See the [module template README](bot/src/examples/module-template/README.md) for
 | Module                     | Privileged intent       | Other requirements                     |
 | -------------------------- | ----------------------- | -------------------------------------- |
 | welcome-message            | Server Members          | —                                      |
-| pic-repost-commands        | —                       | Manage Messages, thread permissions    |
+| pic-repost-commands        | —                       | Manage Messages, Create/Manage Threads   |
 | links-pics-vids-autothread | Message Content         | —                                      |
 | tickets                    | Server Members          | Manage Threads, Manage Roles           |
 | reaction-roles             | — (reactions: standard) | Manage Roles                           |
