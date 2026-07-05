@@ -63,8 +63,9 @@ shared/           core/, config.ts, modules/ (types, config-io, validate, panel,
 bot/src/          index.ts, moduleLoader.ts, modules/ (handlers + index.ts), examples/
 web-admin/src/    web editor server + UI
 website/          Astro public site (see INSTALL.md § Part 7)
+Dockerfile        bot + web-editor image targets (shared npm ci)
 data/             config.json, per-module config + texts (gitignored secrets)
-scripts/          deploy-commands, copy-web-plugins, build.sh
+scripts/          build.sh, deploy-commands, copy-web-plugins
 ```
 
 ## Web editor
@@ -81,7 +82,7 @@ npm run build
 npm run web        # or npm run web:dev
 ```
 
-With Docker: `docker compose up -d --build` starts bot + editor. See [INSTALL.md](INSTALL.md).
+With Docker: `./scripts/build.sh` for deploy (see [INSTALL.md § Part 4](INSTALL.md#part-4---build-the-images)).
 
 ## Setup
 

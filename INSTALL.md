@@ -294,17 +294,24 @@ Run from the repo root (where `docker-compose.yml` lives). The committed `.env` 
 `nproc` ulimits in `docker-compose.yml` take effect.
 
 Use [`scripts/build.sh`](scripts/build.sh) for full-stack deploy builds. Bot and editor
-share one [`Dockerfile`](Dockerfile) (single `npm ci`), website has its own. Builds use
-layer cache by default; changed source re-runs only the affected steps. Pass **`-v`** for
-uncollapsed build logs (`--progress plain`).
+share one [`Dockerfile`](Dockerfile) (single `npm ci`), website has its own
+([`website/Dockerfile`](website/Dockerfile)). Builds use layer cache by default;
+changed source re-runs only the affected steps.
+
+| Flag | Effect |
+| ---- | ------ |
+| *(none)* | Compact build progress (default) |
+| `-v` | Full step-by-step output (`--progress plain`) |
+| `--no-cache` | Ignore layer cache; full rebuild |
+| `-v --no-cache` | Both |
 
 ```bash
 chmod +x scripts/build.sh   # once, on Linux/macOS
-./scripts/build.sh          # compact progress (default)
-./scripts/build.sh -v       # full step-by-step build output
+./scripts/build.sh
+./scripts/build.sh -v
+./scripts/build.sh --no-cache
+./scripts/build.sh -v --no-cache
 ```
-
-Force a full rebuild (no layer cache): `./scripts/build.sh --no-cache`
 
 This builds and recreates:
 
@@ -392,11 +399,7 @@ After **website** source changes, rebuild and restart the website service:
 docker compose build ttt-website && docker compose up -d --force-recreate ttt-website
 ```
 
-For a full stack deploy (bot + web editor + website), use `./scripts/build.sh` (same as Part 4).
-
-```bash
-./scripts/build.sh
-```
+For a full stack deploy (bot + web editor + website), use `./scripts/build.sh` (see Part 4 for flags).
 
 For local preview, run the dev server in `website/` (`npm install` once, then `npm run dev`).
 
@@ -439,7 +442,7 @@ and redirects plain HTTP to HTTPS — no SSL config in nginx required.
 | Stop the bot                   | `docker compose down`                    |
 | Start the bot                  | `docker compose up -d`                   |
 | Restart the bot                | `docker compose restart ttt-discord-bot` |
-| Rebuild after code changes     | `./scripts/build.sh` |
+| Rebuild after code changes     | `./scripts/build.sh` (optional `-v`, `--no-cache`) |
 | Re-register commands           | `docker compose run --rm ttt-discord-bot npm run deploy` |
 | Rebuild web editor after edits | `docker compose build ttt-web-editor && docker compose up -d --force-recreate ttt-web-editor` |
 | Rebuild website after edits    | `docker compose build ttt-website && docker compose up -d --force-recreate ttt-website` |
