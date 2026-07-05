@@ -5,3 +5,5 @@ data/*/texts.json
 
 # Build output (bot -> dist/, Astro -> website/dist/).
 dist/
+
+.ssh/
