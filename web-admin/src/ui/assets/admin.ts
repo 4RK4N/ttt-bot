@@ -1,6 +1,3 @@
-import "htmx.org/dist/htmx.esm.js";
-import "../css/admin.css";
-
 document.body.addEventListener("htmx:configRequest", (evt) => {
   const meta = document.querySelector('meta[name="csrf-token"]');
   const headers = (

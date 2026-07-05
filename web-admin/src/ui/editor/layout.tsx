@@ -1,4 +1,4 @@
-import { ADMIN_CSS, ADMIN_JS, FAVICON_HREF } from "../css-urls.js";
+import { ADMIN_CSS, ADMIN_JS, FAVICON_HREF, HTMX_JS } from "../css-urls.js";
 import { StatusDot } from "./enabled-ui.js";
 
 export function EditorLayout({
@@ -99,6 +99,7 @@ export function EditorLayout({
             </aside>
           </div>
         </div>
+        <script src={HTMX_JS} defer />
         <script src={ADMIN_JS} defer />
       </body>
     </html>

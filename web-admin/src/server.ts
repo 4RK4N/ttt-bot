@@ -53,11 +53,11 @@ async function main(): Promise<void> {
     return null;
   }
 
-  if (!resolveCssFile("admin.css")) {
-    console.warn("[web] admin.css missing; rebuild with npm run build.");
+  if (!resolveCssFile("admin.min.css")) {
+    console.warn("[web] admin.min.css missing; rebuild with npm run build.");
   }
-  if (!resolveJsFile("admin.js")) {
-    console.warn("[web] admin.js missing; rebuild with npm run build.");
+  if (!resolveJsFile("admin.min.js")) {
+    console.warn("[web] admin.min.js missing; rebuild with npm run build.");
   }
 
   app.get("/assets/css/:file", (c) => {

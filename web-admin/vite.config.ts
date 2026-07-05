@@ -7,30 +7,24 @@ import { defineConfig } from "vite";
 const webAdminRoot = dirname(fileURLToPath(import.meta.url));
 const outDir = resolve(webAdminRoot, "../dist/web-admin/src/ui");
 const outCss = resolve(outDir, "css");
-const outJs = resolve(outDir, "js");
 
 export default defineConfig({
   root: webAdminRoot,
   plugins: [
     tailwindcss(),
     {
-      name: "prepare-admin-asset-dirs",
+      name: "prepare-admin-css-dir",
       buildStart() {
         mkdirSync(outCss, { recursive: true });
-        mkdirSync(outJs, { recursive: true });
         for (const stale of [
           "tabler.min.css",
           "admin-overrides.css",
+          "admin.css",
           "admin2.css",
-          "htmx.min.js",
+          "admin-styles.js",
         ]) {
           try {
             rmSync(resolve(outCss, stale));
-          } catch {
-            /* ignore */
-          }
-          try {
-            rmSync(resolve(outJs, stale));
           } catch {
             /* ignore */
           }
@@ -45,10 +39,10 @@ export default defineConfig({
     cssMinify: true,
     cssCodeSplit: false,
     rollupOptions: {
-      input: resolve(webAdminRoot, "src/ui/assets/admin.ts"),
+      input: resolve(webAdminRoot, "src/ui/assets/admin-styles.ts"),
       output: {
-        entryFileNames: "js/admin.js",
-        assetFileNames: "css/admin.css",
+        assetFileNames: "css/admin.min.css",
+        entryFileNames: "css/[name].js",
       },
     },
   },
