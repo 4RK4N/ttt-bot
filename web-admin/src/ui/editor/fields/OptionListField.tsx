@@ -32,12 +32,16 @@ export function OptionListField({
   const listId = `optlist-${namespace}-${fieldKey}-${rowIndex}-${f.key}`;
 
   return (
-    <div class={`mb-3 field${disabled ? " disabled" : ""}`}>
-      <label class="form-label">{f.label}</label>
-      {f.help ? <div class="form-text text-secondary">{f.help}</div> : null}
-      <div class="vstack gap-3" id={listId}>
+    <div class={`field mb-4 w-full${disabled ? " disabled" : ""}`}>
+      <label class="label py-0">
+        <span class="label-text font-medium">{f.label}</span>
+      </label>
+      {f.help ? (
+        <p class="mb-1 text-sm text-base-content/60">{f.help}</p>
+      ) : null}
+      <div class="flex flex-col gap-3" id={listId}>
         {items.map((item, optIndex) => (
-          <div class="card">
+          <div class="card bg-base-100 shadow-sm">
             <div class="card-body">
               <input
                 type="hidden"
@@ -55,7 +59,7 @@ export function OptionListField({
               ))}
               <button
                 type="button"
-                class="btn btn-outline-danger mt-2"
+                class="btn btn-outline btn-error btn-sm mt-2"
                 hx-post={`/htmx/modules/${namespace}/list/${fieldKey}/option/${f.key}/remove/${rowIndex}/${optIndex}`}
                 hx-include={`#panel-form-${namespace}`}
                 hx-target={`#${listId}`}
@@ -70,7 +74,7 @@ export function OptionListField({
       </div>
       <button
         type="button"
-        class="btn mt-2"
+        class="btn btn-sm mt-2"
         hx-post={`/htmx/modules/${namespace}/list/${fieldKey}/option/${f.key}/add/${rowIndex}`}
         hx-include={`#panel-form-${namespace}`}
         hx-target={`#${listId}`}
@@ -104,9 +108,9 @@ export function OptionListRowsOnly({
 }) {
   const listId = `optlist-${namespace}-${fieldKey}-${rowIndex}-${f.key}`;
   return (
-    <div class="vstack gap-3" id={listId}>
+    <div class="flex flex-col gap-3" id={listId}>
       {items.map((item, optIndex) => (
-        <div class="card">
+        <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
             <input
               type="hidden"
@@ -124,7 +128,7 @@ export function OptionListRowsOnly({
             ))}
             <button
               type="button"
-              class="btn btn-outline-danger mt-2"
+              class="btn btn-outline btn-error btn-sm mt-2"
               hx-post={`/htmx/modules/${namespace}/list/${fieldKey}/option/${f.key}/remove/${rowIndex}/${optIndex}`}
               hx-include={`#panel-form-${namespace}`}
               hx-target={`#${listId}`}

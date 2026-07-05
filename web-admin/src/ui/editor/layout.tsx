@@ -1,121 +1,106 @@
-import {
-  FAVICON_HREF,
-  HTMX_JS,
-  OVERRIDES_CSS,
-  TABLER_CSS,
-} from "../css-urls.js";
+import { ADMIN_CSS, ADMIN_JS, FAVICON_HREF } from "../css-urls.js";
 import { StatusDot } from "./enabled-ui.js";
-
-export function HtmxScripts() {
-  return (
-    <>
-      <script src={HTMX_JS} />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.body.addEventListener('htmx:configRequest', function (evt) {
-  var meta = document.querySelector('meta[name="csrf-token"]');
-  if (meta) evt.detail.headers['X-CSRF-Token'] = meta.getAttribute('content') || '';
-});`,
-        }}
-      />
-    </>
-  );
-}
 
 export function EditorLayout({
   title,
   username,
   csrfToken,
-  children,
-}: {
-  title: string;
-  username: string;
-  csrfToken: string;
-  children: unknown;
-}) {
-  return (
-    <html lang="en" data-bs-theme="dark">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{title}</title>
-        <link rel="icon" href={FAVICON_HREF} />
-        <link rel="stylesheet" href={TABLER_CSS} />
-        <link rel="stylesheet" href={OVERRIDES_CSS} />
-        <meta name="csrf-token" content={csrfToken} />
-      </head>
-      <body class="d-flex flex-column">
-        <div class="page">
-          <header class="navbar navbar-expand-md d-print-none">
-            <div class="container-xl">
-              <h1 class="navbar-brand navbar-brand-autodark pe-0 pe-md-3 mb-0">
-                <span class="navbar-brand-text">{title}</span>
-              </h1>
-              <div class="d-flex align-items-center gap-3 ms-auto">
-                <span class="text-secondary d-none d-md-inline">
-                  Signed in as {username}
-                </span>
-                <form method="post" action="/logout" class="mb-0">
-                  <input type="hidden" name="_csrf" value={csrfToken} />
-                  <button type="submit" class="btn btn-outline-secondary">
-                    Log out
-                  </button>
-                </form>
-              </div>
-            </div>
-          </header>
-          <div class="page-wrapper">{children}</div>
-        </div>
-        <HtmxScripts />
-      </body>
-    </html>
-  );
-}
-
-export function EditorBody({
   plugins,
   activeNamespace,
   panel,
 }: {
+  title: string;
+  username: string;
+  csrfToken: string;
   plugins: Array<{ namespace: string; title: string; enabled?: boolean }>;
   activeNamespace: string;
   panel: unknown;
 }) {
   return (
-    <>
-      <aside class="navbar navbar-vertical">
-        <div class="container-fluid">
-          <div class="collapse navbar-collapse show" id="sidebar-menu">
-            <ul class="navbar-nav pt-lg-3">
-              <li class="nav-item">
-                <span class="text-secondary text-uppercase small px-3 py-2 d-block">
-                  Modules
+    <html lang="en" data-theme="ttt-dark">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <link rel="icon" href={FAVICON_HREF} />
+        <link rel="stylesheet" href={ADMIN_CSS} />
+        <meta name="csrf-token" content={csrfToken} />
+      </head>
+      <body>
+        <div class="drawer lg:drawer-open">
+          <input
+            id="admin-drawer"
+            type="checkbox"
+            class="drawer-toggle"
+            aria-hidden="true"
+          />
+          <div class="drawer-content flex min-h-screen flex-col bg-base-100">
+            <header class="navbar border-b border-base-300 bg-base-200 px-2">
+              <div class="flex-none lg:hidden">
+                <label
+                  for="admin-drawer"
+                  class="btn btn-square btn-ghost drawer-button"
+                  aria-label="Open module menu"
+                >
+                  ☰
+                </label>
+              </div>
+              <div class="flex-1">
+                <span class="text-lg font-semibold">{title}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="hidden text-base-content/60 md:inline">
+                  Signed in as {username}
                 </span>
-              </li>
-              {plugins.map((p) => (
-                <li class="nav-item w-100">
-                  <button
-                    type="button"
-                    class={`nav-link w-100 text-start${p.namespace === activeNamespace ? " active" : ""}`}
-                    hx-get={`/htmx/modules/${p.namespace}/panel`}
-                    hx-target="#module-content"
-                    hx-swap="innerHTML"
-                    hx-on:click="this.closest('.navbar-nav').querySelectorAll('.nav-link').forEach(el => el.classList.remove('active')); this.classList.add('active')"
-                  >
-                    <StatusDot namespace={p.namespace} enabled={p.enabled} />
-                    <span>{p.title}</span>
+                <form method="post" action="/logout">
+                  <input type="hidden" name="_csrf" value={csrfToken} />
+                  <button type="submit" class="btn btn-ghost btn-sm">
+                    Log out
                   </button>
-                </li>
-              ))}
-            </ul>
+                </form>
+              </div>
+            </header>
+            <main
+              class="container mx-auto max-w-7xl flex-1 p-4"
+              id="module-content"
+            >
+              {panel}
+            </main>
+          </div>
+          <div class="drawer-side z-40">
+            <label
+              for="admin-drawer"
+              class="drawer-overlay"
+              aria-label="Close module menu"
+            />
+            <aside class="flex min-h-full w-60 flex-col border-r border-base-300 bg-base-200">
+              <div class="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-base-content/60">
+                Modules
+              </div>
+              <ul class="menu menu-vertical w-full gap-1 px-2 pb-4">
+                {plugins.map((p) => (
+                  <li>
+                    <button
+                      type="button"
+                      class={`justify-start${p.namespace === activeNamespace ? " menu-active" : ""}`}
+                      hx-get={`/htmx/modules/${p.namespace}/panel`}
+                      hx-target="#module-content"
+                      hx-swap="innerHTML"
+                      hx-indicator="find .loading"
+                      hx-on:click="this.closest('.menu').querySelectorAll('button').forEach(el => el.classList.remove('menu-active')); this.classList.add('menu-active')"
+                    >
+                      <StatusDot namespace={p.namespace} enabled={p.enabled} />
+                      <span>{p.title}</span>
+                      <span class="loading loading-spinner loading-xs htmx-indicator ml-auto" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </aside>
           </div>
         </div>
-      </aside>
-      <div class="page-body">
-        <div class="container-xl py-4" id="module-content">
-          {panel}
-        </div>
-      </div>
-    </>
+        <script src={ADMIN_JS} defer />
+      </body>
+    </html>
   );
 }

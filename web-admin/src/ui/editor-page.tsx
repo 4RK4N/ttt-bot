@@ -3,7 +3,7 @@ import type { WebPlugin } from "../plugin-types.js";
 import { readEnabled } from "../store.js";
 import type { WebConfig } from "../config.js";
 import { buildEditorModule, loadEditorContext } from "./editor/data.js";
-import { EditorBody, EditorLayout } from "./editor/layout.js";
+import { EditorLayout } from "./editor/layout.js";
 import { ModulePanel } from "./editor/ModulePanel.js";
 
 export async function EditorPage({
@@ -39,12 +39,9 @@ export async function EditorPage({
       title={`${cfg.botName} Admin Interface`}
       username={user.username}
       csrfToken={csrfToken}
-    >
-      <EditorBody
-        plugins={pluginList}
-        activeNamespace={activePlugin?.namespace ?? ""}
-        panel={panel}
-      />
-    </EditorLayout>
+      plugins={pluginList}
+      activeNamespace={activePlugin?.namespace ?? ""}
+      panel={panel}
+    />
   );
 }

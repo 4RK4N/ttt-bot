@@ -36,16 +36,16 @@ export function ChannelField({
     return (
       <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
         <input
-          class="form-control"
+          class="input input-bordered w-full"
           type="text"
           id={id}
           name={name}
           value={strVal}
           disabled={disabled}
         />
-        <div class="form-text text-danger">
+        <p class="mt-1 text-sm text-error">
           {ctx.channelsError} Enter id manually.
-        </div>
+        </p>
       </FieldWrap>
     );
   }
@@ -53,7 +53,7 @@ export function ChannelField({
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
       <select
-        class="form-select"
+        class="select select-bordered w-full"
         id={id}
         name={name}
         disabled={disabled}
@@ -79,53 +79,53 @@ export function ChannelMultiField({
     return (
       <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
         <input
-          class="form-control"
+          class="input input-bordered w-full"
           type="text"
           id={id}
           name={name}
           value={selected.join(", ")}
           disabled={disabled}
         />
-        <div class="form-text text-danger">
+        <p class="mt-1 text-sm text-error">
           {ctx.channelsError} Enter id(s) comma-separated.
-        </div>
+        </p>
       </FieldWrap>
     );
   }
 
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <div class="border rounded p-2 checklist-scroll">
+      <div class="checklist-scroll rounded-box border border-base-300 p-2">
         {ctx.channels.length === 0 ? (
-          <div class="form-text text-secondary">No channels available.</div>
+          <p class="text-sm text-base-content/60">No channels available.</p>
         ) : (
           ctx.channels.map((ch) => (
-            <label class="form-check">
+            <label class="label cursor-pointer justify-start gap-3 py-1">
               <input
-                class="form-check-input"
+                class="checkbox checkbox-primary checkbox-sm"
                 type="checkbox"
                 name={`${name}[]`}
                 value={ch.id}
                 checked={selected.includes(ch.id)}
                 disabled={disabled}
               />
-              <span class="form-check-label">#{ch.name}</span>
+              <span class="label-text">#{ch.name}</span>
             </label>
           ))
         )}
         {selected
           .filter((sid) => !ctx.channels.some((ch) => ch.id === sid))
           .map((sid) => (
-            <label class="form-check">
+            <label class="label cursor-pointer justify-start gap-3 py-1">
               <input
-                class="form-check-input"
+                class="checkbox checkbox-primary checkbox-sm"
                 type="checkbox"
                 name={`${name}[]`}
                 value={sid}
                 checked
                 disabled={disabled}
               />
-              <span class="form-check-label">{sid} (not found)</span>
+              <span class="label-text">{sid} (not found)</span>
             </label>
           ))}
       </div>

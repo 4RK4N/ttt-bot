@@ -6,7 +6,7 @@ export function TextField({ f, value, name, disabled }: SubFieldProps) {
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
       <input
-        class="form-control"
+        class="input input-bordered w-full"
         type="text"
         id={id}
         name={name}
@@ -22,7 +22,7 @@ export function TextareaField({ f, value, name, disabled }: SubFieldProps) {
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
       <textarea
-        class="form-control"
+        class="textarea textarea-bordered w-full"
         id={id}
         name={name}
         rows={4}

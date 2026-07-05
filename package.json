@@ -8,9 +8,10 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "tsc -b && node scripts/copy-web-plugins.js",
+    "build": "tsc -b && npm run build:admin-assets && node scripts/copy-web-plugins.js",
+    "build:admin-assets": "vite build --config web-admin/vite.config.ts",
     "build:bot": "tsc -b shared bot scripts",
-    "build:web-admin": "tsc -b shared web-admin && node scripts/copy-web-plugins.js",
+    "build:web-admin": "tsc -b shared web-admin && npm run build:admin-assets && node scripts/copy-web-plugins.js",
     "start": "node dist/bot/src/index.js",
     "deploy": "node dist/scripts/deploy-commands.js",
     "dev": "tsx bot/src/index.ts",
@@ -33,16 +34,19 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@tabler/core": "^1.4.0",
-    "@types/node": "^24.13.0",
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/node": "^24.13.2",
+    "daisyui": "^5.6.13",
     "eslint": "^9.39.2",
     "globals": "^17.7.0",
-    "htmx.org": "^2.0.4",
-    "prettier": "^3.8.1",
+    "htmx.org": "^2.0.10",
+    "prettier": "^3.9.4",
+    "tailwindcss": "^4.3.2",
     "tsx": "^4.23.0",
-    "typescript": "^5.5.0",
-    "typescript-eslint": "^8.56.1",
-    "vitest": "^4.0.18"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.62.1",
+    "vite": "^7.3.2",
+    "vitest": "^4.1.9"
   },
   "allowScripts": {
     "esbuild@0.28.1": true

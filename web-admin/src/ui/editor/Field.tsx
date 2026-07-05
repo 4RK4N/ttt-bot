@@ -118,7 +118,7 @@ export function RowSubFieldsWithWatch({
               : {};
 
           return (
-            <div class={visible ? "" : "d-none"}>
+            <div class={visible ? "" : "hidden"}>
               <SubField
                 f={sub}
                 value={visible ? row[sub.key] : clearedValue(sub)}
@@ -128,9 +128,9 @@ export function RowSubFieldsWithWatch({
                 {...extra}
               />
               {!visible && sub.clearWhenHidden ? (
-                <div class="form-text text-secondary">
+                <p class="text-sm text-base-content/60">
                   Not available for this configuration.
-                </div>
+                </p>
               ) : null}
             </div>
           );

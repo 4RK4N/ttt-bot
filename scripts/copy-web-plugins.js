@@ -32,46 +32,18 @@ console.log(
   `[copy-web-plugins] Copied ${copied} web-plugin.json manifest(s) into dist.`,
 );
 
-const adminCssSrc = join(root, "web-admin", "src", "ui", "css");
-const adminCssDest = join(root, "dist", "web-admin", "src", "ui", "css");
-if (existsSync(adminCssSrc)) {
-  cpSync(adminCssSrc, adminCssDest, { recursive: true });
-  const tablerSrc = join(
-    root,
-    "node_modules",
-    "@tabler",
-    "core",
-    "dist",
-    "css",
-    "tabler.min.css",
+const adminCss = join(root, "dist", "web-admin", "src", "ui", "css", "admin.css");
+const adminJs = join(root, "dist", "web-admin", "src", "ui", "js", "admin.js");
+if (!existsSync(adminCss)) {
+  console.error(
+    "[copy-web-plugins] admin.css missing; run npm run build:admin-assets.",
   );
-  if (existsSync(tablerSrc)) {
-    cpSync(tablerSrc, join(adminCssDest, "tabler.min.css"));
-  } else {
-    console.error("[copy-web-plugins] Missing @tabler/core. Run npm install.");
-    process.exit(1);
-  }
-  console.log("[copy-web-plugins] Copied admin CSS into dist.");
-  const tablerDest = join(adminCssDest, "tabler.min.css");
-  if (!existsSync(tablerDest)) {
-    console.error("[copy-web-plugins] tabler.min.css missing after copy.");
-    process.exit(1);
-  }
-} else {
-  console.error("[copy-web-plugins] Missing web-admin/src/ui/css/.");
   process.exit(1);
 }
-
-const adminJsDest = join(root, "dist", "web-admin", "src", "ui", "js");
-mkdirSync(adminJsDest, { recursive: true });
-const htmxSrc = join(root, "node_modules", "htmx.org", "dist", "htmx.min.js");
-if (!existsSync(htmxSrc)) {
-  console.error("[copy-web-plugins] Missing htmx.org. Run npm install.");
+if (!existsSync(adminJs)) {
+  console.error(
+    "[copy-web-plugins] admin.js missing; run npm run build:admin-assets.",
+  );
   process.exit(1);
 }
-cpSync(htmxSrc, join(adminJsDest, "htmx.min.js"));
-console.log("[copy-web-plugins] Copied htmx.min.js into dist.");
-if (!existsSync(join(adminJsDest, "htmx.min.js"))) {
-  console.error("[copy-web-plugins] htmx.min.js missing after copy.");
-  process.exit(1);
-}
+console.log("[copy-web-plugins] Verified bundled admin.css and admin.js in dist.");

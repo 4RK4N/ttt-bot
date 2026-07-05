@@ -16,10 +16,10 @@ function cardTitle(
   const merged = { ...row, ...subValues };
   return String(
     merged.openButtonLabel ??
-      merged.panelTitle ??
-      merged.id ??
-      field.itemLabel ??
-      "Item",
+    merged.panelTitle ??
+    merged.id ??
+    field.itemLabel ??
+    "Item",
   );
 }
 
@@ -51,37 +51,37 @@ export function ObjectListRow({
 
   return (
     <div
-      class={`card${collapsed ? " is-collapsed" : ""}`}
+      class={`card bg-base-200 shadow-sm${collapsed ? " is-collapsed" : ""}`}
       id={`row-${namespace}-${field.key}-${rowIndex}`}
     >
       <div
-        class={`card-header d-flex align-items-center justify-content-between gap-2${field.collapsible ? " is-toggle" : ""}`}
+        class={`flex items-center justify-between gap-2 border-b border-base-300 p-4${field.collapsible ? " is-toggle" : ""}`}
         {...(field.collapsible
           ? {
-              "hx-post": toggleUrl,
-              "hx-target": `#row-${namespace}-${field.key}-${rowIndex}`,
-              "hx-swap": "outerHTML",
-              "hx-include": `#panel-form-${namespace}`,
-            }
+            "hx-post": toggleUrl,
+            "hx-target": `#row-${namespace}-${field.key}-${rowIndex}`,
+            "hx-swap": "outerHTML",
+            "hx-include": `#panel-form-${namespace}`,
+          }
           : {})}
       >
-        <div class="d-flex align-items-center gap-2 flex-fill overflow-hidden">
+        <div class="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
           {field.collapsible ? (
-            <span class="text-secondary" aria-hidden="true">
+            <span class="text-base-content/60" aria-hidden="true">
               {collapsed ? "\u25B6" : "\u25BC"}
             </span>
           ) : null}
-          <h3 class="card-title mb-0 text-truncate">
+          <h3 class="truncate font-semibold">
             {cardTitle(field, row, row as Record<string, unknown>)}
           </h3>
         </div>
         <span
-          class={`badge ${row.published ? "bg-success-lt text-success" : "bg-secondary-lt text-secondary"}`}
+          class={`badge ${row.published ? "badge-success" : "badge-ghost"}`}
         >
           {row.published ? "Published" : "Unpublished"}
         </span>
       </div>
-      <div class="card-body">
+      <div class="card-content card-body border-t border-base-300 pt-0">
         <RowSubFieldsWithWatch
           field={field}
           row={row}
@@ -103,12 +103,12 @@ export function ObjectListRow({
               rowIndex={rowIndex}
             />
           ))}
-        <div class="d-flex flex-wrap gap-2 mt-3">
+        <div class="mt-3 flex flex-wrap gap-2">
           {field.publishable ? (
             <>
               <button
                 type="button"
-                class="btn btn-success"
+                class="btn btn-success btn-sm"
                 hx-post={`/htmx/modules/${namespace}/publish/${fieldValueStr(row.id) || String(rowIndex)}`}
                 hx-include={`#panel-form-${namespace}`}
                 hx-target={`#htmx-panel-${namespace}`}
@@ -119,7 +119,7 @@ export function ObjectListRow({
               </button>
               <button
                 type="button"
-                class="btn"
+                class="btn btn-sm"
                 hx-post={`/htmx/modules/${namespace}/unpublish/${fieldValueStr(row.id)}`}
                 hx-include={`#panel-form-${namespace}`}
                 hx-target={`#htmx-panel-${namespace}`}
@@ -132,7 +132,7 @@ export function ObjectListRow({
           ) : null}
           <button
             type="button"
-            class="btn btn-outline-danger"
+            class="btn btn-outline btn-error btn-sm"
             hx-post={`/htmx/modules/${namespace}/list/${field.key}/remove/${rowIndex}?expanded=${expandedParam}`}
             hx-include={`#panel-form-${namespace}`}
             hx-target={`#list-${namespace}-${field.key}`}
@@ -170,10 +170,14 @@ export function ObjectListField({
   const expandedParam = encodeURIComponent((expanded ?? []).join(","));
 
   return (
-    <div class="mb-3 field">
-      <label class="form-label">{f.label}</label>
-      {f.help ? <div class="form-text text-secondary">{f.help}</div> : null}
-      <div class="vstack gap-3" id={`list-${namespace}-${f.key}`}>
+    <div class="field mb-4 w-full">
+      <label class="label py-0">
+        <span class="label-text font-medium">{f.label}</span>
+      </label>
+      {f.help ? (
+        <p class="mb-1 text-sm text-base-content/60">{f.help}</p>
+      ) : null}
+      <div class="flex flex-col gap-3" id={`list-${namespace}-${f.key}`}>
         {items.map((row, index) => (
           <ObjectListRow
             field={f}
@@ -187,7 +191,7 @@ export function ObjectListField({
       </div>
       <button
         type="button"
-        class="btn mt-2"
+        class="btn btn-sm mt-2"
         hx-post={`/htmx/modules/${namespace}/list/${f.key}/add?expanded=${expandedParam}`}
         hx-include={`#panel-form-${namespace}`}
         hx-target={`#list-${namespace}-${f.key}`}

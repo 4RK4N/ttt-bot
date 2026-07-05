@@ -41,51 +41,23 @@ async function main(): Promise<void> {
   const cssDir = join(dirname(fileURLToPath(import.meta.url)), "ui", "css");
   const jsDir = join(dirname(fileURLToPath(import.meta.url)), "ui", "js");
 
-  function findProjectRoot(start: string): string {
-    let dir = start;
-    for (;;) {
-      if (existsSync(join(dir, "package.json"))) return dir;
-      const parent = dirname(dir);
-      if (parent === dir) return start;
-      dir = parent;
-    }
-  }
-
   function resolveCssFile(file: string): string | null {
     const local = resolve(cssDir, file);
     if (local.startsWith(resolve(cssDir)) && existsSync(local)) return local;
-    if (file !== "tabler.min.css") return null;
-    const tabler = join(
-      findProjectRoot(dirname(fileURLToPath(import.meta.url))),
-      "node_modules",
-      "@tabler",
-      "core",
-      "dist",
-      "css",
-      "tabler.min.css",
-    );
-    return existsSync(tabler) ? tabler : null;
+    return null;
   }
 
   function resolveJsFile(file: string): string | null {
     const local = resolve(jsDir, file);
     if (local.startsWith(resolve(jsDir)) && existsSync(local)) return local;
-    if (file !== "htmx.min.js") return null;
-    const htmx = join(
-      findProjectRoot(dirname(fileURLToPath(import.meta.url))),
-      "node_modules",
-      "htmx.org",
-      "dist",
-      "htmx.min.js",
-    );
-    return existsSync(htmx) ? htmx : null;
+    return null;
   }
 
-  if (!resolveCssFile("tabler.min.css")) {
-    console.warn("[web] tabler.min.css missing; rebuild with npm run build.");
+  if (!resolveCssFile("admin.css")) {
+    console.warn("[web] admin.css missing; rebuild with npm run build.");
   }
-  if (!resolveJsFile("htmx.min.js")) {
-    console.warn("[web] htmx.min.js missing; rebuild with npm run build.");
+  if (!resolveJsFile("admin.js")) {
+    console.warn("[web] admin.js missing; rebuild with npm run build.");
   }
 
   app.get("/assets/css/:file", (c) => {

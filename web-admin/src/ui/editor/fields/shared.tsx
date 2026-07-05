@@ -23,7 +23,7 @@ export function fieldValueStr(value: unknown): string {
 
 export function Help({ text }: { text?: string }) {
   if (!text) return null;
-  return <div class="form-text text-secondary">{text}</div>;
+  return <p class="mb-1 text-sm text-base-content/60">{text}</p>;
 }
 
 export function FieldWrap({
@@ -40,9 +40,9 @@ export function FieldWrap({
   disabled?: boolean;
 }) {
   return (
-    <div class={`mb-3 field${disabled ? " disabled" : ""}`}>
-      <label class="form-label" for={id}>
-        {label}
+    <div class={`mb-4 field w-full${disabled ? " disabled" : ""}`}>
+      <label class="label py-0" for={id}>
+        <span class="label-text font-medium">{label}</span>
       </label>
       <Help text={help} />
       {children}

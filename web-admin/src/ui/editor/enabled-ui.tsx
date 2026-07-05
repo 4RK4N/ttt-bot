@@ -4,7 +4,7 @@ export function isModuleEnabled(enabled: boolean | undefined): boolean {
 }
 
 const REVERT_CHECKBOX_ON_HTMX_ERROR =
-  "var c=this.checked;this.checked=!c;this.closest('label').querySelector('.form-check-label').textContent=this.checked?'On':'Off'";
+  "var c=this.checked;this.checked=!c;var l=this.closest('label');if(l){var s=l.querySelector('.toggle-label');if(s)s.textContent=this.checked?'On':'Off'}";
 
 export function StatusDot({
   namespace,
@@ -36,9 +36,10 @@ export function EnabledToggle({
   const toggleId = `enabled-toggle-${namespace}`;
   return (
     <div id={toggleId}>
-      <label class="form-check form-switch mb-0">
+      <label class="label cursor-pointer justify-end gap-3">
+        <span class="label-text toggle-label">{on ? "On" : "Off"}</span>
         <input
-          class="form-check-input"
+          class="toggle toggle-success"
           type="checkbox"
           name="enabled"
           value="true"
@@ -51,7 +52,6 @@ export function EnabledToggle({
           hx-on:response-error={REVERT_CHECKBOX_ON_HTMX_ERROR}
           hx-on:send-error={REVERT_CHECKBOX_ON_HTMX_ERROR}
         />
-        <span class="form-check-label">{on ? "On" : "Off"}</span>
       </label>
     </div>
   );
