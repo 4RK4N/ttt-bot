@@ -16,7 +16,7 @@ export const EXAMPLE_BTN_PREFIX = "example-module:btn:";
 
 // import { resolveExamplePanel } from './config-io.js';
 
-export function buildPanelPayload(_panelId: string): DiscordMessagePayload {
+export function buildPanelPayload(panelId: string): DiscordMessagePayload {
   /*
   const panel = resolveExamplePanel(_panelId);
   if (!panel) throw new Error(`Unknown example panel "${_panelId}".`);
@@ -27,7 +27,7 @@ export function buildPanelPayload(_panelId: string): DiscordMessagePayload {
   };
   */
   throw new Error(
-    "Example panel stub — enable panel types and implement buildPanelPayload (see panel-types.ts).",
+    `Example panel stub for "${panelId}" — enable panel types and implement buildPanelPayload (see panel-types.ts).`,
   );
 }
 

@@ -13,6 +13,9 @@ export default tseslint.config(
       ".astro/",
       "bot/src/examples/",
       "tests/",
+      // Vite/esbuild entry points — compiled by build:admin-assets, not web-admin tsc
+      "web-admin/vite.config.ts",
+      "web-admin/src/ui/assets/**",
     ],
   },
   {
