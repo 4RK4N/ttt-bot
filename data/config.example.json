@@ -9,5 +9,6 @@
   "webPort": 8088,
   "internalApiPort": 8087,
   "internalApiSecret": "long-random-string-internal-api",
-  "botInternalApiUrl": "http://127.0.0.1:8087"
+  "botInternalApiUrl": "http://127.0.0.1:8087",
+  "internalApiBind": "127.0.0.1"
 }

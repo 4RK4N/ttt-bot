@@ -109,7 +109,8 @@ copy it to `config.json` or `texts.json` and edit.
   "webPort": 8088,
   "internalApiPort": 8087,
   "internalApiSecret": "long-random-string-internal-api",
-  "botInternalApiUrl": "http://127.0.0.1:8087"
+  "botInternalApiUrl": "http://127.0.0.1:8087",
+  "internalApiBind": "127.0.0.1"
 }
 ```
 
@@ -126,7 +127,7 @@ copy it to `config.json` or `texts.json` and edit.
 | `internalApiPort`  | No          | Port for the bot's internal publish API. Defaults to `8087`. Not exposed to the public internet — only reachable on the Docker internal network or `127.0.0.1` locally.                                                           |
 | `internalApiSecret`| **Editor + bot** | Shared secret for `X-Internal-Token` on internal API requests. Required when running the web editor (publish/unpublish panels). Generate like `sessionSecret`.                                                              |
 | `botInternalApiUrl`| **Editor**  | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` (also set via `BOT_INTERNAL_API_URL` env on the web container).                             |
-| `internalApiBind`  | No          | Address the bot internal API listens on. Defaults to `127.0.0.1`. Set explicitly (e.g. `0.0.0.0`) when the API must be reachable from another container on the Docker network. |
+| `internalApiBind`  | No          | Address the bot internal API listens on. Defaults to `127.0.0.1`. Docker Compose sets `INTERNAL_API_BIND=0.0.0.0` on the bot service so the web-editor container can reach it; override via this key or the `INTERNAL_API_BIND` env var. |
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
 `webPort`) plus `guildId`, `internalApiSecret`, and `botInternalApiUrl` are only needed if you run the browser-based editor;
