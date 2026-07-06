@@ -58,12 +58,14 @@ const isOpen = targetMs <= Date.now();
       interval = undefined;
     }
 
-    const timer = document.getElementById("event-timer");
+    const timer = document.getElementById(
+      "event-timer",
+    ) as HTMLDivElement | null;
     if (!timer) return;
 
     const target = Number(timer.dataset.timestamp) * 1000;
     const openMessage = timer.dataset.openMessage ?? "We're open!";
-    const digits = timer.querySelectorAll("[data-digit]");
+    const digits = timer.querySelectorAll<HTMLSpanElement>("[data-digit]");
 
     function showOpen() {
       timer!.innerHTML = `<p class="timer-open">${openMessage}</p>`;

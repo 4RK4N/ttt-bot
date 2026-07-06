@@ -109,13 +109,13 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
     <ClientRouter />
   </head>
 
-  <body class="pt-[length:var(--header-height)]">
+  <body class="pt-(--header-height)">
     <a href="#main-content" class="skip-link site-bar site-bar--header"
       >{skipLabel}</a
     >
 
     <header
-      class="site-bar site-bar--header fixed inset-x-0 top-0 z-50 flex h-[length:var(--header-height)] items-center gap-4 px-4 font-jost text-base lg:px-7"
+      class="site-bar site-bar--header fixed inset-x-0 top-0 z-50 flex h-(--header-height) items-center gap-4 px-4 font-jost text-base lg:px-7"
     >
       <a href={homePath[lang]} class="flex h-full shrink-0 items-center py-1.5">
         <Image
@@ -178,14 +178,14 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
       currentPath={path}
       variant="mobile"
       ariaLabel={mobileMenuLabel}
-      class="site-bar site-bar--header fixed inset-x-0 top-[length:var(--header-height)] z-40 hidden max-h-[calc(100vh-var(--header-height))] overflow-y-auto px-4 pb-4 pt-3 text-left font-jost text-base md:hidden!"
+      class="site-bar site-bar--header fixed inset-x-0 top-(--header-height) z-40 hidden max-h-[calc(100vh-var(--header-height))] overflow-y-auto px-4 pb-4 pt-3 text-left font-jost text-base md:hidden!"
     />
 
     <main id="main-content" transition:animate={fade({ duration: "0.2s" })}>
       <slot />
     </main>
 
-    <footer class="site-bar site-bar--footer px-4 py-[18px] text-center">
+    <footer class="site-bar site-bar--footer px-4 py-4.5 text-center">
       <nav
         class="footer-nav"
         aria-label={lang === "de" ? "Rechtliches" : "Legal"}
@@ -203,21 +203,35 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
     <Lightbox />
 
     <script>
+      import { on, renewListenerScope } from "../lib/dom-listeners";
+
+      let shellAbort: AbortController | null = null;
+      const documentScope = new AbortController();
+
       function closeAllDropdowns() {
-        document.querySelectorAll(".nav-dropdown.is-open").forEach((el) => {
-          el.classList.remove("is-open");
-          el.querySelector(".nav-dropdown-trigger")?.setAttribute(
-            "aria-expanded",
-            "false",
-          );
-        });
+        document
+          .querySelectorAll<HTMLLIElement>(".nav-dropdown.is-open")
+          .forEach((el) => {
+            el.classList.remove("is-open");
+            el.querySelector<HTMLButtonElement>(
+              ".nav-dropdown-trigger",
+            )?.setAttribute("aria-expanded", "false");
+          });
       }
 
       function setDrawer(open: boolean) {
-        const toggle = document.getElementById("menu-toggle");
-        const drawer = document.getElementById("mobile-drawer");
-        const iconOpen = document.getElementById("menu-icon-open");
-        const iconClose = document.getElementById("menu-icon-close");
+        const toggle = document.getElementById(
+          "menu-toggle",
+        ) as HTMLButtonElement | null;
+        const drawer = document.getElementById(
+          "mobile-drawer",
+        ) as HTMLElement | null;
+        const iconOpen = document.getElementById(
+          "menu-icon-open",
+        ) as SVGElement | null;
+        const iconClose = document.getElementById(
+          "menu-icon-close",
+        ) as SVGElement | null;
         if (!toggle || !drawer || !iconOpen || !iconClose) return;
 
         drawer.classList.toggle("hidden", !open);
@@ -228,86 +242,132 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
         if (!open) closeAllDropdowns();
       }
 
-      function initMobileMenu() {
-        const toggle = document.getElementById("menu-toggle");
-        const drawer = document.getElementById("mobile-drawer");
+      function initMobileMenu(signal: AbortSignal) {
+        const toggle = document.getElementById(
+          "menu-toggle",
+        ) as HTMLButtonElement | null;
+        const drawer = document.getElementById(
+          "mobile-drawer",
+        ) as HTMLElement | null;
         if (!toggle || !drawer) return;
 
         setDrawer(false);
 
-        toggle.onclick = () => {
-          setDrawer(drawer.classList.contains("hidden"));
-        };
+        on(
+          toggle,
+          "click",
+          () => {
+            setDrawer(drawer.classList.contains("hidden"));
+          },
+          signal,
+        );
 
-        drawer.onclick = (e) => {
-          const link = (e.target as HTMLElement).closest("a");
-          if (link && drawer.contains(link)) setDrawer(false);
-        };
+        on(
+          drawer,
+          "click",
+          (e) => {
+            const link = (e.target as HTMLElement).closest(
+              "a",
+            ) as HTMLAnchorElement | null;
+            if (link && drawer.contains(link)) setDrawer(false);
+          },
+          signal,
+        );
       }
 
-      function initNavDropdowns() {
-        document.querySelectorAll(".nav-dropdown").forEach((dropdown) => {
-          const trigger = dropdown.querySelector(
-            ".nav-dropdown-trigger",
-          ) as HTMLButtonElement | null;
-          const menu = dropdown.querySelector(".nav-dropdown-menu");
-          if (!trigger || !menu) return;
+      function initNavDropdowns(signal: AbortSignal) {
+        document
+          .querySelectorAll<HTMLLIElement>(".nav-dropdown")
+          .forEach((dropdown) => {
+            const trigger = dropdown.querySelector<HTMLButtonElement>(
+              ".nav-dropdown-trigger",
+            );
+            const menu =
+              dropdown.querySelector<HTMLUListElement>(".nav-dropdown-menu");
+            if (!trigger || !menu) return;
 
-          const items = menu.querySelectorAll('[role="menuitem"]');
+            const items =
+              menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]');
 
-          trigger.onclick = (e) => {
-            e.stopPropagation();
-            const wasOpen = dropdown.classList.contains("is-open");
-            closeAllDropdowns();
-            if (!wasOpen) {
-              dropdown.classList.add("is-open");
-              trigger.setAttribute("aria-expanded", "true");
-            }
-          };
-
-          trigger.onkeydown = (e) => {
-            if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              dropdown.classList.add("is-open");
-              trigger.setAttribute("aria-expanded", "true");
-              (items[0] as HTMLElement)?.focus();
-            }
-          };
-
-          menu.onmousedown = (e) => e.stopPropagation();
-
-          items.forEach((item, index) => {
-            (item as HTMLElement).onkeydown = (e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                (items[index + 1] ?? items[0]).focus();
-              } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                (items[index - 1] ?? items[items.length - 1]).focus();
-              } else if (e.key === "Escape") {
+            on(
+              trigger,
+              "click",
+              (e) => {
+                e.stopPropagation();
+                const wasOpen = dropdown.classList.contains("is-open");
                 closeAllDropdowns();
-                trigger.focus();
-              }
-            };
+                if (!wasOpen) {
+                  dropdown.classList.add("is-open");
+                  trigger.setAttribute("aria-expanded", "true");
+                }
+              },
+              signal,
+            );
+
+            on(
+              trigger,
+              "keydown",
+              (e) => {
+                if (!(e instanceof KeyboardEvent)) return;
+                if (
+                  e.key === "ArrowDown" ||
+                  e.key === "Enter" ||
+                  e.key === " "
+                ) {
+                  e.preventDefault();
+                  dropdown.classList.add("is-open");
+                  trigger.setAttribute("aria-expanded", "true");
+                  items[0]?.focus();
+                }
+              },
+              signal,
+            );
+
+            on(menu, "mousedown", (e) => e.stopPropagation(), signal);
+
+            items.forEach((item, index) => {
+              on(
+                item,
+                "keydown",
+                (e) => {
+                  if (!(e instanceof KeyboardEvent)) return;
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    (items[index + 1] ?? items[0]).focus();
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    (items[index - 1] ?? items[items.length - 1]).focus();
+                  } else if (e.key === "Escape") {
+                    closeAllDropdowns();
+                    trigger.focus();
+                  }
+                },
+                signal,
+              );
+            });
           });
-        });
       }
 
       function initShell() {
-        initMobileMenu();
-        initNavDropdowns();
+        shellAbort = renewListenerScope(shellAbort);
+        initMobileMenu(shellAbort.signal);
+        initNavDropdowns(shellAbort.signal);
       }
 
       initShell();
       document.addEventListener("astro:page-load", initShell);
 
-      document.addEventListener("click", closeAllDropdowns);
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
+      on(document, "click", closeAllDropdowns, documentScope.signal);
+      on(
+        document,
+        "keydown",
+        (e) => {
+          if (!(e instanceof KeyboardEvent) || e.key !== "Escape") return;
           setDrawer(false);
           closeAllDropdowns();
-        }
-      });
+        },
+        documentScope.signal,
+      );
     </script>
   </body>
 </html>
