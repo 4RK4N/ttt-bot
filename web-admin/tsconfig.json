@@ -14,7 +14,7 @@
     "src/**/*.tsx"
   ],
   "exclude": [
-    "src/ui/assets/**"
+    "src/ui/assets/admin-styles.ts"
   ],
   "references": [
     {

@@ -1,5 +1,5 @@
 function syncToggleLabel(checkbox: HTMLInputElement): void {
-  const root = checkbox.closest("label");
+  const root = checkbox.closest(".field") ?? checkbox.closest("label");
   const label = root?.querySelector(".toggle-label");
   if (label) label.textContent = checkbox.checked ? "On" : "Off";
 }
@@ -14,6 +14,13 @@ function revertHtmxToggle(evt: Event): void {
 
 document.body.addEventListener("htmx:responseError", revertHtmxToggle);
 document.body.addEventListener("htmx:sendError", revertHtmxToggle);
+
+document.body.addEventListener("change", (evt) => {
+  const target = evt.target;
+  if (!(target instanceof HTMLInputElement)) return;
+  if (target.type !== "checkbox" || !target.classList.contains("toggle")) return;
+  syncToggleLabel(target);
+});
 
 document.body.addEventListener("htmx:configRequest", (evt) => {
   const meta = document.querySelector('meta[name="csrf-token"]');
@@ -54,6 +61,15 @@ function setDrawerOpen(open: boolean, focusTarget?: HTMLElement | null): void {
   (focusTarget ?? openBtn)?.focus();
 }
 
+function setModuleMenuActive(button: Element): void {
+  const menu = button.closest(".menu");
+  if (!menu) return;
+  menu.querySelectorAll("button").forEach((el) => {
+    el.classList.remove("menu-active");
+  });
+  button.classList.add("menu-active");
+}
+
 document.getElementById("admin-drawer-open")?.addEventListener("click", () => {
   setDrawerOpen(true);
 });
@@ -84,6 +100,7 @@ document.body.addEventListener("click", (evt) => {
   const moduleBtn = target.closest(".drawer-side .menu button[hx-get]");
   if (!moduleBtn) return;
 
+  setModuleMenuActive(moduleBtn);
   const main = document.getElementById("module-content");
   setDrawerOpen(false, main);
 });

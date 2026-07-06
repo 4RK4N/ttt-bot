@@ -95,7 +95,6 @@ export function EditorLayout({
                       hx-target="#module-content"
                       hx-swap="innerHTML"
                       hx-indicator="find .loading"
-                      hx-on:click="this.closest('.menu').querySelectorAll('button').forEach(el => el.classList.remove('menu-active')); this.classList.add('menu-active')"
                     >
                       <StatusDot namespace={p.namespace} enabled={p.enabled} />
                       <span>{p.title}</span>

@@ -15,7 +15,6 @@ export function BooleanField({ f, value, name, disabled }: SubFieldProps) {
           value="true"
           checked={checked}
           disabled={disabled}
-          onchange="var r=this.closest('.field');if(r){var s=r.querySelector('.toggle-label');if(s)s.textContent=this.checked?'On':'Off'}"
         />
         <span class="text-sm text-base-content/80 toggle-label">
           {checked ? "On" : "Off"}
