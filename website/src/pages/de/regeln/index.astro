@@ -1,6 +1,7 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
 import ContentPanel from "../../../components/ContentPanel.astro";
+import RuleCard from "../../../components/RuleCard.astro";
 ---
 
 <ContentPage
@@ -12,7 +13,7 @@ import ContentPanel from "../../../components/ContentPanel.astro";
   centerBody={false}
 >
   <ContentPanel>
-    <div class="hand-text flex flex-col gap-6">
+    <div class="hand-text flex flex-col gap-4">
       <h2>Venue- &amp; Serverregeln</h2>
       <p>
         Um allen Gästen ein sicheres, entspanntes und angenehmes Erlebnis zu
@@ -20,14 +21,20 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         Mit dem Betreten der Venue erklärst du dich damit einverstanden, diese Regeln
         zu lesen, zu verstehen und einzuhalten.
       </p>
-      <h3>1. Allgemeines Verhalten</h3>
+    </div>
+  </ContentPanel>
+  <div class="rules-stack">
+    <RuleCard number={1}>
+      <h3>Allgemeines Verhalten</h3>
       <p>
         Behandelt alle Gäste respektvoll.<br />
         Kein Hass, keine Belästigung, kein Mobbing, keine Diskriminierung und kein
         Drama. Hassrede führt zu einem sofortigen Bann.<br />
         NEIN heißt NEIN - immer und ohne Ausnahme.
       </p>
-      <h3>2. Chat- &amp; Community-Regeln</h3>
+    </RuleCard>
+    <RuleCard number={2}>
+      <h3>Chat- &amp; Community-Regeln</h3>
       <p>
         Kein Spam, Flooding oder Ping-Missbrauch.<br />
         Kein Mic-Spam oder absichtlich laute/störende Geräusche.<br />
@@ -42,7 +49,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
           Lightless!</strong
         >
       </p>
-      <h3>3. Altersbeschränkung</h3>
+    </RuleCard>
+    <RuleCard number={3}>
+      <h3>Altersbeschränkung</h3>
       <p>
         Dies ist ein 18+ Venue!<br />
         Zutritt ist nur gestattet, wenn sowohl reales Alter als auch RP-Alter 18+
@@ -53,7 +62,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
           Bann sowie zum Lightless-Report!</strong
         >
       </p>
-      <h3>4. Rassen &amp; Roleplay</h3>
+    </RuleCard>
+    <RuleCard number={4}>
+      <h3>Rassen &amp; Roleplay</h3>
       <p>
         <strong>Alle</strong> Rassen sind willkommen <strong>inklusive</strong> Lalafell.
         Für alle Gäste gelten die gleichen Regeln.<br />
@@ -65,18 +76,24 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         – Keine Einbeziehung anderer ohne deren ausdrückliche Zustimmung.<br />
         – Keine extremen Inhalte im öffentlichen Bereich.
       </p>
-      <h3>5. Emotes, Pets &amp; Items</h3>
+    </RuleCard>
+    <RuleCard number={5}>
+      <h3>Emotes, Pets &amp; Items</h3>
       <p>
         Bitte deaktiviert Emote-Logs.<br />
         Waffen und Pets nur verwenden, wenn sie zu eurem RP-Charakter passen.
       </p>
-      <h3>6. Räume &amp; Nutzung</h3>
+    </RuleCard>
+    <RuleCard number={6}>
+      <h3>Räume &amp; Nutzung</h3>
       <p>
         Räume dürfen frei genutzt werden.<br />
         Wenn der Staff einen Raum für Massagen oder Fotos benötigt, bitte diesen auf
         Anfrage freigeben.
       </p>
-      <h3>7. Durchsetzung</h3>
+    </RuleCard>
+    <RuleCard number={7}>
+      <h3>Durchsetzung</h3>
       <p>
         Das Team behält sich vor, bei Regelverstößen angemessen zu handeln.<br
         />
@@ -85,7 +102,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         Das Staff-Team hat jederzeit das letzte Wort.<br />
         Entscheidungen des Staffs sind zu respektieren und nicht öffentlich zu diskutieren.
       </p>
-      <h3>8. NSFW</h3>
+    </RuleCard>
+    <RuleCard number={8}>
+      <h3>NSFW</h3>
       <p>
         NSFW-Inhalte sind ausschließlich in den dafür vorgesehenen
         NSFW-Bereichen erlaubt. Diese Bereiche sind für alle Rassen offen,
@@ -96,6 +115,6 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         />
         NSFW-Inhalte außerhalb dieser Bereiche sind nicht gestattet.
       </p>
-    </div>
-  </ContentPanel>
+    </RuleCard>
+  </div>
 </ContentPage>

@@ -18,7 +18,7 @@ export const homeCopy: Record<Lang, HomeCopy> = {
     ],
   },
   de: {
-    openingHeading: "Nächstes Event",
+    openingHeading: "Nächste Öffnung",
     introLines: [
       "Willkommen, Reisender…",
       "Du hast den Weg zu einem Ort gefunden, an dem die Zeit langsamer vergeht und die Welt für einen Moment stillsteht.",

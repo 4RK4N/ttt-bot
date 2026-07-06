@@ -1,5 +1,6 @@
 ---
 import ContentPage from "../../../../components/ContentPage.astro";
+import ContentPanel from "../../../../components/ContentPanel.astro";
 import ContentImage from "../../../../components/ContentImage.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import DiscordButton from "../../../../components/DiscordButton.astro";
@@ -19,23 +20,25 @@ import { DISCORD_MOBATH } from "../../../../data/site";
   path="/en/community/partner/"
   heading="Partner"
 >
-  <div class="hand-text flex flex-col gap-6">
-    <p>
-      <em
-        ><strong
-          >Beyond our walls, there are places<br /> that are connected to us.</strong
-        ></em
-      >
-    </p>
-    <p>
-      <em
-        ><strong
-          >Friends, houses, and communities<br /> with whom we share stories.</strong
-        ></em
-      >
-    </p>
-    <p><em><strong>Together, we create a greater world.</strong></em></p>
-  </div>
+  <ContentPanel>
+    <div class="hand-text flex flex-col gap-6">
+      <p>
+        <em
+          ><strong
+            >Beyond our walls, there are places<br /> that are connected to us.</strong
+          ></em
+        >
+      </p>
+      <p>
+        <em
+          ><strong
+            >Friends, houses, and communities<br /> with whom we share stories.</strong
+          ></em
+        >
+      </p>
+      <p><em><strong>Together, we create a greater world.</strong></em></p>
+    </div>
+  </ContentPanel>
   <ContentImage
     src={resolveGallery("gallery20/0d103a87.png")}
     width={PARTNER_LOGO_PX}

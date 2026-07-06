@@ -27,32 +27,20 @@ const isOpen = targetMs <= Date.now();
   data-timestamp={timestamp}
   data-open-message={openMessage}
   aria-live="polite"
-  class="flex w-full max-w-full flex-col items-center sm:max-w-[36rem]"
+  class="flex w-full max-w-full flex-col items-center"
 >
   {
     isOpen ? (
-      <p class="font-averia text-[1.5em] font-bold text-timer-digit">
-        {openMessage}
-      </p>
+      <p class="timer-open">{openMessage}</p>
     ) : (
-      <div class="flex w-full min-w-0 items-stretch justify-center font-averia font-bold">
+      <div class="timer-row">
         {labels.map((label, i) => (
-          <>
-            {i > 0 && <div class="timer-separator" aria-hidden="true" />}
-            <div class="timer-unit flex flex-col items-center py-2 sm:py-4">
-              <span class="timer-digit-panel">
-                <span
-                  data-digit
-                  class="timer-digit text-[1.45em] leading-none sm:text-[2.5em]"
-                >
-                  {initialDigits[i]}
-                </span>
-              </span>
-              <span class="timer-label mt-1.5 text-[0.45rem] uppercase tracking-[0.06rem] text-white sm:mt-3 sm:text-[0.625rem] sm:tracking-[0.225rem]">
-                {label}
-              </span>
-            </div>
-          </>
+          <div class="timer-unit">
+            <span data-digit class="timer-digit">
+              {initialDigits[i]}
+            </span>
+            <span class="timer-label">{label}</span>
+          </div>
         ))}
       </div>
     )
@@ -78,7 +66,7 @@ const isOpen = targetMs <= Date.now();
     const digits = timer.querySelectorAll("[data-digit]");
 
     function showOpen() {
-      timer!.innerHTML = `<p class="font-averia text-[1.5em] font-bold text-timer-digit">${openMessage}</p>`;
+      timer!.innerHTML = `<p class="timer-open">${openMessage}</p>`;
     }
 
     function tick() {

@@ -31,16 +31,16 @@ const navLinkClass = (itemPath: string) => [
   "nav-link",
   isDesktop ? "" : "block px-1 py-2.5",
   isActive(itemPath) && "nav-link--active",
-  !isActive(itemPath) && "text-bar-text",
 ];
 
-const navItemClass = !isDesktop ? "border-b border-bar-border/50" : undefined;
+const navItemClass = !isDesktop ? "border-b border-bar-border" : undefined;
 ---
 
 <nav id={id} class:list={[className]} aria-label={ariaLabel}>
   <ul
     class:list={[
-      isDesktop && "flex flex-wrap items-center justify-center gap-x-4 gap-y-1",
+      isDesktop &&
+        "site-nav__list flex flex-nowrap items-center justify-center",
     ]}
   >
     {

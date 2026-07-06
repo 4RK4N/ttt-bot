@@ -35,10 +35,10 @@ interface Props {
   heroLcp?: boolean;
   /** Responsive preload for the home hero image. */
   lcpPreload?: { srcset: string; sizes: string };
-  /** Preload Caveat (pages with h1 page-heading). Default true. */
-  preloadCaveat?: boolean;
-  /** Preload Gochi Hand (body copy). Default true. */
-  preloadGochi?: boolean;
+  /** Preload Pacifico (pages with h1 page-heading). Default true. */
+  preloadPacifico?: boolean;
+  /** Preload Patrick Hand (handwriting copy). Default true. */
+  preloadPatrick?: boolean;
 }
 
 const {
@@ -48,8 +48,8 @@ const {
   description,
   heroLcp,
   lcpPreload,
-  preloadCaveat = true,
-  preloadGochi = true,
+  preloadPacifico = true,
+  preloadPatrick = true,
 } = Astro.props;
 
 const metaDescription = description ?? siteDescription[lang];
@@ -103,9 +103,9 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
         />
       )
     }
-    <Font cssVariable="--font-averia-face" preload />
-    {preloadGochi && <Font cssVariable="--font-gochi-face" preload />}
-    {preloadCaveat && <Font cssVariable="--font-caveat-face" preload />}
+    <Font cssVariable="--font-jost-face" preload />
+    {preloadPatrick && <Font cssVariable="--font-patrick-face" preload />}
+    {preloadPacifico && <Font cssVariable="--font-pacifico-face" preload />}
     <ClientRouter />
   </head>
 
@@ -115,7 +115,7 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
     >
 
     <header
-      class="site-bar site-bar--header fixed inset-x-0 top-0 z-50 flex h-[length:var(--header-height)] items-center gap-4 px-4 font-averia text-[15px] lg:px-6"
+      class="site-bar site-bar--header fixed inset-x-0 top-0 z-50 flex h-[length:var(--header-height)] items-center gap-4 px-4 font-jost text-base lg:px-7"
     >
       <a href={homePath[lang]} class="flex h-full shrink-0 items-center py-1.5">
         <Image
@@ -136,7 +136,7 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
         currentPath={path}
         variant="desktop"
         ariaLabel={mainMenuLabel}
-        class="site-nav hidden flex-1 md:block"
+        class="site-nav hidden flex-1 min-w-0 md:block"
       />
 
       <div class="ml-auto flex items-center gap-2">
@@ -150,7 +150,7 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
           aria-expanded="false"
           aria-controls="mobile-drawer"
           aria-label={lang === "de" ? "Menü" : "Menu"}
-          class="site-control flex h-9 w-9 cursor-pointer items-center justify-center hover:border-bar-accent hover:text-bar-accent md:hidden"
+          class="menu-toggle"
         >
           <svg
             id="menu-icon-open"
@@ -178,29 +178,21 @@ const mobileMenuLabel = lang === "de" ? "Mobilmenü" : "Mobile menu";
       currentPath={path}
       variant="mobile"
       ariaLabel={mobileMenuLabel}
-      class="site-bar site-bar--header fixed inset-x-0 top-[length:var(--header-height)] z-40 hidden max-h-[calc(100vh-var(--header-height))] overflow-y-auto px-4 pb-4 pt-3 text-left font-averia text-[15px] md:hidden!"
+      class="site-bar site-bar--header fixed inset-x-0 top-[length:var(--header-height)] z-40 hidden max-h-[calc(100vh-var(--header-height))] overflow-y-auto px-4 pb-4 pt-3 text-left font-jost text-base md:hidden!"
     />
 
     <main id="main-content" transition:animate={fade({ duration: "0.2s" })}>
       <slot />
     </main>
 
-    <footer
-      class="site-bar site-bar--footer px-4 py-5 text-center font-averia text-[13px] text-bar-text/70"
-    >
-      <div class="section-divider mx-auto mb-4 max-w-md" aria-hidden="true">
-      </div>
+    <footer class="site-bar site-bar--footer px-4 py-[18px] text-center">
       <nav
-        class="flex flex-wrap justify-center gap-x-3"
+        class="footer-nav"
         aria-label={lang === "de" ? "Rechtliches" : "Legal"}
       >
         {
           legal.map((item) => (
-            <a
-              href={item.path}
-              data-astro-prefetch
-              class="transition-colors hover:text-bar-accent"
-            >
+            <a href={item.path} data-astro-prefetch>
               {item.label}
             </a>
           ))

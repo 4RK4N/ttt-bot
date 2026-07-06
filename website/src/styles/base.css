@@ -3,7 +3,7 @@
   /* Responsive root scale — 24px desktop; layout.ts tracks the same breakpoints. */
   html {
     font-size: 24px;
-    background-color: #000;
+    background-color: var(--color-page-bg);
   }
 
   @media (max-width: 1280px) {
@@ -29,8 +29,9 @@
     min-width: 320px;
     overflow-x: hidden;
     word-wrap: break-word;
-    font-family: var(--font-gochi);
-    color: #fff;
+    font-family: var(--font-jost);
+    font-weight: 400;
+    color: var(--color-body-text);
     text-align: center;
   }
 
@@ -46,7 +47,7 @@
     z-index: 100;
     padding: 0.5rem 1rem;
     color: var(--color-bar-text);
-    font-family: var(--font-averia);
+    font-family: var(--font-jost);
     font-size: 0.875rem;
     text-decoration: none;
     transform: translateY(-120%);
@@ -57,13 +58,9 @@
     transform: translateY(0);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-caveat);
+  h1 {
+    font-family: var(--font-pacifico);
+    font-weight: 400;
   }
 
   /* Fixed page background (--page-bg-image set in Base.astro) */
@@ -76,8 +73,16 @@
     background-image:
       linear-gradient(var(--color-page-overlay), var(--color-page-overlay)),
       var(--page-bg-image);
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
+  }
+
+  @media (hover: none),
+  (pointer: coarse) {
+    body::before {
+      background-attachment: scroll;
+    }
   }
 }

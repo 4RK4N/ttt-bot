@@ -4,8 +4,26 @@ export const ROOT_FONT_PX = 24;
 /** Card images go full-width below this (matches narrow content layout). */
 export const NARROW_CONTENT_BP_PX = 720;
 
-/** Inner content width: max-w-[36rem] section minus px-6 (1.5rem × 2). */
-export const CONTENT_COLUMN_PX = 33 * ROOT_FONT_PX;
+/** Horizontal padding on .content-section (px-6 × 2). */
+export const CONTENT_SECTION_PADDING_REM = 3;
+
+/** Section max-widths — keep in sync with --content-max-* in theme.css. */
+export const CONTENT_MAX_REM = 56.25;
+export const CONTENT_MAX_TEXT_REM = 42.5;
+export const CONTENT_MAX_WIDE_REM = 47.5;
+export const CONTENT_MAX_GALLERY_REM = 56.25;
+
+const CONTENT_COLUMN_INNER_REM =
+  CONTENT_MAX_TEXT_REM - CONTENT_SECTION_PADDING_REM;
+
+/** Inner content width for full-width images in the default text column. */
+export const CONTENT_COLUMN_PX = Math.round(
+  CONTENT_COLUMN_INNER_REM * ROOT_FONT_PX,
+);
+
+function contentSectionSizes(maxRem: number): string {
+  return `calc(min(100vw, ${maxRem}rem) - ${CONTENT_SECTION_PADDING_REM}rem)`;
+}
 
 /** w-72 = 18rem — home hero circle */
 export const HERO_REM = 18;
@@ -24,11 +42,14 @@ export const HEADER_LOGO_WIDTH_PX = 127;
 export const HEADER_LOGO_HEIGHT_PX = 49;
 
 /** Header bar height — synced with --header-height in theme.css. */
-export const HEADER_HEIGHT_PX = 68;
+export const HEADER_HEIGHT_PX = 74;
 
-/** Header bar height and logo vertical padding (py-1.5) — logo scales with rem. */
+/** Target logo display height inside the header bar. */
+export const HEADER_LOGO_TARGET_PX = 54;
+
+/** Header bar height and logo vertical padding — logo scales with rem. */
 const HEADER_BAR_PX = HEADER_HEIGHT_PX;
-const HEADER_LOGO_PAD_REM = 0.375;
+const HEADER_LOGO_PAD_REM = (HEADER_HEIGHT_PX - HEADER_LOGO_TARGET_PX) / 2 / ROOT_FONT_PX;
 
 /** Display height of header logo at a given root font size. */
 export function headerLogoDisplayHeight(rootPx: number = ROOT_FONT_PX): number {
@@ -51,7 +72,12 @@ const BUILD_WIDTHS = {
   headerLogo: [130, 195, 260],
   hero: [432, 648, 864],
   partner: [288, 432, 576],
-  contentColumn: [400, 792, 1200, 1584],
+  contentColumn: [
+    400,
+    CONTENT_COLUMN_PX,
+    1200,
+    Math.round(CONTENT_COLUMN_PX * 1.67),
+  ],
   cardImage: [400, 576, 792, 1200],
   portraitGallery: [320, 640, 960],
   landscapeGallery: [400, 800, 1200],
@@ -96,21 +122,22 @@ export function remScaledWidths(rem: number): number[] {
 
 /** Portrait gallery sizes — calc() tracks rem scaling and column max-width. */
 export const PORTRAIT_GALLERY_SIZES =
-  "(max-width: 640px) calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2), " +
-  "(max-width: 1024px) calc((min(100vw, 36rem) - 3rem - 1.5rem) / 3), " +
-  "calc((min(100vw, 36rem) - 3rem - 3rem) / 5)";
+  `(max-width: 640px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - ${GRID_GAP_REM}rem) / 2), ` +
+  `(max-width: 1024px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 1.5rem) / 3), ` +
+  `calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 3rem) / 5)`;
 
 /** srcset widths for portrait gallery cells. */
 export function portraitGalleryWidths(): number[] {
   return buildWidths("portraitGallery");
 }
 
-/** Full content column — w-full images inside max-w-[36rem] px-6 sections. */
-export const CONTENT_COLUMN_SIZES = "calc(min(100vw, 36rem) - 3rem)";
+/** Full content column — w-full images inside default text sections. */
+export const CONTENT_COLUMN_SIZES = contentSectionSizes(CONTENT_MAX_TEXT_REM);
 
-/** Full content column for 56rem gallery pages. */
-export const GALLERY_CONTENT_COLUMN_SIZES =
-  "calc(min(100vw, 56rem) - 3rem)";
+/** Full content column for gallery pages. */
+export const GALLERY_CONTENT_COLUMN_SIZES = contentSectionSizes(
+  CONTENT_MAX_GALLERY_REM,
+);
 
 /** srcset widths for full-width content column images. */
 export function contentColumnWidths(): number[] {
@@ -119,19 +146,19 @@ export function contentColumnWidths(): number[] {
 
 /** Landscape gallery sizes — 1 col below sm, 2 cols at sm+. */
 export const LANDSCAPE_GALLERY_SIZES =
-  "(max-width: 640px) calc(min(100vw, 36rem) - 3rem), " +
-  "calc((min(100vw, 36rem) - 3rem - 0.75rem) / 2)";
+  `(max-width: 640px) ${contentSectionSizes(CONTENT_MAX_TEXT_REM)}, ` +
+  `calc((${contentSectionSizes(CONTENT_MAX_TEXT_REM)} - ${GRID_GAP_REM}rem) / 2)`;
 
-/** Landscape gallery sizes for 56rem gallery pages. */
+/** Landscape gallery sizes for gallery pages. */
 export const LANDSCAPE_GALLERY_SIZES_WIDE =
-  "(max-width: 640px) calc(min(100vw, 56rem) - 3rem), " +
-  "calc((min(100vw, 56rem) - 3rem - 0.75rem) / 2)";
+  `(max-width: 640px) ${contentSectionSizes(CONTENT_MAX_GALLERY_REM)}, ` +
+  `calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - ${GRID_GAP_REM}rem) / 2)`;
 
 /** Portrait gallery sizes wide variant. */
 export const PORTRAIT_GALLERY_SIZES_WIDE =
-  "(max-width: 640px) calc((min(100vw, 56rem) - 3rem - 0.75rem) / 2), " +
-  "(max-width: 1024px) calc((min(100vw, 56rem) - 3rem - 1.5rem) / 3), " +
-  "calc((min(100vw, 56rem) - 3rem - 3rem) / 5)";
+  `(max-width: 640px) calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - ${GRID_GAP_REM}rem) / 2), ` +
+  `(max-width: 1024px) calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - 1.5rem) / 3), ` +
+  `calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - 3rem) / 5)`;
 
 /** srcset widths for landscape gallery cells. */
 export function landscapeGalleryWidths(): number[] {

@@ -41,7 +41,7 @@ function pickNavItems(items: NavItem[], paths: readonly string[]): NavItem[] {
 const navPages: Record<Lang, NavItem[]> = {
   de: [
     { label: "Über Uns", path: "/de/uber-uns/" },
-    { label: "Hausregeln", path: "/de/regeln/" },
+    { label: "Regeln", path: "/de/regeln/" },
     { label: "Events", path: "/de/pics/events/" },
     { label: "Karte", path: "/de/karte/" },
     { label: "Staff", path: "/de/community/staff/" },

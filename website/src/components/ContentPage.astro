@@ -7,16 +7,16 @@ interface Props {
   lang: Lang;
   path: string;
   heading: string;
-  /** Rules pages use the wider column (45rem); default is 36rem. */
+  /** Rules pages use the wider column (760px); default is 680px text. */
   wide?: boolean;
-  /** Gallery/guestbook pages use the widest column (56rem). */
+  /** Gallery/guestbook pages use the widest column (900px). */
   gallery?: boolean;
   /** Long-form pages (about, rules) keep left-aligned body text. */
   centerBody?: boolean;
-  /** Preload Caveat (pages with h1 page-heading). Default true. */
-  preloadCaveat?: boolean;
-  /** Preload Gochi Hand (body copy). Default true. */
-  preloadGochi?: boolean;
+  /** Preload Pacifico (pages with h1 page-heading). Default true. */
+  preloadPacifico?: boolean;
+  /** Preload Patrick Hand (handwriting copy). Default true. */
+  preloadPatrick?: boolean;
 }
 
 const {
@@ -27,8 +27,8 @@ const {
   wide = false,
   gallery = false,
   centerBody = true,
-  preloadCaveat = true,
-  preloadGochi = true,
+  preloadPacifico = true,
+  preloadPatrick = true,
 } = Astro.props;
 ---
 
@@ -36,8 +36,8 @@ const {
   title={title}
   lang={lang}
   path={path}
-  preloadCaveat={preloadCaveat}
-  preloadGochi={preloadGochi}
+  preloadPacifico={preloadPacifico}
+  preloadPatrick={preloadPatrick}
 >
   <section
     class:list={[
@@ -47,9 +47,14 @@ const {
       centerBody && "content-section--center-body",
     ]}
   >
-    <h1 class="page-heading">
-      <span class="page-heading__text">{heading}</span>
-    </h1>
+    <div class="section-head">
+      <h1 class="page-heading">
+        <span class="page-heading__text">{heading}</span>
+      </h1>
+      <div class="page-ornament" aria-hidden="true">
+        <span class="page-ornament__diamond"></span>
+      </div>
+    </div>
     {
       Astro.slots.has("intro") && (
         <div class="page-intro">

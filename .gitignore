@@ -16,3 +16,5 @@ npm-debug.log*
 .cursor/
 .vscode/
 .ssh/
+
+_tmp/

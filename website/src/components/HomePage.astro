@@ -35,27 +35,29 @@ const lcpPreload = await buildResponsivePreload(
 ---
 
 <Base title={title} lang={lang} path={path} heroLcp lcpPreload={lcpPreload}>
-  <section class="content-section">
-    <div class="hero-circle-wrap">
-      <Image
-        src={homeCircle}
-        alt=""
-        width={HERO_CIRCLE_PX}
-        height={HERO_CIRCLE_PX}
-        widths={heroWidths}
-        sizes={heroSizes}
-        loading="eager"
-        fetchpriority="high"
-        class="hero-circle w-72 max-w-full"
-      />
+  <section class="content-section content-section--home">
+    <div class="section-head section-head--compact">
+      <div class="hero-circle-wrap">
+        <Image
+          src={homeCircle}
+          alt=""
+          width={HERO_CIRCLE_PX}
+          height={HERO_CIRCLE_PX}
+          widths={heroWidths}
+          sizes={heroSizes}
+          loading="eager"
+          fetchpriority="high"
+          class="hero-circle"
+        />
+      </div>
+      <h1 class="page-heading page-heading--home">
+        <span class="page-heading__text">Tiny Temptation Tubs</span>
+      </h1>
+      <p class="opening-label">{copy.openingHeading}</p>
+      <Timer lang={lang} timestamp={EVENT_TIMESTAMP} />
     </div>
-    <h1 class="page-heading">
-      <span class="page-heading__text">Tiny Temptation Tubs</span>
-    </h1>
-    <h2>{copy.openingHeading}</h2>
-    <Timer lang={lang} timestamp={EVENT_TIMESTAMP} />
-    <h3 class="location-heading">{SERVER_LINE[lang]}</h3>
-    <ContentPanel>
+    <p class="location-pill">{SERVER_LINE[lang]}</p>
+    <ContentPanel class="content-panel--welcome">
       <p class="hand-text hand-text--home">
         {
           copy.introLines.map((line, i) => (

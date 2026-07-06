@@ -1,0 +1,14 @@
+---
+interface Props {
+  number: number;
+}
+
+const { number } = Astro.props;
+---
+
+<div class="rule-card">
+  <span class="rule-card__number">{number}</span>
+  <div class="rule-card__body">
+    <slot />
+  </div>
+</div>

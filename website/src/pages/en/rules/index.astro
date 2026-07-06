@@ -1,6 +1,7 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
 import ContentPanel from "../../../components/ContentPanel.astro";
+import RuleCard from "../../../components/RuleCard.astro";
 ---
 
 <ContentPage
@@ -12,21 +13,27 @@ import ContentPanel from "../../../components/ContentPanel.astro";
   centerBody={false}
 >
   <ContentPanel>
-    <div class="hand-text flex flex-col gap-6">
+    <div class="hand-text flex flex-col gap-4">
       <h2>Venue &amp; Server Rules</h2>
       <p>
         To ensure a safe, relaxed, and enjoyable experience for everyone, the
         following house rules apply within our bathhouse.<br />
         By entering the venue, you agree to read, understand, and follow these rules.
       </p>
-      <h3>1. General Conduct</h3>
+    </div>
+  </ContentPanel>
+  <div class="rules-stack">
+    <RuleCard number={1}>
+      <h3>General Conduct</h3>
       <p>
         Treat all guests with respect.<br />
         No hate, harassment, bullying, discrimination, or drama. Hate speech results
         in an instant ban.<br />
         NO means NO - always and without exception.
       </p>
-      <h3>2. Chat &amp; Community Rules</h3>
+    </RuleCard>
+    <RuleCard number={2}>
+      <h3>Chat &amp; Community Rules</h3>
       <p>
         No spam, flooding, or ping abuse.<br />
         No mic spam or intentionally loud or disruptive noises.<br />
@@ -39,7 +46,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
           As adult Lalafell you have nothing to worry on Lightless!</strong
         >
       </p>
-      <h3>3. Age Requirement</h3>
+    </RuleCard>
+    <RuleCard number={3}>
+      <h3>Age Requirement</h3>
       <p>
         This is an 18+ venue!<br />
         Entry is only allowed if both real age and roleplay age are 18+.<br />
@@ -49,7 +58,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
           reported to Lightless!</strong
         >
       </p>
-      <h3>4. Races &amp; Roleplay</h3>
+    </RuleCard>
+    <RuleCard number={4}>
+      <h3>Races &amp; Roleplay</h3>
       <p>
         <strong>All</strong> races are welcome <strong>including</strong> Lalafell.
         The same rules apply to everyone.<br />
@@ -61,17 +72,23 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         – Do not involve others without their explicit consent.<br />
         – Do not take sexual roleplay to extreme levels in public areas.
       </p>
-      <h3>5. Emotes, Pets &amp; Items</h3>
+    </RuleCard>
+    <RuleCard number={5}>
+      <h3>Emotes, Pets &amp; Items</h3>
       <p>
         Please deactivate emote logs.<br />
         Only use weapons or pets if they fit your RP character.
       </p>
-      <h3>6. Rooms &amp; Usage</h3>
+    </RuleCard>
+    <RuleCard number={6}>
+      <h3>Rooms &amp; Usage</h3>
       <p>
         Rooms may be used freely.<br />
         If staff requires a room for massages or photos, please vacate it when asked.
       </p>
-      <h3>7. Enforcement</h3>
+    </RuleCard>
+    <RuleCard number={7}>
+      <h3>Enforcement</h3>
       <p>
         Staff reserves the right to take appropriate action in case of rule
         violations.<br />
@@ -79,7 +96,9 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         The staff team always has the final say.<br />
         Staff decisions must be respected and are not to be publicly argued or challenged.
       </p>
-      <h3>8. NSFW</h3>
+    </RuleCard>
+    <RuleCard number={8}>
+      <h3>NSFW</h3>
       <p>
         NSFW content is only permitted in designated NSFW areas. These areas are
         open to all races, including Lalafell. Access to NSFW areas and the
@@ -88,6 +107,6 @@ import ContentPanel from "../../../components/ContentPanel.astro";
         server so you can post freely and without fear<br />
         NSFW content outside these areas is not allowed.
       </p>
-    </div>
-  </ContentPanel>
+    </RuleCard>
+  </div>
 </ContentPage>

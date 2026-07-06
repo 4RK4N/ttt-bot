@@ -1,5 +1,6 @@
 ---
 import ContentPage from "../../../../components/ContentPage.astro";
+import ContentPanel from "../../../../components/ContentPanel.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import { resolveGalleryList } from "../../../../data/images";
 ---
@@ -10,29 +11,31 @@ import { resolveGalleryList } from "../../../../data/images";
   path="/de/community/staff/"
   heading="Staff"
 >
-  <div class="hand-text flex flex-col gap-6">
-    <p>
-      <em
-        ><strong
-          >Hinter jedem warmen Empfang stehen jene,<br /> die sich um das Haus kümmern.</strong
-        ></em
-      >
-    </p>
-    <p>
-      <strong
-        >Unsere Gastgeber, Helfer und Wächter<br /> sorgen dafür, dass jeder Moment
-        angenehm bleibt.</strong
-      >
-    </p>
-    <p>
-      <em
-        ><strong
-          >Sie halten das Gleichgewicht,<br /> damit sich jeder sicher und willkommen
-          fühlt.</strong
-        ></em
-      >
-    </p>
-  </div>
+  <ContentPanel>
+    <div class="hand-text flex flex-col gap-6">
+      <p>
+        <em
+          ><strong
+            >Hinter jedem warmen Empfang stehen jene,<br /> die sich um das Haus kümmern.</strong
+          ></em
+        >
+      </p>
+      <p>
+        <strong
+          >Unsere Gastgeber, Helfer und Wächter<br /> sorgen dafür, dass jeder Moment
+          angenehm bleibt.</strong
+        >
+      </p>
+      <p>
+        <em
+          ><strong
+            >Sie halten das Gleichgewicht,<br /> damit sich jeder sicher und willkommen
+            fühlt.</strong
+          ></em
+        >
+      </p>
+    </div>
+  </ContentPanel>
   <Gallery
     aspect="portrait"
     altPrefix="Staff portrait"
