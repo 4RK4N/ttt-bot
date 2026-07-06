@@ -32,7 +32,7 @@ export function EditorLayout({
             id="admin-drawer"
             type="checkbox"
             class="drawer-toggle"
-            tabindex="-1"
+            tabindex={-1}
             aria-label="Module menu"
           />
           <div class="drawer-content flex min-h-screen flex-col bg-base-100">
