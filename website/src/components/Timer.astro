@@ -1,5 +1,6 @@
 ---
 import type { Lang } from "../data/nav";
+import { splitRemainingMs } from "../data/countdown";
 
 interface Props {
   lang: Lang;
@@ -16,16 +17,9 @@ const labels =
 
 const openMessage = lang === "de" ? "Wir haben geöffnet!" : "We're open!";
 
-const units = [86_400_000, 3_600_000, 60_000, 1000];
 const targetMs = timestamp * 1000;
-const now = Date.now();
-let remaining = Math.max(0, targetMs - now);
-const initialDigits = units.map((unit) => {
-  const value = Math.floor(remaining / unit);
-  remaining -= value * unit;
-  return String(value).padStart(2, "0");
-});
-const isOpen = targetMs <= now;
+const initialDigits = splitRemainingMs(targetMs - Date.now());
+const isOpen = targetMs <= Date.now();
 ---
 
 <div
@@ -66,34 +60,50 @@ const isOpen = targetMs <= now;
 </div>
 
 <script>
-  const timer = document.getElementById("event-timer")!;
-  const target = Number(timer.dataset.timestamp) * 1000;
-  const openMessage = timer.dataset.openMessage ?? "We're open!";
-  const digits = timer.querySelectorAll("[data-digit]");
-  const units = [86_400_000, 3_600_000, 60_000, 1000];
+  import { splitRemainingMs } from "../data/countdown";
 
-  function showOpen() {
-    timer.innerHTML = `<p class="font-averia text-[1.5em] font-bold text-timer-digit">${openMessage}</p>`;
-  }
+  let interval: ReturnType<typeof setInterval> | undefined;
 
-  function tick() {
-    let remaining = Math.max(0, target - Date.now());
-    if (remaining === 0) {
-      showOpen();
-      return false;
+  function initTimer() {
+    if (interval) {
+      clearInterval(interval);
+      interval = undefined;
     }
-    units.forEach((unit, i) => {
-      const value = Math.floor(remaining / unit);
-      remaining -= value * unit;
-      digits[i].textContent = String(value).padStart(2, "0");
-    });
-    return true;
+
+    const timer = document.getElementById("event-timer");
+    if (!timer) return;
+
+    const target = Number(timer.dataset.timestamp) * 1000;
+    const openMessage = timer.dataset.openMessage ?? "We're open!";
+    const digits = timer.querySelectorAll("[data-digit]");
+
+    function showOpen() {
+      timer!.innerHTML = `<p class="font-averia text-[1.5em] font-bold text-timer-digit">${openMessage}</p>`;
+    }
+
+    function tick() {
+      const remaining = target - Date.now();
+      if (remaining <= 0) {
+        showOpen();
+        return false;
+      }
+      splitRemainingMs(remaining).forEach((digit, i) => {
+        digits[i].textContent = digit;
+      });
+      return true;
+    }
+
+    if (!digits.length) return;
+
+    tick();
+    interval = setInterval(() => {
+      if (!tick()) {
+        clearInterval(interval);
+        interval = undefined;
+      }
+    }, 1000);
   }
 
-  if (digits.length) {
-    const interval = setInterval(() => {
-      if (!tick()) clearInterval(interval);
-    }, 1000);
-    document.addEventListener("astro:page-load", () => clearInterval(interval));
-  }
+  initTimer();
+  document.addEventListener("astro:page-load", initTimer);
 </script>
