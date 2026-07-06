@@ -24,7 +24,6 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
     "@hono/node-server": "^2.0.8",
     "@napi-rs/canvas": "^1.0.2",
     "discord.js": "^14.26.4",

@@ -15,7 +15,7 @@ export const pageImages = {
   image09,
 } as const satisfies Record<string, ImageMetadata>;
 
-const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
+const galleryModules = import.meta.glob<ImageMetadata>(
   "../assets/images/gallery*/**/*.{jpg,jpeg,png}",
   { eager: true, import: "default" },
 );
