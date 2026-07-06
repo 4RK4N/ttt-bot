@@ -34,13 +34,5 @@ host — bind-mounted to `/app/data` inside the bot and web-editor containers
 
 The web editor validates `channel` / `role` fields as numeric Discord IDs on save.
 
-## Non-Docker / custom data path
-
-If you set `DATA_DIR` to relocate the data tree, copy this folder there instead:
-
-```
-$DATA_DIR/example-module/
-```
-
 Edits invalidate the bot's in-memory cache automatically (`invalidateModuleCache` in
 `web-admin/src/store.ts`) — no restart required.

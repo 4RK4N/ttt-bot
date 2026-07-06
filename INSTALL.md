@@ -90,9 +90,7 @@ commit. See the **Configuration reference** below for every field.
 
 ## Configuration reference
 
-The bot reads all configuration from JSON files under `data/`. There are no
-environment variables to set (only the optional `DATA_DIR`, which relocates the
-`data/` directory itself). Each file has a committed `*.example.json` template;
+The bot reads all configuration from JSON files under `data/`. Each file has a committed `*.example.json` template;
 copy it to `config.json` or `texts.json` and edit.
 
 ### `data/config.json` - core bot + web editor
@@ -126,7 +124,7 @@ copy it to `config.json` or `texts.json` and edit.
 | `webPort`          | No          | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too.                                                        |
 | `internalApiPort`  | No          | Port for the bot's internal publish API. Defaults to `8087`. Not exposed to the public internet — only reachable on the Docker internal network or `127.0.0.1` locally.                                                           |
 | `internalApiSecret`| **Editor + bot** | Shared secret for `X-Internal-Token` on internal API requests. Required when running the web editor (publish/unpublish panels). Generate like `sessionSecret`.                                                              |
-| `botInternalApiUrl`| **Editor**  | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` (also set via `BOT_INTERNAL_API_URL` env on the web container).                             |
+| `botInternalApiUrl`| **Editor**  | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` in `config.json`.                             |
 | `internalApiBind`  | No          | Address the bot internal API listens on. Defaults to `127.0.0.1`. Docker: set to `0.0.0.0` so the web-editor container can reach the bot on the internal network. |
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,

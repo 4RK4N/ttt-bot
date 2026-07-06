@@ -58,13 +58,8 @@ export async function warmGuildMemberCache(guild: Guild): Promise<void> {
 
   const promise = (async () => {
     try {
-      const count = await fetchAllGuildMembers(guild);
+      await fetchAllGuildMembers(guild);
       memberCacheWarmed.add(guild.id);
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          `[tickets] Member cache warmed for ${guild.name} (${count} members).`,
-        );
-      }
     } catch (err) {
       console.error(
         `[tickets] Failed to warm member cache for guild ${guild.id}:`,

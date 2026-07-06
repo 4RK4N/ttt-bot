@@ -5,10 +5,7 @@ import path from "node:path";
 // (not import.meta.url) so it is stable across `tsx` dev, compiled `dist/` prod,
 // and Docker, and lives outside the build output so edits survive rebuilds.
 // A future web editor writes the same files.
-export const DATA_DIR = path.resolve(
-  process.env.DATA_DIR ?? process.cwd(),
-  "data",
-);
+export const DATA_DIR = path.resolve(process.cwd(), "data");
 
 /** Resolves a path inside a module's data folder: data/<namespace>/<segments>. */
 export function moduleDataPath(

@@ -96,7 +96,5 @@ export const config: Config = {
   internalApiPort: optionalPort(raw.internalApiPort, 8087),
   internalApiSecret: trimmedOrUndefined(raw.internalApiSecret),
   internalApiBind: trimmedOrUndefined(raw.internalApiBind),
-  botInternalApiUrl:
-    trimmedOrUndefined(process.env.BOT_INTERNAL_API_URL) ??
-    trimmedOrUndefined(raw.botInternalApiUrl),
+  botInternalApiUrl: trimmedOrUndefined(raw.botInternalApiUrl),
 };
