@@ -2,7 +2,12 @@ import { randomBytes } from "node:crypto";
 import type { Context, MiddlewareHandler } from "hono";
 import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 import type { WebConfig } from "./config.js";
-import { DISCORD_API, discordBotFetch } from "../../shared/core/discordApi.js";
+import { DISCORD_API } from "./discord.js";
+import {
+  discordBotGetOptional,
+  fetchGuildOwnerId,
+  fetchGuildRolesRaw,
+} from "./discordCache.js";
 
 const AUTHORIZE_URL = "https://discord.com/oauth2/authorize";
 const OAUTH_SCOPES = "identify guilds";
@@ -145,33 +150,12 @@ async function isGuildAdmin(
   }
 }
 
-interface DiscordGuild {
-  owner_id?: string;
-}
-
 interface DiscordGuildMember {
   roles?: string[];
 }
 
-interface DiscordRole {
-  id: string;
-  permissions?: string | number;
-}
-
 // Per-user cache of recent positive bot-token admin re-checks only.
 const adminCache = new Map<string, { at: number }>();
-
-async function discordBotGet<T>(
-  cfg: WebConfig,
-  path: string,
-): Promise<T | null> {
-  const res = await discordBotFetch(cfg.botToken, path);
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    throw new Error(`Discord API returned HTTP ${res.status} for ${path}.`);
-  }
-  return (await res.json()) as T;
-}
 
 function hasAdminPermission(permissions: string | number | undefined): boolean {
   if (permissions === undefined || permissions === null) return false;
@@ -191,30 +175,24 @@ async function isGuildAdminViaBot(
   cfg: WebConfig,
   userId: string,
 ): Promise<boolean> {
-  const member = await discordBotGet<DiscordGuildMember>(
+  const member = await discordBotGetOptional<DiscordGuildMember>(
     cfg,
     `/guilds/${cfg.guildId}/members/${userId}`,
   );
   if (!member) return false;
 
-  const guild = await discordBotGet<DiscordGuild>(
-    cfg,
-    `/guilds/${cfg.guildId}`,
-  );
-  if (guild?.owner_id && guild.owner_id === userId) return true;
+  const ownerId = await fetchGuildOwnerId(cfg);
+  if (ownerId && ownerId === userId) return true;
 
-  const roles = await discordBotGet<DiscordRole[]>(
-    cfg,
-    `/guilds/${cfg.guildId}/roles`,
-  );
-  if (!Array.isArray(roles)) return false;
-
+  const roles = await fetchGuildRolesRaw(cfg);
   const memberRoleIds = new Set(member.roles ?? []);
   memberRoleIds.add(cfg.guildId);
 
   return roles.some(
     (role) =>
-      memberRoleIds.has(role.id) && hasAdminPermission(role.permissions),
+      typeof role.id === "string" &&
+      memberRoleIds.has(role.id) &&
+      hasAdminPermission(role.permissions),
   );
 }
 
