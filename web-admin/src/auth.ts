@@ -14,13 +14,13 @@ const SESSION_COOKIE = "ttt_session";
 const STATE_COOKIE = "ttt_oauth_state";
 const CSRF_COOKIE = "ttt_csrf";
 // Kept short on purpose: the session is only a convenience cache. Admin status is
-// re-validated against Discord (via the bot token) on each request, so a stale
-// session can't grant access for long even if this is lengthened.
+// re-validated against Discord (via the bot token) on each request.
 const SESSION_MAX_AGE = 60 * 60 * 4; // 4 hours
 const STATE_MAX_AGE = 60 * 10; // 10 minutes
 
-// How long a positive admin re-check is trusted before we ask Discord again.
-const ADMIN_CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+// Positive admin re-checks only — short TTL cuts burst Discord API calls (HTMX)
+// while demotions take effect within a few seconds. Never cache a negative result.
+const ADMIN_CACHE_TTL_MS = 3_000;
 
 export interface SessionUser {
   id: string;
@@ -158,7 +158,7 @@ interface DiscordRole {
   permissions?: string | number;
 }
 
-// Per-user cache of positive bot-token admin re-checks only.
+// Per-user cache of recent positive bot-token admin re-checks only.
 const adminCache = new Map<string, { at: number }>();
 
 async function discordBotGet<T>(
@@ -218,7 +218,10 @@ async function isGuildAdminViaBot(
   );
 }
 
-/** Cached positive admin checks only; demoted admins are re-checked every request. */
+/**
+ * Re-validates guild admin via the bot token. Positive results are cached briefly;
+ * demotions are detected on the next request after the TTL expires.
+ */
 async function isStillAdmin(cfg: WebConfig, userId: string): Promise<boolean> {
   const cached = adminCache.get(userId);
   if (cached && Date.now() - cached.at < ADMIN_CACHE_TTL_MS) {

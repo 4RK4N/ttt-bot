@@ -58,7 +58,7 @@ export function EditorLayout({
                 </span>
                 <form method="post" action="/logout">
                   <input type="hidden" name="_csrf" value={csrfToken} />
-                  <button type="submit" class="btn btn-ghost btn-sm">
+                  <button type="submit" class="btn btn-error btn-sm">
                     Log out
                   </button>
                 </form>
