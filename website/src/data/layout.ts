@@ -29,7 +29,7 @@ function contentSectionSizes(maxRem: number): string {
 export const HERO_REM = 18;
 export const HERO_CIRCLE_PX = HERO_REM * ROOT_FONT_PX;
 
-/** max-w-[32rem] — featured event poster */
+/** max-w-128 — featured event poster */
 export const FEATURED_EVENT_REM = 32;
 export const FEATURED_EVENT_IMAGE_PX = FEATURED_EVENT_REM * ROOT_FONT_PX;
 
