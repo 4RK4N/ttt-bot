@@ -1,6 +1,6 @@
 ---
 import type { ImageMetadata } from "astro";
-import { Image } from "astro:assets";
+import { getImage, Image } from "astro:assets";
 import {
   LANDSCAPE_CELL_PX,
   LANDSCAPE_GALLERY_SIZES,
@@ -64,6 +64,15 @@ const imageHeight =
   aspect === "portrait"
     ? Math.round((PORTRAIT_CELL_LG_PX * 3) / 2)
     : Math.round((LANDSCAPE_CELL_PX * 9) / 16);
+
+const fullSrcs = lightbox
+  ? await Promise.all(
+      images.map(
+        async (src) =>
+          (await getImage({ src, width: src.width, format: "webp" })).src,
+      ),
+    )
+  : [];
 ---
 
 <div
@@ -91,6 +100,7 @@ const imageHeight =
           type="button"
           class="image-frame lightbox-trigger cursor-pointer p-0"
           data-lightbox-index={index}
+          data-full-src={fullSrcs[index]}
           aria-label={alt}
         >
           {imageEl}

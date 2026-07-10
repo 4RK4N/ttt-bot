@@ -1,6 +1,6 @@
 ---
 import type { ImageMetadata } from "astro";
-import { Image } from "astro:assets";
+import { getImage, Image } from "astro:assets";
 
 interface Props {
   src: ImageMetadata;
@@ -25,6 +25,11 @@ const {
   alt = "",
   lightbox = false,
 } = Astro.props;
+
+const fullSrc =
+  lightbox && alt
+    ? (await getImage({ src, width: src.width, format: "webp" })).src
+    : undefined;
 ---
 
 {
@@ -36,6 +41,7 @@ const {
         className,
       ]}
       aria-label={alt}
+      data-full-src={fullSrc}
     >
       <Image
         src={src}

@@ -34,7 +34,15 @@
       <path d="M15 6l-6 6 6 6"></path>
     </svg>
   </button>
-  <img id="lightbox-image" class="lightbox__image" alt="" />
+  <div id="lightbox-stage" class="lightbox__stage">
+    <img
+      id="lightbox-image"
+      class="lightbox__image"
+      alt=""
+      title="Zoom in"
+      aria-label="Zoom in"
+    />
+  </div>
   <button
     type="button"
     id="lightbox-next"
@@ -59,11 +67,14 @@
   let current = 0;
   let lastFocus: HTMLButtonElement | null = null;
   let overlayAbort: AbortController | null = null;
+  let zoomed = false;
+  let fitSrc = "";
   const documentScope = new AbortController();
 
   function getElements() {
     return {
       overlay: document.getElementById("lightbox") as HTMLDivElement | null,
+      stage: document.getElementById("lightbox-stage") as HTMLDivElement | null,
       img: document.getElementById("lightbox-image") as HTMLImageElement | null,
       counter: document.getElementById(
         "lightbox-counter",
@@ -99,14 +110,41 @@
     return largest || "";
   }
 
+  function setZoomUi(isZoomed: boolean) {
+    const { overlay, img } = getElements();
+    if (!overlay || !img) return;
+
+    zoomed = isZoomed;
+    img.classList.toggle("is-zoomed", isZoomed);
+    overlay.classList.toggle("is-zoomed", isZoomed);
+
+    const label = isZoomed ? "Zoom out" : "Zoom in";
+    img.title = label;
+    img.setAttribute("aria-label", label);
+  }
+
+  function resetZoom() {
+    const { stage, img } = getElements();
+    if (!img) return;
+
+    if (zoomed && fitSrc) {
+      img.src = fitSrc;
+    }
+
+    setZoomUi(false);
+    stage?.scrollTo(0, 0);
+  }
+
   function hide() {
     const { overlay, img } = getElements();
     if (!overlay || !img) return;
 
+    resetZoom();
     overlay.classList.add("hidden");
     overlay.hidden = true;
     document.body.classList.remove("overflow-hidden");
     img.src = "";
+    fitSrc = "";
     lastFocus?.focus();
   }
 
@@ -116,6 +154,8 @@
     const { overlay, img, counter, closeBtn } = getElements();
     if (!overlay || !img || !counter || !closeBtn) return;
 
+    resetZoom();
+
     current = (index + triggers.length) % triggers.length;
     const trigger = triggers[current];
     const source = trigger.querySelector<HTMLImageElement>("img");
@@ -124,6 +164,7 @@
     const src = imageSrc(source);
     if (!src) return;
 
+    fitSrc = src;
     img.src = src;
     img.alt = source.alt;
     counter.textContent = `${current + 1} / ${triggers.length}`;
@@ -131,6 +172,31 @@
     overlay.hidden = false;
     document.body.classList.add("overflow-hidden");
     closeBtn.focus();
+  }
+
+  function onImageClick(e: Event) {
+    e.stopPropagation();
+
+    const { stage, img } = getElements();
+    if (!img) return;
+
+    const trigger = triggers[current];
+    const fullSrc = trigger?.dataset.fullSrc;
+
+    if (!zoomed) {
+      if (fullSrc && img.src !== fullSrc) {
+        img.src = fullSrc;
+      }
+      setZoomUi(true);
+      stage?.scrollTo(0, 0);
+      return;
+    }
+
+    if (fitSrc) {
+      img.src = fitSrc;
+    }
+    setZoomUi(false);
+    stage?.scrollTo(0, 0);
   }
 
   function onTriggerClick(e: Event) {
@@ -145,15 +211,22 @@
     const { overlay, img } = getElements();
     if (!overlay) return;
 
+    zoomed = false;
+    fitSrc = "";
+    overlay.classList.remove("is-zoomed");
     overlay.classList.add("hidden");
     overlay.hidden = true;
-    if (img) img.src = "";
+    if (img) {
+      img.classList.remove("is-zoomed");
+      img.src = "";
+    }
   }
 
   function setupLightbox() {
     const els = getElements();
     if (
       !els.overlay ||
+      !els.stage ||
       !els.img ||
       !els.counter ||
       !els.closeBtn ||
@@ -178,6 +251,7 @@
     on(els.closeBtn, "click", hide, signal);
     on(els.prevBtn, "click", () => show(current - 1), signal);
     on(els.nextBtn, "click", () => show(current + 1), signal);
+    on(els.img, "click", onImageClick, signal);
 
     on(
       els.overlay,
