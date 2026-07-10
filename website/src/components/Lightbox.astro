@@ -261,6 +261,15 @@
       },
       signal,
     );
+
+    on(
+      els.stage,
+      "click",
+      (e) => {
+        if (e.target === els.stage) hide();
+      },
+      signal,
+    );
   }
 
   on(

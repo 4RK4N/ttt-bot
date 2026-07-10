@@ -637,6 +637,7 @@
   .lightbox__stage {
     position: absolute;
     inset: 0;
+    z-index: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -670,6 +671,7 @@
 
   .lightbox__counter {
     position: absolute;
+    z-index: 1;
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
@@ -680,7 +682,7 @@
   }
 
   .lightbox__btn {
-    @apply absolute top-1/2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
+    @apply absolute top-1/2 z-[1] flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
     border-color: var(--color-bar-border-strong);
     background: var(--color-bar-bg);
   }
@@ -699,7 +701,7 @@
   }
 
   .lightbox__close {
-    @apply absolute right-4 top-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
+    @apply absolute right-4 top-4 z-[1] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
     border-color: var(--color-bar-border-strong);
     background: var(--color-bar-bg);
   }
