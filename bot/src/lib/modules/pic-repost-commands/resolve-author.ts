@@ -27,7 +27,5 @@ export function resolvePicRepostAuthor(
   const mentionIds = resolveMentionedUserIds(message);
   if (mentionIds.length === 0) return undefined;
 
-  return useLastMention
-    ? mentionIds.at(-1)
-    : mentionIds.at(0);
+  return useLastMention ? mentionIds.at(-1) : mentionIds.at(0);
 }

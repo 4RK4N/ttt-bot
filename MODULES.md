@@ -32,10 +32,13 @@ The author can delete their repost by reacting with the configured delete emoji 
 
 ### links-pics-vids-autothread
 
-Auto-creates comments threads on qualifying posts in watched channels (X/Bluesky/Aethy links or media).
+Auto-creates comments threads on qualifying posts in watched channels: X,
+Bluesky, Aethy, or Instagram post links; direct Discord image/video links; or
+native image/video attachments.
 
 - **Config:** `channelIds[]`
 - **Intent:** Message Content
+- **Permissions:** Create Public Threads, Send Messages in Threads
 - **Thread naming:** same pattern as `/pic` (`buildThreadName` in core)
 
 ### tickets
@@ -95,17 +98,17 @@ Channel and role fields in the web editor are validated as Discord IDs (numeric 
 
 Every production module follows the same shape:
 
-| Location                  | File              | Role                                                                |
-| ------------------------- | ----------------- | ------------------------------------------------------------------- |
-| `shared/modules/<name>/`  | `types.ts`        | Panel modules only — shared contract with web validators            |
-| `shared/modules/<name>/`  | `validate.ts`     | Row validation for object-lists (panel modules)                     |
-| `shared/modules/<name>/`  | `web-plugin.json` | Web editor fields (optional)                                        |
-| `bot/src/lib/modules/<name>/` | `types.ts`    | Non-panel modules — defaults, `config()`, `texts()`                 |
-| `bot/src/lib/modules/<name>/` | `config-io.ts` | IO boundary — **handlers import from here**                         |
-| `bot/src/lib/modules/<name>/` | `panel.ts`     | Publish payload + custom IDs (panel modules)                        |
-| `bot/src/lib/modules/<name>/` | `publisher.ts` | Publish/unpublish (panel modules)                                   |
-| `bot/src/modules/<name>/` | `index.ts`        | `CommandModule` export only                                         |
-| `bot/src/modules/<name>/` | `handlers.ts`     | Event/command handlers (recommended)                                |
+| Location                      | File              | Role                                                     |
+| ----------------------------- | ----------------- | -------------------------------------------------------- |
+| `shared/modules/<name>/`      | `types.ts`        | Panel modules only — shared contract with web validators |
+| `shared/modules/<name>/`      | `validate.ts`     | Row validation for object-lists (panel modules)          |
+| `shared/modules/<name>/`      | `web-plugin.json` | Web editor fields (optional)                             |
+| `bot/src/lib/modules/<name>/` | `types.ts`        | Non-panel modules — defaults, `config()`, `texts()`      |
+| `bot/src/lib/modules/<name>/` | `config-io.ts`    | IO boundary — **handlers import from here**              |
+| `bot/src/lib/modules/<name>/` | `panel.ts`        | Publish payload + custom IDs (panel modules)             |
+| `bot/src/lib/modules/<name>/` | `publisher.ts`    | Publish/unpublish (panel modules)                        |
+| `bot/src/modules/<name>/`     | `index.ts`        | `CommandModule` export only                              |
+| `bot/src/modules/<name>/`     | `handlers.ts`     | Event/command handlers (recommended)                     |
 
 **Simple modules:** `config-io.ts` re-exports reads from `bot/src/lib/modules/<name>/types.ts`.
 **Panel modules:** shared `types.ts` + `validate.ts`; bot lib holds `config-io`, `panel`, `publisher`.
@@ -130,8 +133,8 @@ See the [module template README](bot/src/examples/module-template/README.md) for
 | Module                     | Privileged intent       | Other requirements                     |
 | -------------------------- | ----------------------- | -------------------------------------- |
 | welcome-message            | Server Members          | —                                      |
-| pic-repost-commands        | —                       | Manage Messages, Create/Manage Threads   |
-| links-pics-vids-autothread | Message Content         | —                                      |
+| pic-repost-commands        | —                       | Manage Messages, Create/Manage Threads |
+| links-pics-vids-autothread | Message Content         | Create Public Threads, Send in Threads |
 | tickets                    | Server Members          | Manage Threads, Manage Roles           |
 | reaction-roles             | — (reactions: standard) | Manage Roles                           |
 | moderation-log             | Server Members          | View Audit Log (moderator on kick/ban) |

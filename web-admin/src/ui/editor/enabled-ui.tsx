@@ -34,7 +34,9 @@ export function EnabledToggle({
   return (
     <div id={toggleId}>
       <label class="flex cursor-pointer items-center justify-end gap-3">
-        <span class="text-sm text-base-content/80 toggle-label">{on ? "On" : "Off"}</span>
+        <span class="text-sm text-base-content/80 toggle-label">
+          {on ? "On" : "Off"}
+        </span>
         <input
           class="toggle toggle-success"
           type="checkbox"

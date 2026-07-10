@@ -27,8 +27,7 @@ export interface ExamplePanelTexts {
 }
 
 export interface ResolvedExamplePanel
-  extends ExamplePanelConfig,
-  ExamplePanelTexts { }
+  extends ExamplePanelConfig, ExamplePanelTexts {}
 
 export interface ExamplePanelModuleConfig {
   enabled?: boolean;

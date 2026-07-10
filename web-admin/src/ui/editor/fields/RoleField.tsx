@@ -45,7 +45,12 @@ export function RoleField({ f, value, name, ctx, disabled }: SubFieldProps) {
 
   return (
     <FieldWrap id={id} label={f.label} help={f.help} disabled={disabled}>
-      <select class="select select-bordered w-full" id={id} name={name} disabled={disabled}>
+      <select
+        class="select select-bordered w-full"
+        id={id}
+        name={name}
+        disabled={disabled}
+      >
         {roleOptions(ctx.roles, strVal)}
       </select>
     </FieldWrap>

@@ -3,7 +3,7 @@ import ContentPage from "../../../../components/ContentPage.astro";
 import ContentPanel from "../../../../components/ContentPanel.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import DiscordButton from "../../../../components/DiscordButton.astro";
-import { resolveGalleryList } from "../../../../data/images";
+import { resolveImages } from "../../../../data/images";
 import { DISCORD_TTT } from "../../../../data/site";
 ---
 
@@ -38,9 +38,9 @@ import { DISCORD_TTT } from "../../../../data/site";
     cols={2}
     altPrefix="Community photo"
     class="mx-auto max-w-[24rem]"
-    images={resolveGalleryList([
-      "gallery12/c4a04ae5.jpg",
-      "gallery12/3cb16362.jpg",
+    images={resolveImages([
+      "community/c4a04ae5.jpg",
+      "community/3cb16362.jpg",
     ])}
   />
   <DiscordButton href={DISCORD_TTT} />

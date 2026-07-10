@@ -53,7 +53,7 @@ export interface RolePanelTexts {
   ephemeralMessage: string;
 }
 
-export interface ResolvedRolePanel extends RolePanelConfig, RolePanelTexts { }
+export interface ResolvedRolePanel extends RolePanelConfig, RolePanelTexts {}
 
 export interface ReactionRolesConfig {
   enabled?: boolean;
@@ -105,7 +105,9 @@ export function resolvePanel(id: string): ResolvedRolePanel | undefined {
     (row: RolePanelConfig, copy: RolePanelTexts) => ({
       ...row,
       ...copy,
-      reactionType: isReactionType(row.reactionType) ? row.reactionType : "button",
+      reactionType: isReactionType(row.reactionType)
+        ? row.reactionType
+        : "button",
       toggleable: row.toggleable !== false,
       roleOptions: normalizeRoleOptions(row.roleOptions),
     }),

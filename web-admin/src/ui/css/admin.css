@@ -79,7 +79,11 @@
 }
 
 .is-toggle:hover {
-  background-color: color-mix(in oklch, var(--color-base-content) 8%, transparent);
+  background-color: color-mix(
+    in oklch,
+    var(--color-base-content) 8%,
+    transparent
+  );
 }
 
 .field.disabled {

@@ -1,4 +1,10 @@
-import type { Client, Guild, Message, PartialMessage, ThreadChannel } from "discord.js";
+import type {
+  Client,
+  Guild,
+  Message,
+  PartialMessage,
+  ThreadChannel,
+} from "discord.js";
 import { getMemberDisplayName } from "./memberDisplayNames.js";
 
 const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.

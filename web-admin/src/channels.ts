@@ -1,8 +1,5 @@
 import type { WebConfig } from "./config.js";
-import {
-  fetchGuildChannelsRaw,
-  type RawGuildChannel,
-} from "./discordCache.js";
+import { fetchGuildChannelsRaw, type RawGuildChannel } from "./discordCache.js";
 
 // Channel types we offer in the channel pickers: where text can be posted.
 // 0 = GuildText, 5 = GuildAnnouncement, 15 = GuildForum.
@@ -28,7 +25,7 @@ export async function listGuildChannels(
       (
         c,
       ): c is Required<Pick<RawGuildChannel, "id" | "name" | "type">> &
-      RawGuildChannel =>
+        RawGuildChannel =>
         typeof c.id === "string" &&
         typeof c.name === "string" &&
         typeof c.type === "number" &&

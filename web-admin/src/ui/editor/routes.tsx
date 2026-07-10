@@ -12,7 +12,11 @@ import {
   writeEnabled,
   writeValues,
 } from "../../store.js";
-import { publishPanel, resolveBotActionError, unpublishPanel } from "../../botClient.js";
+import {
+  publishPanel,
+  resolveBotActionError,
+  unpublishPanel,
+} from "../../botClient.js";
 import { buildEditorModule, loadEditorContext, parseExpanded } from "./data.js";
 import { formBodyToValues } from "./form-parse.js";
 import {

@@ -1,5 +1,9 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import { config } from "../../../shared/config.js";
 import { getPublishHandlers } from "./publishRegistry.js";
 
@@ -65,9 +69,7 @@ async function handleRequest(
     return;
   }
 
-  const publishMatch = path.match(
-    /^\/internal\/publish\/([^/]+)\/([^/]+)$/,
-  );
+  const publishMatch = path.match(/^\/internal\/publish\/([^/]+)\/([^/]+)$/);
   const unpublishMatch = path.match(
     /^\/internal\/unpublish\/([^/]+)\/([^/]+)$/,
   );
@@ -94,14 +96,10 @@ async function handleRequest(
   try {
     if (publishMatch) {
       await handlers.publish({ botToken: config.discordToken }, itemId);
-      console.log(
-        `[internal-api] published ${namespace} panel "${itemId}".`,
-      );
+      console.log(`[internal-api] published ${namespace} panel "${itemId}".`);
     } else {
       await handlers.unpublish(itemId);
-      console.log(
-        `[internal-api] unpublished ${namespace} panel "${itemId}".`,
-      );
+      console.log(`[internal-api] unpublished ${namespace} panel "${itemId}".`);
     }
     sendJson(res, 200, { ok: true });
   } catch (err) {

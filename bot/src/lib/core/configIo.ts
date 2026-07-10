@@ -1,5 +1,8 @@
 import { readFileSync } from "node:fs";
-import { invalidateModuleCache, moduleDataPath } from "../../../../shared/core/texts.js";
+import {
+  invalidateModuleCache,
+  moduleDataPath,
+} from "../../../../shared/core/texts.js";
 import { writeJsonAtomic } from "../../../../shared/core/jsonWrite.js";
 
 export interface ConfigIo<T extends { id: string }> {

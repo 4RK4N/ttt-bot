@@ -7,7 +7,7 @@ import {
   CONTENT_COLUMN_PX,
   contentColumnWidths,
 } from "../../../../data/layout";
-import { pageImages, resolveGalleryList } from "../../../../data/images";
+import { pageImages, resolveImages } from "../../../../data/images";
 ---
 
 <ContentPage
@@ -42,33 +42,49 @@ import { pageImages, resolveGalleryList } from "../../../../data/images";
   <Gallery
     wide
     altPrefix="Bathhouse screenshot"
-    images={resolveGalleryList([
-      "gallery07/9c352b69.jpg",
-      "gallery07/fcd8f85d.jpg",
-      "gallery07/81a2a56a.jpg",
+    images={resolveImages([
+      "gallery/venue/9c352b69.jpg",
+      "gallery/venue/fcd8f85d.jpg",
+      "gallery/venue/81a2a56a.jpg",
     ])}
   />
   <Gallery
     wide
     altPrefix="Bathhouse screenshot"
-    images={resolveGalleryList([
-      "gallery09/c2cde289.jpg",
-      "gallery09/09600657.jpg",
-      "gallery09/009cce14.jpg",
-      "gallery09/736c6a9a.jpg",
-      "gallery09/7b549343.jpg",
+    images={resolveImages([
+      "gallery/venue/c2cde289.jpg",
+      "gallery/venue/09600657.jpg",
+      "gallery/venue/009cce14.jpg",
+      "gallery/venue/736c6a9a.jpg",
+      "gallery/venue/7b549343.jpg",
     ])}
   />
   <Gallery
     wide
     altPrefix="Bathhouse screenshot"
-    images={resolveGalleryList([
-      "gallery10/d7414f9a.jpg",
-      "gallery10/cac149e2.jpg",
-      "gallery10/ac774d7a.jpg",
-      "gallery10/068c47f1.jpg",
-      "gallery10/eb706e6d.jpg",
-      "gallery10/dfbe594f.jpg",
+    images={resolveImages([
+      "gallery/venue/d7414f9a.jpg",
+      "gallery/venue/cac149e2.jpg",
+      "gallery/venue/ac774d7a.jpg",
+      "gallery/venue/068c47f1.jpg",
+      "gallery/venue/eb706e6d.jpg",
+      "gallery/venue/dfbe594f.jpg",
+    ])}
+  />
+  <div class="section-divider" aria-hidden="true"></div>
+  <h2>Room 1</h2>
+  <Gallery
+    wide
+    altPrefix="Room 1 screenshot"
+    images={resolveImages([
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-52-01.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-53-43.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-54-26.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-54-42.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-55-13.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-55-31.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-55-50.png",
+      "gallery/room01/ffxiv_dx11_2026-07-07_11-56-05.png",
     ])}
   />
   <div class="section-divider" aria-hidden="true"></div>
@@ -76,15 +92,15 @@ import { pageImages, resolveGalleryList } from "../../../../data/images";
   <Gallery
     wide
     altPrefix="Room 2 screenshot"
-    images={resolveGalleryList([
-      "gallery21/716cf24b.jpg",
-      "gallery21/ab4e17c6.jpg",
-      "gallery21/dddae266.jpg",
-      "gallery21/f3f31675.jpg",
-      "gallery21/88a002bb.jpg",
-      "gallery21/3ec6e4af.jpg",
-      "gallery21/03ac8647.jpg",
-      "gallery21/e83b206b.jpg",
+    images={resolveImages([
+      "gallery/room02/716cf24b.jpg",
+      "gallery/room02/ab4e17c6.jpg",
+      "gallery/room02/dddae266.jpg",
+      "gallery/room02/f3f31675.jpg",
+      "gallery/room02/88a002bb.jpg",
+      "gallery/room02/3ec6e4af.jpg",
+      "gallery/room02/03ac8647.jpg",
+      "gallery/room02/e83b206b.jpg",
     ])}
   />
 </ContentPage>

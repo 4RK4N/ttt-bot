@@ -18,10 +18,7 @@ export function moduleDataPath(
   }
   const dataRoot = path.resolve(DATA_DIR);
   const resolved = path.resolve(dataRoot, namespace, ...segments);
-  if (
-    resolved !== dataRoot &&
-    !resolved.startsWith(`${dataRoot}${path.sep}`)
-  ) {
+  if (resolved !== dataRoot && !resolved.startsWith(`${dataRoot}${path.sep}`)) {
     throw new Error("Path escapes data directory.");
   }
   return resolved;

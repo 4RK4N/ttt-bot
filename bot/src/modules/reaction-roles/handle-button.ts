@@ -1,9 +1,6 @@
 import { type ButtonInteraction } from "discord.js";
 import { replyEphemeral } from "../../lib/core/discordInteractions.js";
-import {
-  tryAssignRole,
-  tryRemoveRole,
-} from "../../lib/core/discordRoles.js";
+import { tryAssignRole, tryRemoveRole } from "../../lib/core/discordRoles.js";
 import { isOnCooldown, touchCooldown } from "./cooldown.js";
 import { guardPublishedPanel } from "./guards.js";
 import { formatEphemeralMessage, replyRoleResult } from "./respond.js";

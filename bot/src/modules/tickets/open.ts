@@ -25,10 +25,7 @@ import {
 import { memberHasAnyRole } from "../../lib/core/discordInteractions.js";
 import { buildEmbed } from "../../lib/core/embedBuilder.js";
 import { addMembersToThread, collectStaffUserIds } from "./thread-members.js";
-import {
-  lookupOpenTicketThreadId,
-  registerOpenTicket,
-} from "./open-index.js";
+import { lookupOpenTicketThreadId, registerOpenTicket } from "./open-index.js";
 import {
   resolveTicketType,
   texts,

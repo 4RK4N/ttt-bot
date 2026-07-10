@@ -1,5 +1,4 @@
 @layer base {
-
   /* Responsive root scale — 24px desktop; layout.ts tracks the same breakpoints. */
   html {
     font-size: 24px;
@@ -79,8 +78,7 @@
     background-attachment: fixed;
   }
 
-  @media (hover: none),
-  (pointer: coarse) {
+  @media (hover: none), (pointer: coarse) {
     body::before {
       background-attachment: scroll;
     }

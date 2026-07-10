@@ -9,10 +9,7 @@ import { ensureFullReaction } from "../../lib/core/reactionContext.js";
 import { isModuleEnabled } from "../../../../shared/core/texts.js";
 import { isOnCooldown, touchCooldown } from "./cooldown.js";
 import { matchOptionByReaction } from "../../lib/modules/reaction-roles/panel.js";
-import {
-  tryAssignRole,
-  tryRemoveRole,
-} from "../../lib/core/discordRoles.js";
+import { tryAssignRole, tryRemoveRole } from "../../lib/core/discordRoles.js";
 import {
   findPanelByMessageId,
   NAMESPACE,

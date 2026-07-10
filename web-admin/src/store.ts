@@ -43,9 +43,7 @@ function validateSlugId(id: string, label: string): void {
   try {
     assertSlugId(id, label);
   } catch (err) {
-    throw new ValidationError(
-      err instanceof Error ? err.message : String(err),
-    );
+    throw new ValidationError(err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -53,9 +51,7 @@ function validateSnowflake(value: string, label: string): void {
   try {
     assertSnowflake(value, label);
   } catch (err) {
-    throw new ValidationError(
-      err instanceof Error ? err.message : String(err),
-    );
+    throw new ValidationError(err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -63,9 +59,7 @@ function validateSnowflakesInArray(values: string[], label: string): void {
   try {
     assertSnowflakesInArray(values, label);
   } catch (err) {
-    throw new ValidationError(
-      err instanceof Error ? err.message : String(err),
-    );
+    throw new ValidationError(err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -326,7 +320,7 @@ export async function writeEnabled(
 
 export function readValues(plugin: WebPlugin): Record<string, FieldValue> {
   const parsedByStore: Partial<Record<WebFieldStore, Record<string, unknown>>> =
-  {};
+    {};
   function parsed(store: WebFieldStore): Record<string, unknown> {
     return (parsedByStore[store] ??= readDataJson(plugin.namespace, store));
   }
@@ -354,7 +348,7 @@ export function readValues(plugin: WebPlugin): Record<string, FieldValue> {
   return values;
 }
 
-export class ValidationError extends Error { }
+export class ValidationError extends Error {}
 
 export async function writeValues(
   plugin: WebPlugin,
@@ -423,7 +417,7 @@ export async function writeValues(
             typeof row.panelTitle === "string" && row.panelTitle.trim() !== ""
               ? row.panelTitle
               : typeof row.openButtonLabel === "string" &&
-                row.openButtonLabel.trim() !== ""
+                  row.openButtonLabel.trim() !== ""
                 ? row.openButtonLabel
                 : (field.itemLabel ?? "item");
           id = uniqueId(slugify(label), usedIds);

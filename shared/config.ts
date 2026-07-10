@@ -25,8 +25,8 @@ function loadRaw(): RawConfig {
   } catch (err) {
     throw new Error(
       `Could not read configuration from "${CONFIG_FILE}". ` +
-      'Copy "data/config.example.json" to "data/config.json" and fill in the values. ' +
-      `(${(err as Error).message})`,
+        'Copy "data/config.example.json" to "data/config.json" and fill in the values. ' +
+        `(${(err as Error).message})`,
     );
   }
 }
@@ -44,7 +44,7 @@ function required(key: keyof RawConfig): string {
   if (!value) {
     throw new Error(
       `Missing required config value "${key}" in "${CONFIG_FILE}". ` +
-      'See "data/config.example.json" for the expected shape.',
+        'See "data/config.example.json" for the expected shape.',
     );
   }
   return value;

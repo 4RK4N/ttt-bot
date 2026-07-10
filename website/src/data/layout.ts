@@ -29,9 +29,9 @@ function contentSectionSizes(maxRem: number): string {
 export const HERO_REM = 18;
 export const HERO_CIRCLE_PX = HERO_REM * ROOT_FONT_PX;
 
-/** max-w-[24rem] — events archive image */
-export const CARD_REM = 24;
-export const CARD_IMAGE_PX = CARD_REM * ROOT_FONT_PX;
+/** max-w-[32rem] — featured event poster */
+export const FEATURED_EVENT_REM = 32;
+export const FEATURED_EVENT_IMAGE_PX = FEATURED_EVENT_REM * ROOT_FONT_PX;
 
 /** w-48 = 12rem — partner logo */
 export const PARTNER_REM = 12;
@@ -49,7 +49,8 @@ export const HEADER_LOGO_TARGET_PX = 54;
 
 /** Header bar height and logo vertical padding — logo scales with rem. */
 const HEADER_BAR_PX = HEADER_HEIGHT_PX;
-const HEADER_LOGO_PAD_REM = (HEADER_HEIGHT_PX - HEADER_LOGO_TARGET_PX) / 2 / ROOT_FONT_PX;
+const HEADER_LOGO_PAD_REM =
+  (HEADER_HEIGHT_PX - HEADER_LOGO_TARGET_PX) / 2 / ROOT_FONT_PX;
 
 /** Display height of header logo at a given root font size. */
 export function headerLogoDisplayHeight(rootPx: number = ROOT_FONT_PX): number {
@@ -71,6 +72,7 @@ export function headerLogoSizes(): string {
 const BUILD_WIDTHS = {
   headerLogo: [130, 195, 260],
   hero: [432, 648, 864],
+  featuredEvent: [400, 576, 768, 1024, 1200],
   partner: [288, 432, 576],
   contentColumn: [
     400,
@@ -78,7 +80,6 @@ const BUILD_WIDTHS = {
     1200,
     Math.round(CONTENT_COLUMN_PX * 1.67),
   ],
-  cardImage: [400, 576, 792, 1200],
   portraitGallery: [320, 640, 960],
   landscapeGallery: [400, 800, 1200],
 } as const;
@@ -108,6 +109,7 @@ export function remScaledSizes(rem: number): string {
 
 const REM_WIDTH_PROFILES: Partial<Record<number, BuildWidthProfile>> = {
   [HERO_REM]: "hero",
+  [FEATURED_EVENT_REM]: "featuredEvent",
   [PARTNER_REM]: "partner",
 };
 
@@ -165,14 +167,9 @@ export function landscapeGalleryWidths(): number[] {
   return buildWidths("landscapeGallery");
 }
 
-/** Events card: full column below NARROW_CONTENT_BP, max-w-[24rem] above. */
-export function cardImageSizes(): string {
-  return `(max-width: ${NARROW_CONTENT_BP_PX}px) calc(100vw - 3rem), (max-width: 480px) ${remPx(CARD_REM, 18)}px, (max-width: 736px) ${remPx(CARD_REM, 20)}px, (max-width: 1280px) ${remPx(CARD_REM, 22)}px, ${remPx(CARD_REM, 24)}px`;
-}
-
-/** srcset widths for events card image. */
-export function cardImageWidths(): number[] {
-  return buildWidths("cardImage");
+/** Featured event poster: full column on narrow screens, max 32rem above. */
+export function featuredEventImageSizes(): string {
+  return `(max-width: ${NARROW_CONTENT_BP_PX}px) calc(100vw - 3rem), ${remScaledSizes(FEATURED_EVENT_REM)}`;
 }
 
 const GRID_GAP_PX = remPx(GRID_GAP_REM);

@@ -30,8 +30,7 @@ const guildOwnerCache: { current: CacheEntry<string | null> | null } = {
 const guildRolesCache: { current: CacheEntry<RawGuildRole[]> | null } = {
   current: null,
 };
-const guildChannelsCache: { current: CacheEntry<RawGuildChannel[]> | null } =
-{
+const guildChannelsCache: { current: CacheEntry<RawGuildChannel[]> | null } = {
   current: null,
 };
 

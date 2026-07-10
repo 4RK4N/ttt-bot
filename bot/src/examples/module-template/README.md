@@ -26,19 +26,19 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 
 ## File map
 
-| Location                  | File                | Purpose                                                                         |
-| ------------------------- | ------------------- | ------------------------------------------------------------------------------- |
-| `bot/src/lib/modules/<name>/` | `types.ts`          | Simple modules — interfaces, defaults, `config()`, `texts()`                    |
-| `shared/modules/<name>/`  | `types.ts`          | Panel modules — copy from [`panel-types.ts`](panel-types.ts)                  |
-| `bot/src/lib/modules/<name>/` | `config-io.ts`      | IO boundary — **handlers import from here**, not `types.ts`                     |
-| `bot/src/modules/<name>/` | `handlers.ts`       | Example patterns: guards, config/text reads, interactions                       |
-| `bot/src/modules/<name>/` | `index.ts`          | `CommandModule` export only                                                     |
-| `bot/src/examples/module-template/` | `web-plugin.json`   | Copy to `shared/modules/<name>/` for the web editor                            |
-| `bot/src/examples/module-template/` | `validate.ts`       | Copy to `shared/modules/<name>/` for panel row validation                     |
-| `shared/modules/<name>/`  | `validate.ts`       | Panel/list row validation (web editor save) — lives here after copy             |
-| `bot/src/lib/modules/<name>/`  | `panel.ts`          | Panel publish payload — panel modules only                                      |
-| `bot/src/lib/modules/<name>/`  | `publisher.ts`      | Publish/unpublish — panel modules only (see example-module/publisher.ts)        |
-| `data/example-module/`    | (under this folder) | Seed JSON for `data/<namespace>/`                                               |
+| Location                            | File                | Purpose                                                                  |
+| ----------------------------------- | ------------------- | ------------------------------------------------------------------------ |
+| `bot/src/lib/modules/<name>/`       | `types.ts`          | Simple modules — interfaces, defaults, `config()`, `texts()`             |
+| `shared/modules/<name>/`            | `types.ts`          | Panel modules — copy from [`panel-types.ts`](panel-types.ts)             |
+| `bot/src/lib/modules/<name>/`       | `config-io.ts`      | IO boundary — **handlers import from here**, not `types.ts`              |
+| `bot/src/modules/<name>/`           | `handlers.ts`       | Example patterns: guards, config/text reads, interactions                |
+| `bot/src/modules/<name>/`           | `index.ts`          | `CommandModule` export only                                              |
+| `bot/src/examples/module-template/` | `web-plugin.json`   | Copy to `shared/modules/<name>/` for the web editor                      |
+| `bot/src/examples/module-template/` | `validate.ts`       | Copy to `shared/modules/<name>/` for panel row validation                |
+| `shared/modules/<name>/`            | `validate.ts`       | Panel/list row validation (web editor save) — lives here after copy      |
+| `bot/src/lib/modules/<name>/`       | `panel.ts`          | Panel publish payload — panel modules only                               |
+| `bot/src/lib/modules/<name>/`       | `publisher.ts`      | Publish/unpublish — panel modules only (see example-module/publisher.ts) |
+| `data/example-module/`              | (under this folder) | Seed JSON for `data/<namespace>/`                                        |
 
 ## Import rule
 
@@ -83,14 +83,14 @@ await updateExamplePanel(panelId, {
 
 Reuse these instead of duplicating logic:
 
-| Module                                                                                 | Use for                                                           |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts)               | `createModuleConfig`, `resolveKeyedItem`                          |
-| [`shared/core/texts.ts`](../../../../shared/core/texts.ts)                             | `format`, `isModuleEnabled`, `getConfig`/`getTexts` (via factory) |
+| Module                                                                             | Use for                                                           |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts)           | `createModuleConfig`, `resolveKeyedItem`                          |
+| [`shared/core/texts.ts`](../../../../shared/core/texts.ts)                         | `format`, `isModuleEnabled`, `getConfig`/`getTexts` (via factory) |
 | [`bot/src/lib/core/discordInteractions.ts`](../../lib/core/discordInteractions.ts) | `replyEphemeral`, `memberHasAnyRole`                              |
 | [`bot/src/lib/core/discordRoles.ts`](../../lib/core/discordRoles.ts)               | `tryAssignRole`, `tryRemoveRole`                                  |
 | [`bot/src/lib/core/threads.ts`](../../lib/core/threads.ts)                         | `buildThreadName`, `startAndPopulateCommentsThread`               |
-| [`shared/core/panelFields.ts`](../../../../shared/core/panelFields.ts)                 | `parsePanelBaseFields` (validators)                               |
+| [`shared/core/panelFields.ts`](../../../../shared/core/panelFields.ts)             | `parsePanelBaseFields` (validators)                               |
 | [`bot/src/lib/core/panelPublisher.ts`](../../lib/core/panelPublisher.ts)           | Publish/unpublish orchestration                                   |
 
 ## Web editor validation
@@ -119,11 +119,11 @@ for full examples.
 
 ## Module loader patterns (`index.ts`)
 
-| Export              | Use for                                                        |
-| ------------------- | -------------------------------------------------------------- |
-| `init(client)`      | `client.on(Events.…)` listeners                                |
-| `commands[]`        | Slash commands — requires `npm run deploy`                     |
-| `componentRoutes[]` | `{ prefix: '<namespace>:', handle }` for buttons/selects       |
+| Export              | Use for                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| `init(client)`      | `client.on(Events.…)` listeners                                                                         |
+| `commands[]`        | Slash commands — requires `npm run deploy`                                                              |
+| `componentRoutes[]` | `{ prefix: '<namespace>:', handle }` for buttons/selects                                                |
 | `publish*()`        | Panel modules — export from `bot/src/lib/modules/<name>/publisher.ts`; register in `publishRegistry.ts` |
 
 ## Data folder

@@ -1,42 +1,40 @@
 import type { ImageMetadata } from "astro";
 
 import logo from "../assets/custom/logo.png";
-import bg from "../assets/images/bg.jpg";
-import homeCircle from "../assets/images/image22.png";
+import bg from "../assets/images/content/bg.jpg";
+import homeCircle from "../assets/images/content/image22.png";
 
-import image04 from "../assets/images/image04.jpg";
-import image09 from "../assets/images/image09.jpg";
-import drinksMenu from "../assets/images/Ralvus_karte_v2_upscaled.png";
+import image09 from "../assets/images/content/image09.jpg";
+import drinksMenu from "../assets/images/content/Ralvus_karte_v2_upscaled.png";
 
 export { logo, bg, homeCircle };
 
-/** Inline content images (events archive, gallery hero). */
+/** Inline content images (gallery hero and drinks menu). */
 export const pageImages = {
-  image04,
   image09,
   drinksMenu,
 } as const satisfies Record<string, ImageMetadata>;
 
-const galleryModules = import.meta.glob<ImageMetadata>(
-  "../assets/images/gallery*/**/*.{jpg,jpeg,png}",
+const imageModules = import.meta.glob<ImageMetadata>(
+  "../assets/images/{community,events,gallery,guestbook,partner,staff}/**/*.{jpg,jpeg,png}",
   { eager: true, import: "default" },
 );
 
-const galleryByPath = new Map<string, ImageMetadata>();
-for (const [key, mod] of Object.entries(galleryModules)) {
+const imagesByPath = new Map<string, ImageMetadata>();
+for (const [key, mod] of Object.entries(imageModules)) {
   const suffix = key.replace("../assets/images/", "");
-  galleryByPath.set(suffix, mod);
+  imagesByPath.set(suffix, mod);
 }
 
-/** Resolve a gallery path suffix (e.g. `gallery03/foo.jpg`) to imported metadata. */
-export function resolveGallery(suffix: string): ImageMetadata {
-  const img = galleryByPath.get(suffix);
+/** Resolve an image path suffix (e.g. `gallery/room01/foo.png`) to metadata. */
+export function resolveImage(suffix: string): ImageMetadata {
+  const img = imagesByPath.get(suffix);
   if (!img) {
-    throw new Error(`Gallery image not found: ${suffix}`);
+    throw new Error(`Image not found: ${suffix}`);
   }
   return img;
 }
 
-export function resolveGalleryList(paths: readonly string[]): ImageMetadata[] {
-  return paths.map(resolveGallery);
+export function resolveImages(paths: readonly string[]): ImageMetadata[] {
+  return paths.map(resolveImage);
 }

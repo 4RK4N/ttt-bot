@@ -1,5 +1,8 @@
 export const URL_REGEX = /https?:\/\/[^\s<>]+/gi;
 
+const DISCORD_MEDIA_PATH =
+  /^\/attachments\/\d+\/\d+\/[^/]+\.(?:avif|bmp|gif|jpe?g|png|webp|m4v|mov|mp4|webm)$/i;
+
 export function stripUrls(content: string): string {
   return content.replace(URL_REGEX, " ").replace(/\s+/g, " ").trim();
 }
@@ -8,13 +11,15 @@ function normalizeHost(host: string): string {
   return host.replace(/^www\./i, "").toLowerCase();
 }
 
-export function isSupportedPostUrl(raw: string): boolean {
+export function isSupportedAutoThreadUrl(raw: string): boolean {
   let url: URL;
   try {
     url = new URL(raw);
   } catch {
     return false;
   }
+
+  if (url.protocol !== "http:" && url.protocol !== "https:") return false;
 
   const host = normalizeHost(url.hostname);
   const path = url.pathname.replace(/[).,]+$/, "");
@@ -33,10 +38,18 @@ export function isSupportedPostUrl(raw: string): boolean {
     );
   }
 
+  if (host === "instagram.com") {
+    return /^\/(?:p|reel|reels)\/[A-Za-z0-9_-]+\/?$/.test(path);
+  }
+
+  if (host === "cdn.discordapp.com" || host === "media.discordapp.net") {
+    return DISCORD_MEDIA_PATH.test(path);
+  }
+
   return false;
 }
 
-export function extractSupportedPostUrls(text: string): string[] {
+export function extractSupportedAutoThreadUrls(text: string): string[] {
   const matches = text.match(URL_REGEX) ?? [];
-  return matches.filter(isSupportedPostUrl);
+  return matches.filter(isSupportedAutoThreadUrl);
 }

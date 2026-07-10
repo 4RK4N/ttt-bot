@@ -2,7 +2,12 @@ import { assertSnowflake } from "../../core/discordIds.js";
 import { emojiMatchKey } from "../../core/discordEmoji.js";
 import { MAX_PANEL_OPTIONS } from "../../core/limits.js";
 import { parsePanelBaseFields } from "../../core/panelFields.js";
-import { isReactionType, normalizeRoleOptions, type ReactionType, type ResolvedRolePanel } from "./types.js";
+import {
+  isReactionType,
+  normalizeRoleOptions,
+  type ReactionType,
+  type ResolvedRolePanel,
+} from "./types.js";
 
 const MAX_OPTIONS = MAX_PANEL_OPTIONS;
 

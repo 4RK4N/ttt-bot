@@ -9,13 +9,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
-  "exclude": [
-    "src/ui/assets/admin-styles.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["src/ui/assets/admin-styles.ts"],
   "references": [
     {
       "path": "../shared"

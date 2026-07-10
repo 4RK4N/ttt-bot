@@ -18,15 +18,15 @@ document.body.addEventListener("htmx:sendError", revertHtmxToggle);
 document.body.addEventListener("change", (evt) => {
   const target = evt.target;
   if (!(target instanceof HTMLInputElement)) return;
-  if (target.type !== "checkbox" || !target.classList.contains("toggle")) return;
+  if (target.type !== "checkbox" || !target.classList.contains("toggle"))
+    return;
   syncToggleLabel(target);
 });
 
 document.body.addEventListener("htmx:configRequest", (evt) => {
   const meta = document.querySelector('meta[name="csrf-token"]');
-  const headers = (
-    evt as CustomEvent<{ headers?: Record<string, string> }>
-  ).detail.headers;
+  const headers = (evt as CustomEvent<{ headers?: Record<string, string> }>)
+    .detail.headers;
   if (meta && headers) {
     headers["X-CSRF-Token"] = meta.getAttribute("content") || "";
   }

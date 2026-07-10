@@ -2,7 +2,7 @@
 import ContentPage from "../../../../components/ContentPage.astro";
 import ContentPanel from "../../../../components/ContentPanel.astro";
 import Gallery from "../../../../components/Gallery.astro";
-import { resolveGalleryList } from "../../../../data/images";
+import { resolveImages } from "../../../../data/images";
 ---
 
 <ContentPage
@@ -39,13 +39,13 @@ import { resolveGalleryList } from "../../../../data/images";
   <Gallery
     aspect="portrait"
     altPrefix="Staff portrait"
-    images={resolveGalleryList([
-      "gallery14/20657f8a.jpg",
-      "gallery14/1ff201fe.jpg",
-      "gallery14/e5fc5b6d.jpg",
-      "gallery14/32b7ed66.jpg",
-      "gallery14/926948ff.jpg",
-      "gallery14/ralvus.png",
+    images={resolveImages([
+      "staff/reiji.jpg",
+      "staff/soldea.jpg",
+      "staff/alice.png",
+      "staff/domi.jpg",
+      "staff/elphine.jpg",
+      "staff/ralvus.png",
     ])}
   />
 </ContentPage>

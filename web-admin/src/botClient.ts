@@ -57,8 +57,13 @@ async function postInternal(cfg: WebConfig, path: string): Promise<void> {
       throw new Error(message);
     } catch (err) {
       lastError =
-        err instanceof Error ? err : new Error("Bot internal API request failed.");
-      if (!isConnectionError(lastError.message) || attempt >= MAX_ATTEMPTS - 1) {
+        err instanceof Error
+          ? err
+          : new Error("Bot internal API request failed.");
+      if (
+        !isConnectionError(lastError.message) ||
+        attempt >= MAX_ATTEMPTS - 1
+      ) {
         throw lastError;
       }
       await sleep(RETRY_DELAY_MS);

@@ -1,7 +1,7 @@
 ---
 import ContentPage from "../../../components/ContentPage.astro";
 import Gallery from "../../../components/Gallery.astro";
-import { resolveGalleryList } from "../../../data/images";
+import { resolveImages } from "../../../data/images";
 ---
 
 <ContentPage
@@ -13,7 +13,8 @@ import { resolveGalleryList } from "../../../data/images";
 >
   <Fragment slot="intro">
     <p class="hand-text">
-      Messages from our community — shared here as screenshots from our Discord.
+      Messages left by our guests in our XIV venue guestbook — shared here as
+      screenshots.
     </p>
     <p class="hand-text">
       <em
@@ -28,15 +29,15 @@ import { resolveGalleryList } from "../../../data/images";
     wide
     aspect="landscape"
     altPrefix="Guestbook message"
-    images={resolveGalleryList([
-      "gallery08/b04b2349.jpg",
-      "gallery08/fb0b75e8.jpg",
-      "gallery08/228b4f2a.jpg",
-      "gallery08/ca8d23e8.jpg",
-      "gallery08/ab7b15ef.jpg",
-      "gallery08/4422e621.jpg",
-      "gallery08/ca8cef1a.jpg",
-      "gallery08/895a9878.jpg",
+    images={resolveImages([
+      "guestbook/b04b2349.jpg",
+      "guestbook/fb0b75e8.jpg",
+      "guestbook/228b4f2a.jpg",
+      "guestbook/ca8d23e8.jpg",
+      "guestbook/ab7b15ef.jpg",
+      "guestbook/4422e621.jpg",
+      "guestbook/ca8cef1a.jpg",
+      "guestbook/895a9878.jpg",
     ])}
   />
 </ContentPage>

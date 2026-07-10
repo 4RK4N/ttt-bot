@@ -8,6 +8,7 @@ interface Props {
   sizes: string;
   widths?: number[];
   class?: string;
+  imageClass?: string;
   loading?: "lazy" | "eager";
   alt?: string;
   lightbox?: boolean;
@@ -19,6 +20,7 @@ const {
   sizes,
   widths,
   class: className,
+  imageClass,
   loading = "lazy",
   alt = "",
   lightbox = false,
@@ -42,7 +44,7 @@ const {
         {...(widths ? { widths } : { densities: [1, 2] })}
         sizes={sizes}
         loading={loading}
-        class="block h-auto w-full"
+        class:list={["block h-auto w-full", imageClass]}
       />
     </button>
   ) : (
@@ -54,7 +56,7 @@ const {
         {...(widths ? { widths } : { densities: [1, 2] })}
         sizes={sizes}
         loading={loading}
-        class="block h-auto w-full"
+        class:list={["block h-auto w-full", imageClass]}
       />
     </div>
   )

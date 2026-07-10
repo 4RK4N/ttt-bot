@@ -3,11 +3,12 @@ import ContentPage from "../../../../components/ContentPage.astro";
 import ContentImage from "../../../../components/ContentImage.astro";
 import Gallery from "../../../../components/Gallery.astro";
 import {
-  CARD_IMAGE_PX,
-  cardImageSizes,
-  cardImageWidths,
+  FEATURED_EVENT_IMAGE_PX,
+  FEATURED_EVENT_REM,
+  featuredEventImageSizes,
+  remScaledWidths,
 } from "../../../../data/layout";
-import { pageImages, resolveGalleryList } from "../../../../data/images";
+import { resolveImage, resolveImages } from "../../../../data/images";
 ---
 
 <ContentPage
@@ -17,22 +18,25 @@ import { pageImages, resolveGalleryList } from "../../../../data/images";
   heading="Events"
 >
   <ContentImage
-    src={pageImages.image04}
-    width={CARD_IMAGE_PX}
-    sizes={cardImageSizes()}
-    widths={cardImageWidths()}
-    class="w-full max-w-[24rem]"
+    src={resolveImage("events/Event_11.07.26.png")}
+    width={FEATURED_EVENT_IMAGE_PX}
+    sizes={featuredEventImageSizes()}
+    widths={remScaledWidths(FEATURED_EVENT_REM)}
+    class="w-full max-w-lg"
+    alt="Nächstes Event: Samstag um 18:00 Uhr Serverzeit"
   />
   <h2>★ Archiv ★</h2>
   <Gallery
     aspect="portrait"
     altPrefix="Event photo"
-    images={resolveGalleryList([
-      "gallery03/b38bdd4c.jpg",
-      "gallery03/895354f2.jpg",
-      "gallery03/68509e48.jpg",
-      "gallery03/33482412.jpg",
-      "gallery03/e17c546b.jpg",
+    images={resolveImages([
+      "events/Event_04.07.26.jpg",
+      "events/Event_20.06.26.png",
+      "events/Event_06.06.26.jpg",
+      "events/Event_23.05.26.jpg",
+      "events/Event_09.05.26.jpg",
+      "events/Event_25.04.26.jpg",
+      "events/Event_11.04.26.jpg",
     ])}
   />
 </ContentPage>

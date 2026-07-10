@@ -112,20 +112,20 @@ copy it to `config.json` or `texts.json` and edit.
 }
 ```
 
-| Field              | Required    | Description                                                                                                                                                                                                                      |
-| ------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `discordToken`     | **Yes**     | Bot token from the Developer Portal (Bot -> Reset Token). Keep it secret.                                                                                                                                                        |
-| `clientId`         | **Yes**     | Application (client) ID from General Information.                                                                                                                                                                                |
-| `guildId`          | No          | A server ID for instant, guild-scoped slash command registration during development. Empty = register globally (can take ~1 hour to propagate). Also **required for the web editor** (the admin check runs against this server). |
-| `botName`          | No          | Display name shown in the web editor's title (`<botName> Admin Interface`). Defaults to `TTT`.                                                                                                                                   |
-| `clientSecret`     | Editor only | OAuth2 client secret (Developer Portal -> OAuth2 -> Client Secret -> Reset).                                                                                                                                                     |
-| `sessionSecret`    | Editor only | Long random string used to sign the editor's session cookies. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.                                                                      |
-| `oauthRedirectUri` | Editor only | OAuth2 redirect URL, added verbatim under Developer Portal -> OAuth2 -> Redirects. Use the editor's public `/callback` URL (https makes the cookie `Secure`). For local dev: `http://localhost:8088/callback`.                   |
-| `webPort`          | No          | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too.                                                        |
-| `internalApiPort`  | No          | Port for the bot's internal publish API. Defaults to `8087`. Not exposed to the public internet — only reachable on the Docker internal network or `127.0.0.1` locally.                                                           |
-| `internalApiSecret`| **Editor + bot** | Shared secret for `X-Internal-Token` on internal API requests. Required when running the web editor (publish/unpublish panels). Generate like `sessionSecret`.                                                              |
-| `botInternalApiUrl`| **Editor**  | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` in `config.json`.                             |
-| `internalApiBind`  | No          | Address the bot internal API listens on. Defaults to `127.0.0.1`. Docker: set to `0.0.0.0` so the web-editor container can reach the bot on the internal network. |
+| Field               | Required         | Description                                                                                                                                                                                                                      |
+| ------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `discordToken`      | **Yes**          | Bot token from the Developer Portal (Bot -> Reset Token). Keep it secret.                                                                                                                                                        |
+| `clientId`          | **Yes**          | Application (client) ID from General Information.                                                                                                                                                                                |
+| `guildId`           | No               | A server ID for instant, guild-scoped slash command registration during development. Empty = register globally (can take ~1 hour to propagate). Also **required for the web editor** (the admin check runs against this server). |
+| `botName`           | No               | Display name shown in the web editor's title (`<botName> Admin Interface`). Defaults to `TTT`.                                                                                                                                   |
+| `clientSecret`      | Editor only      | OAuth2 client secret (Developer Portal -> OAuth2 -> Client Secret -> Reset).                                                                                                                                                     |
+| `sessionSecret`     | Editor only      | Long random string used to sign the editor's session cookies. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.                                                                      |
+| `oauthRedirectUri`  | Editor only      | OAuth2 redirect URL, added verbatim under Developer Portal -> OAuth2 -> Redirects. Use the editor's public `/callback` URL (https makes the cookie `Secure`). For local dev: `http://localhost:8088/callback`.                   |
+| `webPort`           | No               | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too.                                                        |
+| `internalApiPort`   | No               | Port for the bot's internal publish API. Defaults to `8087`. Not exposed to the public internet — only reachable on the Docker internal network or `127.0.0.1` locally.                                                          |
+| `internalApiSecret` | **Editor + bot** | Shared secret for `X-Internal-Token` on internal API requests. Required when running the web editor (publish/unpublish panels). Generate like `sessionSecret`.                                                                   |
+| `botInternalApiUrl` | **Editor**       | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` in `config.json`.                                                                          |
+| `internalApiBind`   | No               | Address the bot internal API listens on. Defaults to `127.0.0.1`. Docker: set to `0.0.0.0` so the web-editor container can reach the bot on the internal network.                                                                |
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
 `webPort`) plus `guildId`, `internalApiSecret`, and `botInternalApiUrl` are only needed if you run the browser-based editor;
@@ -149,12 +149,14 @@ toggling takes effect on the next event without a restart.
 ```
 
 `channelIds` lists the channels where the bot auto-creates a comments thread on
-qualifying posts (X/Twitter, Bluesky, Aethy links, or direct image/video).
+qualifying posts (X/Twitter, Bluesky, Aethy, or Instagram post links; direct
+Discord image/video links; or native image/video attachments).
 Leave it empty (`[]`) to disable the module, or set `"enabled": false` to turn it
 off while keeping the channel list. You can also set both in the
 [Web editor](README.md#web-editor) (a channel picker plus the on/off toggle)
 instead of editing the file. This module needs the privileged **Message Content**
-intent (Developer Portal -> Bot -> Privileged Gateway Intents).
+intent (Developer Portal -> Bot -> Privileged Gateway Intents), plus **Create
+Public Threads** and **Send Messages in Threads** in each watched channel.
 
 ### `data/welcome-message/config.json` - join welcome card
 
@@ -309,11 +311,11 @@ Use [`scripts/build.sh`](scripts/build.sh) for deploy builds. Bot and web editor
 [`website/Dockerfile`](website/Dockerfile). Builds use layer cache by default;
 changed source re-runs only the affected steps.
 
-| Flag / args     | Effect                                        |
-| --------------- | --------------------------------------------- |
-| _(none)_        | Build and recreate all three services         |
-| `-v`            | Full step-by-step output (`--progress plain`) |
-| `--no-cache`    | Ignore layer cache; full rebuild              |
+| Flag / args               | Effect                                                |
+| ------------------------- | ----------------------------------------------------- |
+| _(none)_                  | Build and recreate all three services                 |
+| `-v`                      | Full step-by-step output (`--progress plain`)         |
+| `--no-cache`              | Ignore layer cache; full rebuild                      |
 | `bot` / `web` / `website` | Build only listed services (aliases or `ttt-*` names) |
 
 ```bash
@@ -404,7 +406,14 @@ Static multi-page site built with **Astro 7 + Tailwind CSS**. The site is **buil
 | `website/Dockerfile`                              | Multi-stage: `npm ci` + `astro build`, then nginx                                                        |
 | `website/nginx.conf`                              | nginx config (clean URLs, gzip, caching); `listen 8089`                                                  |
 
-**Site images:** keep `website/src/assets/` **in git** (do not gitignore). Logo, gallery, icons, and background are source content — the Docker build runs `astro build` and needs them on disk after `git pull`. Only `website/dist/` and `website/.astro/` are build output and stay gitignored. `website/public/` holds four fixed-URL files (favicon, share image, etc.) only.
+**Site images:** keep `website/src/assets/` **in git** (do not gitignore). Logo,
+gallery, icons, and background are source content — the Docker build runs
+`astro build` and needs them on disk after `git pull`. Organize optimized page
+images by purpose under `website/src/assets/images/`: `content/`, `events/`,
+`guestbook/`, `community/`, `staff/`, `partner/`, and
+`gallery/{venue,room01,room02,bands}/`. Only `website/dist/` and
+`website/.astro/` are build output and stay gitignored. `website/public/` holds
+four fixed-URL files (favicon, share image, etc.) only.
 
 After **website** source changes, rebuild and restart the website service:
 
@@ -428,7 +437,7 @@ Browser ──HTTPS──► Caddy (caddy-docker-proxy, ports 80/443 on host)
 
 | Layer     | Role                                                                                                                                      |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Caddy** | Public entrypoint. Terminates TLS (Let's Encrypt cert for `ttt-ffxiv.com`), redirects HTTP→HTTPS, proxies to the container.                |
+| **Caddy** | Public entrypoint. Terminates TLS (Let's Encrypt cert for `ttt-ffxiv.com`), redirects HTTP→HTTPS, proxies to the container.               |
 | **nginx** | Serves the built site (baked into the image at build time) on **port 8089 inside the container only**. Plain HTTP — no certificates here. |
 
 The `caddy:` and `caddy.reverse_proxy: "{{upstreams 8089}}"` labels on `ttt-website`

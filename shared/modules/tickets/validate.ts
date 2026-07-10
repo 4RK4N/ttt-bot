@@ -1,4 +1,7 @@
-import { assertSnowflake, assertSnowflakesInArray } from "../../core/discordIds.js";
+import {
+  assertSnowflake,
+  assertSnowflakesInArray,
+} from "../../core/discordIds.js";
 import { parsePanelBaseFields } from "../../core/panelFields.js";
 import { toStringArray } from "../../core/strings.js";
 import type { ResolvedTicketType } from "./types.js";
@@ -25,10 +28,7 @@ export function validateTicketType(ticketType: ResolvedTicketType): void {
     );
   }
 
-  if (
-    ticketType.roleActionRoleId &&
-    !ticketType.roleActionButtonLabel.trim()
-  ) {
+  if (ticketType.roleActionRoleId && !ticketType.roleActionButtonLabel.trim()) {
     throw new Error(
       "Role action button label is required when a role action role is set.",
     );
