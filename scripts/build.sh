@@ -100,4 +100,6 @@ for svc in "${selected[@]}"; do
   compose_build "$svc"
 done
 
-"${compose[@]}" up -d --force-recreate "${selected[@]}"
+for svc in "${selected[@]}"; do
+  "${compose[@]}" up -d --force-recreate --no-deps "$svc"
+done
