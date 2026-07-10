@@ -80,8 +80,8 @@ const BUILD_WIDTHS = {
     1200,
     Math.round(CONTENT_COLUMN_PX * 1.67),
   ],
-  portraitGallery: [320, 640, 960],
-  landscapeGallery: [400, 800, 1200],
+  galleryGrid: [400, 800, 1200],
+  galleryGridDense: [320, 640, 960],
 } as const;
 
 type BuildWidthProfile = keyof typeof BUILD_WIDTHS;
@@ -122,17 +122,6 @@ export function remScaledWidths(rem: number): number[] {
   return buildWidths(profile);
 }
 
-/** Portrait gallery sizes — calc() tracks rem scaling and column max-width. */
-export const PORTRAIT_GALLERY_SIZES =
-  `(max-width: 640px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - ${GRID_GAP_REM}rem) / 2), ` +
-  `(max-width: 1024px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 1.5rem) / 3), ` +
-  `calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 3rem) / 5)`;
-
-/** srcset widths for portrait gallery cells. */
-export function portraitGalleryWidths(): number[] {
-  return buildWidths("portraitGallery");
-}
-
 /** Full content column — w-full images inside default text sections. */
 export const CONTENT_COLUMN_SIZES = contentSectionSizes(CONTENT_MAX_TEXT_REM);
 
@@ -146,40 +135,39 @@ export function contentColumnWidths(): number[] {
   return buildWidths("contentColumn");
 }
 
-/** Landscape gallery sizes — 1 col below sm, 2 cols at sm+. */
-export const LANDSCAPE_GALLERY_SIZES =
+/** 2-column gallery sizes — 1 col below sm, 2 cols at sm+. */
+export const GALLERY_GRID_SIZES =
   `(max-width: 640px) ${contentSectionSizes(CONTENT_MAX_TEXT_REM)}, ` +
   `calc((${contentSectionSizes(CONTENT_MAX_TEXT_REM)} - ${GRID_GAP_REM}rem) / 2)`;
 
-/** Landscape gallery sizes for gallery pages. */
-export const LANDSCAPE_GALLERY_SIZES_WIDE =
+/** 2-column gallery sizes for gallery/guestbook pages. */
+export const GALLERY_GRID_SIZES_WIDE =
   `(max-width: 640px) ${contentSectionSizes(CONTENT_MAX_GALLERY_REM)}, ` +
   `calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - ${GRID_GAP_REM}rem) / 2)`;
 
-/** Portrait gallery sizes wide variant. */
-export const PORTRAIT_GALLERY_SIZES_WIDE =
+/** 5-column gallery sizes — calc() tracks rem scaling and column max-width. */
+export const GALLERY_GRID_DENSE_SIZES =
+  `(max-width: 640px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - ${GRID_GAP_REM}rem) / 2), ` +
+  `(max-width: 1024px) calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 1.5rem) / 3), ` +
+  `calc((min(100vw, ${CONTENT_MAX_TEXT_REM}rem) - ${CONTENT_SECTION_PADDING_REM}rem - 3rem) / 5)`;
+
+/** 5-column gallery sizes for gallery/guestbook pages. */
+export const GALLERY_GRID_DENSE_SIZES_WIDE =
   `(max-width: 640px) calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - ${GRID_GAP_REM}rem) / 2), ` +
   `(max-width: 1024px) calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - 1.5rem) / 3), ` +
   `calc((${contentSectionSizes(CONTENT_MAX_GALLERY_REM)} - 3rem) / 5)`;
 
-/** srcset widths for landscape gallery cells. */
-export function landscapeGalleryWidths(): number[] {
-  return buildWidths("landscapeGallery");
+/** srcset widths for default 2-column gallery cells. */
+export function galleryGridWidths(): number[] {
+  return buildWidths("galleryGrid");
+}
+
+/** srcset widths for dense 5-column gallery cells. */
+export function galleryGridDenseWidths(): number[] {
+  return buildWidths("galleryGridDense");
 }
 
 /** Featured event poster: full column on narrow screens, max 32rem above. */
 export function featuredEventImageSizes(): string {
   return `(max-width: ${NARROW_CONTENT_BP_PX}px) calc(100vw - 3rem), ${remScaledSizes(FEATURED_EVENT_REM)}`;
 }
-
-const GRID_GAP_PX = remPx(GRID_GAP_REM);
-
-/** 2-col landscape grid cell in content column */
-export const LANDSCAPE_CELL_PX = Math.round(
-  (CONTENT_COLUMN_PX - GRID_GAP_PX) / 2,
-);
-
-/** 5-col portrait grid cell at lg */
-export const PORTRAIT_CELL_LG_PX = Math.floor(
-  (CONTENT_COLUMN_PX - 4 * GRID_GAP_PX) / 5,
-);
