@@ -123,6 +123,48 @@
     img.setAttribute("aria-label", label);
   }
 
+  function centerStageScroll() {
+    const { stage, img } = getElements();
+    if (!stage || !img) return;
+
+    stage.scrollLeft = Math.max(
+      0,
+      img.offsetLeft + (img.offsetWidth - stage.clientWidth) / 2,
+    );
+    stage.scrollTop = Math.max(
+      0,
+      img.offsetTop + (img.offsetHeight - stage.clientHeight) / 2,
+    );
+  }
+
+  function centerStageScrollAfterZoom(img: HTMLImageElement) {
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    const tryCenter = () => {
+      centerStageScroll();
+      attempts += 1;
+      if (attempts < maxAttempts) {
+        requestAnimationFrame(tryCenter);
+      }
+    };
+
+    const start = () => {
+      if (img.decode) {
+        img.decode().then(() => tryCenter()).catch(() => tryCenter());
+      } else {
+        tryCenter();
+      }
+    };
+
+    if (img.complete && img.naturalWidth > 0) {
+      start();
+      return;
+    }
+
+    img.addEventListener("load", start, { once: true });
+  }
+
   function resetZoom() {
     const { stage, img } = getElements();
     if (!img) return;
@@ -188,7 +230,7 @@
         img.src = fullSrc;
       }
       setZoomUi(true);
-      stage?.scrollTo(0, 0);
+      centerStageScrollAfterZoom(img);
       return;
     }
 
