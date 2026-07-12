@@ -179,6 +179,7 @@ the message is still deleted and a warning is logged.
 
 `nonQualifyingDm` is sent when enforcement deletes a non-qualifying post.
 Tokens: `{channel}` (Discord channel link), `{message}` (deleted message text).
+Text over 2000 characters is sent as an embed automatically (max 4096).
 
 ### `data/welcome-message/config.json` - join welcome card
 

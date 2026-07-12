@@ -26,7 +26,7 @@
       "key": "nonQualifyingDm",
       "label": "Non-qualifying post DM",
       "type": "textarea",
-      "help": "Sent privately when a non-qualifying post is deleted. Tokens: {channel} (clickable channel link), {message}"
+      "help": "Sent privately when a non-qualifying post is deleted. Tokens: {channel} (clickable channel link), {message}. Text over 2000 characters is sent as an embed automatically."
     }
   ]
 }

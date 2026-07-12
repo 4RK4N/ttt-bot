@@ -10,6 +10,7 @@ import {
   DISCORD_MESSAGE_CONTENT_MAX,
 } from "../../../../shared/core/limits.js";
 import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
+import { buildEmbed } from "../../lib/core/embedBuilder.js";
 import {
   buildThreadName,
   startAndPopulateCommentsThread,
@@ -45,34 +46,25 @@ function resolveChannelLink(message: Message): string {
   return "";
 }
 
-function buildNonQualifyingDm(channelLink: string, messageContent: string): string {
-  const template = texts().nonQualifyingDm;
-  const suffix = "…";
-
-  let dmText = format(template, { channel: channelLink, message: messageContent });
-  if (dmText.length <= DISCORD_MESSAGE_CONTENT_MAX) {
-    return dmText;
-  }
-
-  const withoutMessage = format(template, { channel: channelLink, message: "" });
-  const maxMessageChars =
-    DISCORD_MESSAGE_CONTENT_MAX - withoutMessage.length - suffix.length;
-
-  if (maxMessageChars <= 0) {
-    return dmText.slice(0, DISCORD_MESSAGE_CONTENT_MAX - 1) + suffix;
-  }
-
-  const truncatedMessage = messageContent.slice(0, maxMessageChars) + suffix;
-  dmText = format(template, {
+function formatNonQualifyingDm(
+  channelLink: string,
+  messageContent: string,
+): string {
+  return format(texts().nonQualifyingDm, {
     channel: channelLink,
-    message: truncatedMessage,
+    message: messageContent,
   });
+}
 
+function buildNonQualifyingDmPayload(
+  channelLink: string,
+  messageContent: string,
+): { content: string } | { embeds: ReturnType<typeof buildEmbed>[] } {
+  const dmText = formatNonQualifyingDm(channelLink, messageContent);
   if (dmText.length <= DISCORD_MESSAGE_CONTENT_MAX) {
-    return dmText;
+    return { content: dmText };
   }
-
-  return dmText.slice(0, DISCORD_MESSAGE_CONTENT_MAX - 1) + suffix;
+  return { embeds: [buildEmbed({ description: dmText })] };
 }
 
 async function sendNonQualifyingDm(
@@ -80,9 +72,9 @@ async function sendNonQualifyingDm(
   channelLink: string,
   messageContent: string,
 ): Promise<void> {
-  const dmText = buildNonQualifyingDm(channelLink, messageContent);
+  const payload = buildNonQualifyingDmPayload(channelLink, messageContent);
   try {
-    await author.send(dmText);
+    await author.send(payload);
   } catch (err) {
     if (err instanceof DiscordAPIError && err.code === DISCORD_CANNOT_SEND_DM) {
       console.warn(
