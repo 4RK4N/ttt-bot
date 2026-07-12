@@ -27,6 +27,10 @@ export function EditorLayout({
         <link rel="icon" href={FAVICON_HREF} />
         <link rel="stylesheet" href={ADMIN_CSS} />
         <meta name="csrf-token" content={csrfToken} />
+        <meta
+          name="htmx-config"
+          content='{"includeIndicatorStyles":false}'
+        />
       </head>
       <body>
         <div class="drawer md:drawer-open">

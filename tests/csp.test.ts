@@ -9,15 +9,14 @@ describe("CSP helpers", () => {
     expect(a.length).toBeGreaterThan(0);
   });
 
-  it("allows HTMX inline style attributes and Discord OAuth in form-action", () => {
+  it("keeps strict style-src and allows Discord OAuth in form-action", () => {
     const header = buildCspHeader("test-nonce");
     expect(header).toContain("script-src 'self' 'nonce-test-nonce'");
     expect(header).toContain("style-src 'self'");
-    expect(header).toContain("style-src-attr 'unsafe-inline'");
+    expect(header).not.toContain("style-src-attr");
     expect(header).toContain("form-action 'self' https://discord.com");
     expect(header).not.toMatch(/script-src[^;]*unsafe-inline/);
-    expect(header).not.toMatch(/style-src 'self' 'unsafe-inline'/);
-    expect(header).not.toMatch(/style-src 'self'; style-src 'unsafe-inline'/);
+    expect(header).not.toMatch(/style-src[^;]*unsafe-inline/);
     expect(header).toContain("frame-ancestors 'none'");
   });
 });
