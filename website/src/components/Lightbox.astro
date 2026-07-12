@@ -29,20 +29,6 @@ const labels = lightboxLabels[lang];
   >
     <CloseIcon class="h-5 w-5" />
   </button>
-  <button
-    type="button"
-    id="lightbox-prev"
-    class="lightbox-btn lightbox-btn--prev"
-    aria-label={labels.prev}
-  >
-    <svg
-      viewBox="0 0 24 24"
-      class="h-6 w-6 fill-none stroke-current stroke-2"
-      aria-hidden="true"
-    >
-      <path d="M15 6l-6 6 6 6"></path>
-    </svg>
-  </button>
   <div id="lightbox-stage" class="lightbox-stage">
     <div class="lightbox-zoom-wrap">
       <img
@@ -54,21 +40,37 @@ const labels = lightboxLabels[lang];
       />
     </div>
   </div>
-  <button
-    type="button"
-    id="lightbox-next"
-    class="lightbox-btn lightbox-btn--next"
-    aria-label={labels.next}
-  >
-    <svg
-      viewBox="0 0 24 24"
-      class="h-6 w-6 fill-none stroke-current stroke-2"
-      aria-hidden="true"
+  <div class="lightbox-controls">
+    <button
+      type="button"
+      id="lightbox-prev"
+      class="lightbox-btn lightbox-btn--prev"
+      aria-label={labels.prev}
     >
-      <path d="M9 6l6 6-6 6"></path>
-    </svg>
-  </button>
-  <p id="lightbox-counter" class="lightbox-counter" aria-live="polite"></p>
+      <svg
+        viewBox="0 0 24 24"
+        class="h-6 w-6 fill-none stroke-current stroke-2"
+        aria-hidden="true"
+      >
+        <path d="M15 6l-6 6 6 6"></path>
+      </svg>
+    </button>
+    <p id="lightbox-counter" class="lightbox-counter" aria-live="polite"></p>
+    <button
+      type="button"
+      id="lightbox-next"
+      class="lightbox-btn lightbox-btn--next"
+      aria-label={labels.next}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="h-6 w-6 fill-none stroke-current stroke-2"
+        aria-hidden="true"
+      >
+        <path d="M9 6l6 6-6 6"></path>
+      </svg>
+    </button>
+  </div>
 </div>
 
 <script>

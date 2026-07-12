@@ -759,12 +759,21 @@
     cursor: zoom-out;
   }
 
-  .lightbox-counter {
+  .lightbox-controls {
     position: absolute;
     z-index: 1;
     bottom: 0.25rem;
     left: 50%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     transform: translateX(-50%);
+  }
+
+  .lightbox-counter {
+    margin: 0;
+    min-width: 3.5rem;
+    text-align: center;
     font-family: var(--font-jost);
     font-size: 0.875rem;
     color: var(--color-bar-text);
@@ -772,7 +781,7 @@
   }
 
   .lightbox-btn {
-    @apply absolute top-1/2 z-1 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
+    @apply flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border text-bar-text transition-colors;
     border-color: var(--color-bar-border-strong);
     background: var(--color-bar-bg);
   }
@@ -781,14 +790,6 @@
   .lightbox-close:hover {
     border-color: var(--color-bar-accent);
     color: var(--color-bar-accent);
-  }
-
-  .lightbox-btn--prev {
-    left: 1rem;
-  }
-
-  .lightbox-btn--next {
-    right: 1rem;
   }
 
   .lightbox-close {
