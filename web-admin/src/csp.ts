@@ -11,11 +11,14 @@ export function buildCspHeader(nonce: string): string {
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}'`,
     "style-src 'self'",
+    // HTMX applies inline style attributes for indicators/swaps; external CSS stays on style-src.
+    "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: https://cdn.discordapp.com",
     "connect-src 'self' https://discord.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    // Chrome applies form-action to redirect chains after POST; allow Discord OAuth.
+    "form-action 'self' https://discord.com",
   ];
   return directives.join("; ");
 }

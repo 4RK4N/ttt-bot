@@ -125,7 +125,7 @@ async function main(): Promise<void> {
 
   app.get("/logout", (c) => {
     logout(c);
-    return c.redirect("/login");
+    return c.redirect("/");
   });
 
   app.post("/logout", async (c) => {
@@ -135,7 +135,7 @@ async function main(): Promise<void> {
       return c.text("Invalid CSRF token.", 403);
     }
     logout(c);
-    return c.redirect("/login");
+    return c.redirect("/");
   });
 
   // --- Editor page ------------------------------------------------------------
