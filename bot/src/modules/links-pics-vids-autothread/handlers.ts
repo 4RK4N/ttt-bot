@@ -1,11 +1,11 @@
 import {
   DiscordAPIError,
   GuildMember,
-  TextChannel,
   type Message,
   type User,
 } from "discord.js";
 import {
+  channelUrl,
   DISCORD_CANNOT_SEND_DM,
   DISCORD_MESSAGE_CONTENT_MAX,
 } from "../../../../shared/core/limits.js";
@@ -37,23 +37,24 @@ export function messageQualifiesForAutoThread(message: Message): boolean {
   return hasSupportedLink || hasMedia;
 }
 
-function resolveChannelDisplayName(message: Message): string {
-  if (message.channel instanceof TextChannel) {
-    return `#${message.channel.name}`;
+function resolveChannelLink(message: Message): string {
+  const guildId = message.guild?.id;
+  if (guildId) {
+    return channelUrl(guildId, message.channelId);
   }
-  return "#unknown";
+  return "";
 }
 
-function buildNonQualifyingDm(channelName: string, messageContent: string): string {
+function buildNonQualifyingDm(channelLink: string, messageContent: string): string {
   const template = texts().nonQualifyingDm;
   const suffix = "…";
 
-  let dmText = format(template, { channel: channelName, message: messageContent });
+  let dmText = format(template, { channel: channelLink, message: messageContent });
   if (dmText.length <= DISCORD_MESSAGE_CONTENT_MAX) {
     return dmText;
   }
 
-  const withoutMessage = format(template, { channel: channelName, message: "" });
+  const withoutMessage = format(template, { channel: channelLink, message: "" });
   const maxMessageChars =
     DISCORD_MESSAGE_CONTENT_MAX - withoutMessage.length - suffix.length;
 
@@ -63,7 +64,7 @@ function buildNonQualifyingDm(channelName: string, messageContent: string): stri
 
   const truncatedMessage = messageContent.slice(0, maxMessageChars) + suffix;
   dmText = format(template, {
-    channel: channelName,
+    channel: channelLink,
     message: truncatedMessage,
   });
 
@@ -76,10 +77,10 @@ function buildNonQualifyingDm(channelName: string, messageContent: string): stri
 
 async function sendNonQualifyingDm(
   author: User,
-  channelName: string,
+  channelLink: string,
   messageContent: string,
 ): Promise<void> {
-  const dmText = buildNonQualifyingDm(channelName, messageContent);
+  const dmText = buildNonQualifyingDm(channelLink, messageContent);
   try {
     await author.send(dmText);
   } catch (err) {
@@ -98,7 +99,7 @@ async function sendNonQualifyingDm(
 
 async function deleteNonQualifyingMessage(message: Message): Promise<void> {
   const messageContent = message.content ?? "";
-  const channelName = resolveChannelDisplayName(message);
+  const channelLink = resolveChannelLink(message);
 
   try {
     await message.delete();
@@ -112,7 +113,7 @@ async function deleteNonQualifyingMessage(message: Message): Promise<void> {
     return;
   }
 
-  await sendNonQualifyingDm(message.author, channelName, messageContent);
+  await sendNonQualifyingDm(message.author, channelLink, messageContent);
 }
 
 export async function handleMessage(message: Message): Promise<void> {

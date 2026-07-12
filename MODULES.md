@@ -37,7 +37,7 @@ Bluesky, Aethy, or Instagram post links; direct Discord image/video links; or
 native image/video attachments.
 
 - **Config:** `channelIds[]`, `deleteNonQualifyingMessages` (default off)
-- **Texts:** `threadFirstMessage`, `nonQualifyingDm` (tokens: `{channel}`, `{message}`)
+- **Texts:** `threadFirstMessage`, `nonQualifyingDm` (tokens: `{channel}` link, `{message}`)
 - **Intent:** Message Content
 - **Permissions:** Create Public Threads, Send Messages in Threads; **Manage Messages** when `deleteNonQualifyingMessages` is on
 - **Thread naming:** same pattern as `/pic` (`buildThreadName` in core)

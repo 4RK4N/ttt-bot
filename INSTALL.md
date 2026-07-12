@@ -178,7 +178,7 @@ the message is still deleted and a warning is logged.
 ```
 
 `nonQualifyingDm` is sent when enforcement deletes a non-qualifying post.
-Tokens: `{channel}` (channel name), `{message}` (deleted message text).
+Tokens: `{channel}` (Discord channel link), `{message}` (deleted message text).
 
 ### `data/welcome-message/config.json` - join welcome card
 
