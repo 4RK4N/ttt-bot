@@ -97,7 +97,7 @@ export function headerLogoWidths(): number[] {
 const GRID_GAP_REM = 0.75; // gap-3
 
 /** Rem length at a given root font size (px). */
-function remPx(rem: number, rootPx: number = ROOT_FONT_PX): number {
+export function remPx(rem: number, rootPx: number = ROOT_FONT_PX): number {
   return Math.round(rem * rootPx);
 }
 

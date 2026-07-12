@@ -75,6 +75,15 @@ Static embed panels (info/rules) with optional author, footer, timestamp.
 - **Config:** `panels[]`
 - **Permissions:** Send Messages, Embed Links in target channel
 
+### emojis (`/emoji-add`, `/emoji-copy`)
+
+Upload or clone custom server emojis.
+
+- **Config:** `emojiRoleId` (optional — members with this role can use the commands; Administrators always can)
+- **Texts:** disabled notice, permission/size/slot errors, success reply
+- **Tokens:** `{emoji}` in success reply
+- **Permissions:** Manage Emojis and Stickers
+
 ---
 
 ## Data layout
@@ -141,3 +150,4 @@ See the [module template README](bot/src/examples/module-template/README.md) for
 | reaction-roles             | — (reactions: standard) | Manage Roles                           |
 | moderation-log             | Server Members          | View Audit Log (moderator on kick/ban) |
 | custom-embeds              | —                       | Embed Links                            |
+| emojis                     | —                       | Manage Emojis and Stickers             |

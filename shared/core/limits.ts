@@ -7,6 +7,9 @@ export const DISCORD_CANNOT_SEND_DM = 50007;
 /** Max role/button/select options per reaction-roles panel (Discord select menu cap). */
 export const MAX_PANEL_OPTIONS = 25;
 
+/** Discord custom emoji max file size (static and animated). */
+export const DISCORD_EMOJI_MAX_BYTES = 256 * 1024;
+
 /** Builds a Discord channel URL for the current guild. */
 export function channelUrl(guildId: string, channelId: string): string {
   return `https://discord.com/channels/${guildId}/${channelId}`;

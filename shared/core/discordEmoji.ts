@@ -9,6 +9,28 @@ export function parseEmoji(
   return { name: trimmed };
 }
 
+/** Guild emoji names: 2–32 alphanumeric characters or underscores. */
+export const EMOJI_NAME_RE = /^[a-zA-Z0-9_]{2,32}$/;
+
+export function isValidGuildEmojiName(name: string): boolean {
+  return EMOJI_NAME_RE.test(name);
+}
+
+/** True when the input is custom emoji markup with a snowflake id. */
+export function isCustomEmojiMarkup(emoji: string): boolean {
+  return parseEmoji(emoji)?.id !== undefined;
+}
+
+/** True when custom emoji markup is animated (`<a:name:id>`). */
+export function isAnimatedCustomEmojiMarkup(emoji: string): boolean {
+  return /^<a:\w+:\d+>$/.test(emoji.trim());
+}
+
+/** CDN URL for a custom emoji image. */
+export function customEmojiCdnUrl(id: string, animated: boolean): string {
+  return `https://cdn.discordapp.com/emojis/${id}.${animated ? "gif" : "png"}`;
+}
+
 function parseCustomEmojiId(emoji: string): string | undefined {
   const match = emoji.trim().match(/^<a?:(\w+):(\d+)>$/);
   return match?.[2];

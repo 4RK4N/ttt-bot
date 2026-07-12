@@ -321,6 +321,21 @@ run), so its `config.json` holds the module toggle and delete emoji. Set `"enabl
 and `/post`; while off they reply with a short "disabled" notice instead of
 posting.
 
+### `data/emojis/config.json` - /emoji-add and /emoji-copy commands
+
+```json
+{ "enabled": true, "emojiRoleId": "" }
+```
+
+- **`emojiRoleId`** — Discord role ID allowed to use `/emoji-add` and `/emoji-copy`
+  alongside Administrators. Leave empty for admins only. Set in the [Web editor](README.md#web-editor).
+
+User-facing error and success messages are editable in the web editor (`texts.json`).
+Images must be 256 KiB or smaller. Run `npm run deploy` after enabling the module
+so the slash commands appear in Discord.
+
+The bot needs **Manage Emojis and Stickers** in the server.
+
 ---
 
 ## Part 4 - Build the images
@@ -353,8 +368,8 @@ chmod +x scripts/build.sh   # once, on Linux/macOS
 
 This builds and recreates:
 
-- **`ttt-discord-bot:1.3.1`** — multi-stage Node 24: compile TypeScript (`npm run build:bot` → `dist/bot/`), runtime image with production dependencies only.
-- **`ttt-web-editor:1.3.1`** — same root `Dockerfile`, separate target (`npm run build:web-admin` → `dist/web-admin/`).
+- **`ttt-discord-bot:1.4.0`** — multi-stage Node 24: compile TypeScript (`npm run build:bot` → `dist/bot/`), runtime image with production dependencies only.
+- **`ttt-web-editor:1.4.0`** — same root `Dockerfile`, separate target (`npm run build:web-admin` → `dist/web-admin/`).
 - **`ttt-website:2.0.0`** — multi-stage: Astro static site (`website/`), served by nginx on port **8089** inside the container.
 
 Runtime config lives in the mounted `./data` volume — not copied into images at build time.
@@ -509,10 +524,10 @@ If you prefer not to use Compose:
 
 ```bash
 # Bot
-docker build -f Dockerfile --target ttt-discord-bot -t ttt-discord-bot:1.3.1 .
+docker build -f Dockerfile --target ttt-discord-bot -t ttt-discord-bot:1.4.0 .
 
 # Web editor
-docker build -f Dockerfile --target ttt-web-editor -t ttt-web-editor:1.3.1 .
+docker build -f Dockerfile --target ttt-web-editor -t ttt-web-editor:1.4.0 .
 
 # Website
 docker build -f website/Dockerfile -t ttt-website:2.0.0 website/
