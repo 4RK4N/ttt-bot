@@ -1,38 +1,17 @@
 # Example module data
 
-**Move this folder to the Docker data volume directory** (or your local `data/` tree).
+Optional on-disk assets for modules that need files (e.g. welcome card media under
+`data/welcome-message/media/`).
 
-With the default Docker Compose setup, that is the project-root `data/` folder on the
-host — bind-mounted to `/app/data` inside the bot and web-editor containers
-(see `docker-compose.yml`: `./data:/app/data`).
+**Settings and copy are not stored here** — they live in PostgreSQL (`module_*` tables)
+and are edited via the web editor.
 
-## Setup
+## New module checklist
 
-1. Copy this entire `example-module/` folder to:
+1. Add `MODULE_DEFAULTS` in the module's `types.ts`.
+2. Register the namespace in `shared/core/moduleTable.ts` and `scripts/db/schema.sql`.
+3. Add the namespace to `scripts/lib/moduleSeedDefaults.ts` for `./scripts/db-init.sh` seeding.
+4. Create `data/<namespace>/` only if the module needs binary assets on disk.
 
-   ```
-   data/example-module/
-   ```
-
-   The folder name must match `NAMESPACE` in `types.ts` (`createModuleData('example-module', …)`).
-
-2. Rename the example files to their runtime names:
-
-   ```
-   config.example.json  →  config.json
-   texts.example.json   →  texts.json
-   ```
-
-3. Edit via the web editor (after copying [`web-plugin.json`](../../web-plugin.json) to `shared/modules/<name>/`) or by hand.
-
-## Config vs texts
-
-| File          | Contents                                                                                |
-| ------------- | --------------------------------------------------------------------------------------- |
-| `config.json` | Settings: `enabled`, `channelId` (Discord snowflake), panel list rows for panel modules |
-| `texts.json`  | User-facing copy edited in the web editor                                               |
-
-The web editor validates `channel` / `role` fields as numeric Discord IDs on save.
-
-Edits invalidate the bot's in-memory cache automatically (`invalidateModuleCache` in
-`web-admin/src/store.ts`) — no restart required.
+The namespace in `createModuleData('…')` must match the table slug (e.g. `welcome-message`
+→ `module_welcome_message`).

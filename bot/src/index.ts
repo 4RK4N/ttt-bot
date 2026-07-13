@@ -17,8 +17,7 @@ import { startInternalApi } from "./internal-api/server.js";
 
 const MODULE_CACHE_REFRESH_MS = 15_000;
 
-// Generic fallback shown when a command handler throws. Not module-specific, so
-// it stays in code rather than a module's texts.json.
+// Generic fallback shown when a command handler throws. Not module-specific.
 const COMMAND_ERROR_MESSAGE =
   "Something went wrong while handling your command. Please try again.";
 

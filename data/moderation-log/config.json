@@ -4,6 +4,5 @@
   "logMessageDeleted": true,
   "logMemberLeft": true,
   "logMemberKicked": true,
-  "logMemberBanned": true,
-  "logMemberUnbanned": true
+  "logMemberBanned": true
 }

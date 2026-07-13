@@ -2,7 +2,6 @@
   "disabled": "Reaction roles are currently disabled.",
   "panelUnpublished": "This role panel is not available right now.",
   "invalidInteraction": "This interaction does not match a valid role panel.",
-  "cooldown": "Please wait a moment before trying again.",
   "roleError": "Could not update your roles. Please contact an administrator.",
   "roleHierarchyError": "The bot cannot assign one or more of these roles.",
   "panels": {

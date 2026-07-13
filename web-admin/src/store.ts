@@ -88,7 +88,7 @@ function readModuleRows(namespace: string): Record<string, unknown> {
       err,
     );
     throw new DataReadError(
-      `Cannot read module "${namespace}" from the database. Run ./scripts/db-init.sh or ./scripts/db-migrate.sh.`,
+      `Cannot read module "${namespace}" from the database. Run ./scripts/db-init.sh.`,
     );
   }
 }

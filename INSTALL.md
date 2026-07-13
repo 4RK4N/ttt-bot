@@ -84,10 +84,9 @@ docker compose version
 
    `db-init.sh` starts `ttt-postgres`, applies `scripts/db/schema.sql`, prompts
    for Discord/OAuth/API secrets (stored in the `app_config` table), and seeds
-   module tables from each `data/<module>/*.example.json`. Node steps run inside
-   the `ttt-discord-bot` container — build it first with `./scripts/build.sh bot`.
-
-   For an existing JSON-based install, see **Migrating from JSON** below instead.
+   module tables from code defaults (`MODULE_DEFAULTS` in each module's `types.ts`).
+   Node steps run inside the `ttt-discord-bot` container — build it first with
+   `./scripts/build.sh bot`.
 
    Host **Node.js is not required** on the server; only Docker.
 
@@ -96,10 +95,13 @@ Bot secrets and module settings live in **PostgreSQL** (`app_config` and
 
 - `data/config.json` — DB host/port/user/name (no password; internal Docker network)
 - Binary assets (welcome card media, fonts)
-- `*.example.json` templates (committed; used for seeding)
 
-Never commit `data/config.json`, `postgres-data/`, or live module JSON (legacy
-`.bak` files after migration). See **Configuration reference** below.
+Never commit `data/config.json` or `postgres-data/`. See **Configuration reference** below.
+
+**Schema updates:** add SQL under `scripts/db/migrations/`, then
+`./scripts/db-update.sh scripts/db/migrations/00N_description.sql`.
+
+**Backups:** `postgres-data/` holds database files; run `pg_dump` periodically.
 
 ---
 
@@ -132,8 +134,7 @@ No password — `ttt-postgres` uses `trust` on the internal Docker network only
 
 ### `app_config` table — bot + web editor secrets
 
-Populated interactively by `./scripts/db-init.sh` (or imported by
-`./scripts/db-migrate.sh` from a legacy root `config.json`).
+Populated interactively by `./scripts/db-init.sh`.
 
 | Key                 | Required         | Description |
 | ------------------- | ---------------- | ----------- |
@@ -183,14 +184,12 @@ enabled. The bot hot-reloads this from PostgreSQL.
 
 ### Module settings (`module_*` tables)
 
-Each module has a dedicated table (e.g. `module_tickets`). Top-level keys from the
-old `config.json` / `texts.json` layout are stored as individual rows. Panel
-modules (tickets, reaction-roles, custom-embeds) store merged list rows — e.g.
-`ticketTypes[]` includes both `channelId` and `panelTitle` in one array.
+Each module has a dedicated table (e.g. `module_tickets`). Settings and user-facing
+copy are stored as individual key rows (`JSONB` values). Panel modules (tickets,
+reaction-roles, custom-embeds) store merged list rows — e.g. `ticketTypes[]`
+includes both `channelId` and `panelTitle` in one array.
 
-Configure modules via the [Web editor](README.md#web-editor). Legacy
-`data/<module>/config.json` + `texts.json` files are no longer read at runtime
-after migration (kept as `*.json.bak` backups).
+Configure modules via the [Web editor](README.md#web-editor).
 
 ### links-pics-vids-autothread — auto-threading
 
@@ -315,7 +314,7 @@ Portal -> Bot -> Privileged Gateway Intents). Deleted-message logs do not requir
 
 Text template keys (e.g. `messageDeleted`, `memberBanned`) support tokens such as
 `{author}`, `{channel}`, `{mention}`, `{executorId}`, `{messageId}`, and `{userId}`.
-See `data/moderation-log/texts.example.json` for default wording.
+Defaults live in `bot/src/lib/modules/moderation-log/types.ts` (`TEXT_DEFAULTS`).
 
 ### custom-embeds — static embed panels
 
@@ -367,33 +366,6 @@ User-facing error and success messages are editable in the web editor. Images mu
 commands appear in Discord.
 
 The bot needs **Manage Emojis and Stickers** in the server.
-
----
-
-## Migrating from JSON storage
-
-If you already have a working install with secrets in `data/config.json` and
-module `config.json` / `texts.json` files:
-
-1. `docker compose up -d ttt-postgres`
-2. `./scripts/build.sh bot` — migrate/init Node steps run in this image
-3. `./scripts/db-init.sh` — schema only if tables are empty; skip app prompts if
-   you will migrate secrets from the legacy root config
-4. `./scripts/db-migrate.sh --dry-run` — review keys and merge warnings
-5. `./scripts/db-migrate.sh` — backs up `./data/` to `data/.migration-backup.<timestamp>/`,
-   imports into PostgreSQL, verifies round-trip, renames JSON → `*.json.bak`,
-   writes slim DB-only `data/config.json`
-6. `./scripts/build.sh bot web-editor` — rebuild and restart apps
-7. Smoke-test the web editor; keep backups for at least a week
-
-If migration fails, restore from the backup directory printed by the script.
-Use `--force` to overwrite non-empty DB tables.
-
-**Schema updates** after deploy: add SQL under `scripts/db/migrations/`, then
-`./scripts/db-update.sh scripts/db/migrations/00N_description.sql`.
-
-**Backups:** `postgres-data/` holds the database files; run `pg_dump` after a
-successful migrate. `postgres-data/` is git-ignored.
 
 ---
 
@@ -616,11 +588,9 @@ docker logs -f ttt-discord-bot
 - **Bot is online but `/pic` fails to post**: the bot needs **Send Messages** and
   **Attach Files** permissions in that channel. Re-check the channel's permission
   overrides for the bot's role.
-- **Web editor save errors**: module settings are stored in PostgreSQL, not
-  JSON files under `./data`. Ensure `ttt-postgres` is healthy and schema is applied.
-  Legacy note: if `./data` was chowned to uid 1000 for the old JSON editor, you
-  can revert to your own user — containers only need read access to
-  `data/config.json` and media assets.
+- **Web editor save errors**: ensure `ttt-postgres` is healthy and schema is applied.
+  During `./scripts/db-init.sh` or migration cutover, `data/` may need to be writable
+  by UID 1000; afterward containers only need read access to `data/config.json` and media assets.
 
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The
   bot reports this back to the user privately.

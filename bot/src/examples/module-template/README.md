@@ -16,8 +16,8 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
    [`validate.ts`](validate.ts) → `shared/modules/<name>/validate.ts`.
 2. Set namespace via `createModuleData('<name>', …)` in `bot/src/lib/modules/<name>/types.ts`
    (simple) or `shared/modules/<name>/types.ts` (panel — use `panel-types.ts` as starting point).
-3. Copy `data/example-module/` → project **`data/<namespace>/`** (Docker volume). Rename
-   `*.example.json` → `config.json` / `texts.json`.
+3. Register in `moduleTable.ts`, `schema.sql`, and `scripts/lib/moduleSeedDefaults.ts`; run
+   `./scripts/db-init.sh` (or `./scripts/db-seed.js --force` in Docker) to seed defaults.
 4. Wire `bot/src/modules/<name>/index.ts` — enable `commands`, `init`, and/or `componentRoutes` as needed.
 5. **Panel modules only:** uncomment panel block in `config-io.ts`; implement `panel.ts` + `publisher.ts`;
    wire `validate.ts` in `web-admin/src/store.ts`; register namespace in
@@ -38,7 +38,6 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 | `shared/modules/<name>/`            | `validate.ts`       | Panel/list row validation (web editor save) — lives here after copy      |
 | `bot/src/lib/modules/<name>/`       | `panel.ts`          | Panel publish payload — panel modules only                               |
 | `bot/src/lib/modules/<name>/`       | `publisher.ts`      | Publish/unpublish — panel modules only (see example-module/publisher.ts) |
-| `data/example-module/`              | (under this folder) | Seed JSON for `data/<namespace>/`                                        |
 
 ## Import rule
 
@@ -54,12 +53,10 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 PostgreSQL `module_*` table  ──►  get() / data()  in types.ts  ──►  re-exported by config-io.ts
 ```
 
-- **Defaults** in `types.ts` are fallbacks; JSON overrides at runtime.
-- Reads are **mtime-cached** in `shared/core/texts.ts` — web editor writes call
-  `invalidateModuleCache(namespace)` so the bot sees edits without restart.
+- **Defaults** in `types.ts` are fallbacks and seed values for `./scripts/db-init.sh`.
+- Reads are **cached** in `shared/core/texts.ts` — the bot refreshes when DB rows change.
 - **`isModuleEnabled(NAMESPACE)`** checks `config.enabled !== false` (web editor toggle).
-- **No `text-io.ts`** — texts are edited via web editor or hand; only config list items use
-  `createConfigIo` at runtime (publish flow).
+- **Panel list patches** use `createConfigIo` at runtime (publish flow).
 
 ## config-io.ts: simple vs panel
 
@@ -125,12 +122,12 @@ for full examples.
 | `componentRoutes[]` | `{ prefix: '<namespace>:', handle }` for buttons/selects                                                |
 | `publish*()`        | Panel modules — export from `bot/src/lib/modules/<name>/publisher.ts`; register in `publishRegistry.ts` |
 
-## Data folder
+## On-disk data
 
-**Move `data/example-module/` to the Docker data volume** — project-root `data/`
-(`./data:/app/data` in `docker-compose.yml`). Details: [`data/example-module/README.md`](data/example-module/README.md).
+Use `data/<namespace>/` only for **binary assets** (images, fonts). See
+[`data/example-module/README.md`](data/example-module/README.md).
 
-The namespace in `createModuleData('…')` must match the folder name under `data/`.
+The namespace in `createModuleData('…')` must match the module table slug.
 
 ## Debugging
 

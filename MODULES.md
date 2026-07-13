@@ -2,9 +2,9 @@
 
 Bot features live under `bot/src/modules/<name>/` (handlers), `bot/src/lib/modules/<name>/`
 (config-io, panels, publishers), and `shared/modules/<name>/` (web contract: types,
-validators, `web-plugin.json`). Runtime config under `data/<name>/`.
-The [web editor](README.md#web-editor) edits `config.json` / `texts.json` per module;
-changes hot-reload without restart. Panel publish/unpublish goes through the bot internal API.
+validators, `web-plugin.json`). Runtime settings live in PostgreSQL (`module_*` tables).
+The [web editor](README.md#web-editor) edits module settings; changes hot-reload without restart.
+Panel publish/unpublish goes through the bot internal API.
 
 Setup details and example JSON: [INSTALL.md](INSTALL.md#configuration-reference).
 
@@ -14,7 +14,7 @@ Setup details and example JSON: [INSTALL.md](INSTALL.md#configuration-reference)
 
 Posts a welcome card on join and sends rules by DM (falls back to channel if DMs closed).
 
-- **Config:** `channelId`, `rulesChannelId` — `data/welcome-message/config.json`
+- **Config:** `channelId`, `rulesChannelId` — `module_welcome_message` table / web editor
 - **Assets:** `data/welcome-message/media/`, `fonts/`
 - **Intent:** Server Members (`guildMemberAdd`)
 - **Tokens:** `{mention}`, `{rulesChannel}` in texts
@@ -50,7 +50,7 @@ Private-thread tickets via panel buttons — no slash commands.
 - **Config:** `ticketTypes[]` (channel, staff/denied roles, publish state, optional role-action role)
 - **Flow:** open → close → delete; publish/unpublish panels in web editor
 - **Intent:** Server Members (staff resolution)
-- **Setup:** [INSTALL.md — tickets](INSTALL.md#datatickets---ticket-panels-and-private-thread-tickets)
+- **Setup:** [INSTALL.md — tickets](INSTALL.md#tickets--ticket-panels-and-private-thread-tickets)
 
 ### reaction-roles
 
@@ -59,7 +59,7 @@ Embed role panels: buttons, emoji reactions, or dropdown (single/multi).
 - **Config:** `panels[]` (interaction type, role options, publish state)
 - **Intent:** Guild Message Reactions (emoji mode)
 - **Bot needs:** Manage Roles, role hierarchy above assignable roles
-- **Setup:** [INSTALL.md — reaction-roles](INSTALL.md#datareaction-roles---embed-role-panels)
+- **Setup:** [INSTALL.md — reaction-roles](INSTALL.md#reaction-roles--embed-role-panels)
 
 ### moderation-log
 
@@ -90,15 +90,14 @@ Upload or clone custom server emojis.
 
 ```
 data/
-  <namespace>/
-    config.json       # settings, enabled toggle, list rows (panels, ticketTypes, …)
-    texts.json        # user-facing copy
+  config.json         # DB bootstrap only (host/port/user/name)
   welcome-message/
     media/            # welcome card background
     fonts/            # welcome card font
 ```
 
-Each module ships code defaults in `types.ts`; missing or bad JSON falls back safely.
+Module settings and copy live in PostgreSQL (`module_*` tables), edited via the web editor.
+Each module ships code defaults in `types.ts`; `./scripts/db-init.sh` seeds empty tables from those defaults.
 Slash command names/descriptions stay in code — run `npm run deploy` after changes.
 
 Channel and role fields in the web editor are validated as Discord IDs (numeric snowflakes) on save.

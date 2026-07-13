@@ -2,13 +2,12 @@
   "enabled": true,
   "ticketTypes": [
     {
-      "id": "nsfw-yes",
+      "id": "support",
       "published": false,
       "emoji": "",
       "channelId": "",
       "panelMessageId": "",
-      "staffRoleId": "",
-      "deniedRoleIds": [],
+      "staffRoleIds": [],
       "roleActionRoleId": ""
     }
   ]

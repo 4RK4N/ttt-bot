@@ -1,5 +1,3 @@
-import { existsSync, readFileSync } from "node:fs";
-import path from "node:path";
 import {
   closeDbPool,
   initDbPool,
@@ -13,22 +11,7 @@ import {
   moduleTableName,
   type ModuleNamespace,
 } from "../shared/core/moduleTable.js";
-import { planModuleMigration } from "./lib/migrateJsonToDb.js";
-
-const DATA_DIR = path.resolve(process.cwd(), "data");
-
-function readJson(filePath: string): Record<string, unknown> {
-  const raw = readFileSync(filePath, "utf8");
-  const parsed = JSON.parse(raw) as unknown;
-  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error(`Invalid JSON object in ${filePath}`);
-  }
-  return parsed as Record<string, unknown>;
-}
-
-function examplePath(namespace: string, kind: "config" | "texts"): string {
-  return path.join(DATA_DIR, namespace, `${kind}.example.json`);
-}
+import { MODULE_SEED_DEFAULTS } from "./lib/moduleSeedDefaults.js";
 
 async function seedModuleTable(
   namespace: ModuleNamespace,
@@ -39,22 +22,13 @@ async function seedModuleTable(
     return 0;
   }
 
-  const configFile = examplePath(namespace, "config");
-  const textsFile = examplePath(namespace, "texts");
-  if (!existsSync(configFile) && !existsSync(textsFile)) {
-    console.warn(`[seed] No example JSON for module "${namespace}" — skipped.`);
-    return 0;
-  }
-
-  const configData = existsSync(configFile) ? readJson(configFile) : {};
-  const textsData = existsSync(textsFile) ? readJson(textsFile) : {};
-  const plan = planModuleMigration(namespace, configData, textsData);
+  const rows = MODULE_SEED_DEFAULTS[namespace];
 
   await withTransaction(async (client) => {
     if (force) {
       await client.query(`DELETE FROM ${table}`);
     }
-    for (const [key, value] of Object.entries(plan.rows)) {
+    for (const [key, value] of Object.entries(rows)) {
       await client.query(
         `INSERT INTO ${table} (key, value, updated_at)
          VALUES ($1, $2::jsonb, now())
@@ -65,7 +39,7 @@ async function seedModuleTable(
     }
   });
 
-  return Object.keys(plan.rows).length;
+  return Object.keys(rows).length;
 }
 
 export async function seedAllModuleTables(force: boolean): Promise<void> {

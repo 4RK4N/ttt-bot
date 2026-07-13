@@ -31,7 +31,7 @@ import {
 function initExample(client: Client): void {
   if (!targetChannelId()) {
     console.warn(
-      `[${NAMESPACE}] No channelId in data/${NAMESPACE}/config.json — module idle.`,
+      `[${NAMESPACE}] No channelId configured — module idle.`,
     );
     return;
   }

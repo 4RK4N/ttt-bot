@@ -18,7 +18,7 @@ Usage: $0 [--force]
 First-time PostgreSQL setup:
   1. Start ttt-postgres and apply schema
   2. Prompt for app secrets (app_config) when empty
-  3. Seed module tables from *.example.json when empty
+  3. Seed module tables from code defaults when empty
 
   --force  Overwrite existing app_config / module rows
 EOF
@@ -148,7 +148,7 @@ else
   echo "app_config already has ${app_count} row(s) — skipping prompts (use --force to overwrite)."
 fi
 
-echo "Seeding module tables from *.example.json..."
+echo "Seeding module tables from code defaults..."
 run_node_seed
 
 echo "Table summary:"

@@ -12,7 +12,7 @@ const linksPicsVidsAutoThreadModule: CommandModule = {
     if (channelIds().length === 0) {
       console.warn(
         "[links-pics-vids-autothread] No channelIds configured in " +
-          "data/links-pics-vids-autothread/config.json; auto-threading is disabled.",
+        "links-pics-vids-autothread disabled or no channelIds configured.",
       );
       return;
     }

@@ -14,7 +14,7 @@ const welcomeMessageModule: CommandModule = {
     if (!welcomeChannelId()) {
       console.warn(
         "[welcome-message] No channelId configured in " +
-          "data/welcome-message/config.json; welcome messages are disabled.",
+        "welcome-message module disabled or no channelId configured.",
       );
       return;
     }

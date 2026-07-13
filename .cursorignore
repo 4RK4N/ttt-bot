@@ -1,9 +1,2 @@
-ï»¿# Runtime config holds secrets; templates (*.example.json) stay visible.
+# Runtime config — DB bootstrap only.
 data/config.json
-data/*/config.json
-data/*/texts.json
-
-# Build output (bot -> dist/, Astro -> website/dist/).
-dist/
-
-.ssh/

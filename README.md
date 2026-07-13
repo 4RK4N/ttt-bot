@@ -21,11 +21,11 @@ Copy the reference template — it is **not loaded by the bot** (only `bot/src/m
 
    Use kebab-case for `<name>` (e.g. `my-feature`). Delete unused files (`panel.ts`, `validate.ts` for simple modules).
 
-2. **Set the namespace** — `createModuleData('<name>', …)` must match the data folder:
+2. **Set the namespace** — `createModuleData('<name>', …)` must match the PostgreSQL table prefix:
    - **Simple modules:** `bot/src/lib/modules/<name>/types.ts`
    - **Panel modules:** `shared/modules/<name>/types.ts` (copy from [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts))
 
-3. **Seed runtime data** — copy `bot/src/examples/module-template/data/example-module/` to `data/<name>/` on the host (Docker volume `./data:/app/data`). Rename `*.example.json` → `config.json` / `texts.json`.
+3. **Register the module table** — add the namespace to `MODULE_NAMESPACES` in `shared/core/moduleTable.ts` and `scripts/db/schema.sql`, then run `./scripts/db-update.sh` with a migration SQL file.
 
 4. **Wire `index.ts`** — export a `CommandModule` with at least one of:
    - `init(client)` — event listeners
@@ -34,7 +34,7 @@ Copy the reference template — it is **not loaded by the bot** (only `bot/src/m
 
 5. **Web editor (optional)** — keep/adapt `web-plugin.json`; rebuild so `copy-web-plugins.js` copies it to `dist/`.
 
-6. **Panel modules only** — copy [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts) and [`validate.ts`](bot/src/examples/module-template/validate.ts) to `shared/modules/<name>/`; bot lib `panel.ts` / `publisher.ts`; wire validate in `web-admin/src/store.ts`; register namespace in `bot/src/internal-api/publishRegistry.ts`.
+6. **Panel modules only** — copy [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts) and [`validate.ts`](bot/src/examples/module-template/validate.ts) to `shared/modules/<name>/`; bot lib `panel.ts` / `publisher.ts`; wire validate in `web-admin/src/store.ts`; register namespace in `bot/src/internal-api/publishRegistry.ts`; add defaults to `scripts/lib/moduleSeedDefaults.ts`.
 
 Handlers import config/texts from **`bot/src/lib/modules/<name>/config-io.ts`**, not `types.ts`. Patterns and core helpers are documented in [`bot/src/examples/module-template/README.md`](bot/src/examples/module-template/README.md).
 
@@ -59,27 +59,27 @@ No core changes needed — [`moduleLoader.ts`](bot/src/moduleLoader.ts) discover
 | [custom-embeds](MODULES.md#custom-embeds)                           | Static embed info panels               |
 | [emojis](MODULES.md#emojis-emoji-add-emoji-copy)                    | `/emoji-add` / `/emoji-copy`           |
 
-Runtime settings and copy live in `data/<module>/`. Edit via the web editor or by hand —
-the bot hot-reloads on the next event.
+Runtime settings and copy live in PostgreSQL. Edit via the web editor — the bot hot-reloads on a short interval.
 
 ## Project layout
 
 ```
-shared/           core/, config.ts, modules/ (types, config-io, validate, panel, publisher)
+shared/           core/, config.ts, modules/ (types, validate, web-plugin.json)
 bot/src/          index.ts, moduleLoader.ts, modules/ (handlers + index.ts), examples/
 web-admin/src/    web editor server + UI
 website/          Astro public site (see INSTALL.md § Part 7)
 Dockerfile        bot + web-editor image targets (shared npm ci)
-data/             config.json, per-module config + texts (gitignored secrets)
-scripts/          build.sh, deploy-commands, copy-web-plugins
+data/             DB bootstrap config.json + binary assets (welcome media)
+scripts/          build.sh, db-init.sh, deploy-commands, copy-web-plugins
+postgres-data/    PostgreSQL data directory (gitignored)
 ```
 
 ## Web editor
 
-Browser UI for editing module `config.json` / `texts.json` (side-tabs per module).
-Runs as a separate container sharing the bot's `data/` volume — no restart needed.
+Browser UI for editing module settings in PostgreSQL (side-tabs per module).
+Runs as a separate container on the same Docker network as Postgres — no restart needed for module edits.
 
-- Per-module **on/off** toggle (`enabled` in config)
+- Per-module **on/off** toggle (`enabled` in `module_*` table)
 - Fields declared in each module's `web-plugin.json`
 - Guild **administrator** access via Discord OAuth
 
@@ -92,13 +92,11 @@ With Docker: `./scripts/build.sh` for deploy (see [INSTALL.md § Part 4](INSTALL
 
 ## Setup
 
-1. Node.js 24+
+1. Node.js 24+ (local dev only; Docker-only servers need only Docker)
 2. `npm install`
 3. [Developer Portal](https://discord.com/developers/applications): bot token + client ID; invite with Administrator (see [INSTALL.md](INSTALL.md))
-4. `cp data/config.example.json data/config.json` — fill in:
-   - **Bot (required):** `discordToken`, `clientId`
-   - **Web editor (required for `npm run web`):** also `clientSecret`, `sessionSecret`, `oauthRedirectUri`, `guildId` — see [INSTALL.md](INSTALL.md) for OAuth setup
-5. Seed module data: copy each `data/<module>/*.example.json` → `config.json` / `texts.json` ([MODULES.md](MODULES.md#data-layout))
+4. `cp data/config.example.json data/config.json` — DB bootstrap only
+5. `./scripts/db-init.sh` — schema, app secrets (`app_config`), module defaults (see [INSTALL.md](INSTALL.md))
 
 ## Deploy slash commands
 

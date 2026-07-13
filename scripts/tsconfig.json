@@ -9,7 +9,6 @@
   },
   "include": [
     "deploy-commands.ts",
-    "db-migrate.ts",
     "db-seed.ts",
     "db-write-app-config.ts",
     "lib/**/*.ts"

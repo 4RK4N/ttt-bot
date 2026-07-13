@@ -10,7 +10,7 @@ import { getMemberDisplayName } from "./memberDisplayNames.js";
 export const THREAD_NAME_MAX = 100; // Discord's hard limit for thread names.
 
 // Default bilingual opener for comments threads. Each thread module keeps its own
-// editable copy in its texts.json; this constant is the seed/fallback for them.
+// Default thread opener; modules override via `threadFirstMessage` in the database.
 export const DEFAULT_THREAD_FIRST_MESSAGE =
   "Please comment here in the thread to not clutter the channel.\n\n" +
   "Bitte hier im Thread kommentieren um nicht den Channel zu überlasten.";

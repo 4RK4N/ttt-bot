@@ -12,7 +12,7 @@ const moderationLogModule: CommandModule = {
     if (!logChannelId()) {
       console.warn(
         "[moderation-log] No channelId configured in " +
-          "data/moderation-log/config.json; moderation logging is disabled.",
+        "moderation-log disabled or no channelId configured.",
       );
     }
 
