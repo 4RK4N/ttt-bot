@@ -26,8 +26,4 @@ if ! docker compose exec -T ttt-postgres pg_isready -U ttt -d ttt >/dev/null 2>&
   exit 1
 fi
 
-ROOT="$(pwd)"
-docker compose run --rm --no-deps \
-  -v "${ROOT}:/host:rw" \
-  -e TTT_BACKUP_DIR=/host \
-  ttt-discord-bot node dist/scripts/db-migrate.js "$@"
+docker compose run --rm --no-deps ttt-discord-bot node dist/scripts/db-migrate.js "$@"

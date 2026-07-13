@@ -1,6 +1,7 @@
 import {
   cpSync,
   existsSync,
+  mkdirSync,
   readFileSync,
   readdirSync,
   renameSync,
@@ -94,13 +95,18 @@ function collectUnknownDataDirs(): string[] {
 
 function backupDataDir(): string {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const backupRoot = process.env.TTT_BACKUP_DIR?.trim()
-    ? path.resolve(process.env.TTT_BACKUP_DIR.trim())
-    : path.resolve(process.cwd());
-  const dest = path.join(backupRoot, `data.backup.${stamp}`);
-  cpSync(DATA_DIR, dest, { recursive: true });
+  const dest = path.join(DATA_DIR, `.migration-backup-${stamp}`);
+  mkdirSync(dest, { recursive: true });
+
+  for (const name of readdirSync(DATA_DIR)) {
+    if (name.startsWith(".migration-backup-")) continue;
+    cpSync(path.join(DATA_DIR, name), path.join(dest, name), { recursive: true });
+  }
+
   console.log(`Backup created: ${dest}`);
-  console.log(`Restore with: rm -rf data && cp -a ${path.basename(dest)} data`);
+  console.log(
+    `Restore with: rm -rf data && cp -a ${path.relative(process.cwd(), dest)}/. data`,
+  );
   return dest;
 }
 

@@ -380,7 +380,7 @@ module `config.json` / `texts.json` files:
 3. `./scripts/db-init.sh` — schema only if tables are empty; skip app prompts if
    you will migrate secrets from the legacy root config
 4. `./scripts/db-migrate.sh --dry-run` — review keys and merge warnings
-5. `./scripts/db-migrate.sh` — backs up `./data/` to `data.backup.<timestamp>/`,
+5. `./scripts/db-migrate.sh` — backs up `./data/` to `data/.migration-backup.<timestamp>/`,
    imports into PostgreSQL, verifies round-trip, renames JSON → `*.json.bak`,
    writes slim DB-only `data/config.json`
 6. `./scripts/build.sh bot web-editor` — rebuild and restart apps
