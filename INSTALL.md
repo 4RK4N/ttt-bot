@@ -595,6 +595,13 @@ docker logs -f ttt-discord-bot
 
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The
   bot reports this back to the user privately.
+- **Website build panics at "Building static entrypoints"** (`rayon-core` /
+  `ThreadPoolBuildError`, `Resource temporarily unavailable`): Astro 7's Rust
+  compiler tries to spawn too many threads inside the Docker build container.
+  `website/Dockerfile` sets `RAYON_NUM_THREADS=4` to cap this. Rebuild with
+  `docker compose build ttt-website` or `./scripts/build.sh website`. Keep
+  `COMPOSE_BAKE=true` in `.env` so compose bake ulimits apply; avoid bare
+  `docker build` for the website unless you pass equivalent `--ulimit` flags.
 
 ---
 
