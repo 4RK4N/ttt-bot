@@ -94,7 +94,10 @@ function collectUnknownDataDirs(): string[] {
 
 function backupDataDir(): string {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const dest = path.resolve(process.cwd(), `data.backup.${stamp}`);
+  const backupRoot = process.env.TTT_BACKUP_DIR?.trim()
+    ? path.resolve(process.env.TTT_BACKUP_DIR.trim())
+    : path.resolve(process.cwd());
+  const dest = path.join(backupRoot, `data.backup.${stamp}`);
   cpSync(DATA_DIR, dest, { recursive: true });
   console.log(`Backup created: ${dest}`);
   console.log(`Restore with: rm -rf data && cp -a ${path.basename(dest)} data`);

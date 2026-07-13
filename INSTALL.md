@@ -84,9 +84,12 @@ docker compose version
 
    `db-init.sh` starts `ttt-postgres`, applies `scripts/db/schema.sql`, prompts
    for Discord/OAuth/API secrets (stored in the `app_config` table), and seeds
-   module tables from each `data/<module>/*.example.json`.
+   module tables from each `data/<module>/*.example.json`. Node steps run inside
+   the `ttt-discord-bot` container — build it first with `./scripts/build.sh bot`.
 
    For an existing JSON-based install, see **Migrating from JSON** below instead.
+
+   Host **Node.js is not required** on the server; only Docker.
 
 Bot secrets and module settings live in **PostgreSQL** (`app_config` and
 `module_*` tables). On disk under `data/` you keep only:
@@ -373,14 +376,15 @@ If you already have a working install with secrets in `data/config.json` and
 module `config.json` / `texts.json` files:
 
 1. `docker compose up -d ttt-postgres`
-2. `./scripts/db-init.sh` — schema only if tables are empty; skip app prompts if
+2. `./scripts/build.sh bot` — migrate/init Node steps run in this image
+3. `./scripts/db-init.sh` — schema only if tables are empty; skip app prompts if
    you will migrate secrets from the legacy root config
-3. `./scripts/db-migrate.sh --dry-run` — review keys and merge warnings
-4. `./scripts/db-migrate.sh` — backs up `./data/` to `data.backup.<timestamp>/`,
+4. `./scripts/db-migrate.sh --dry-run` — review keys and merge warnings
+5. `./scripts/db-migrate.sh` — backs up `./data/` to `data.backup.<timestamp>/`,
    imports into PostgreSQL, verifies round-trip, renames JSON → `*.json.bak`,
    writes slim DB-only `data/config.json`
-5. `./scripts/build.sh bot web-editor` — restart apps
-6. Smoke-test the web editor; keep backups for at least a week
+6. `./scripts/build.sh bot web-editor` — rebuild and restart apps
+7. Smoke-test the web editor; keep backups for at least a week
 
 If migration fails, restore from the backup directory printed by the script.
 Use `--force` to overwrite non-empty DB tables.

@@ -39,21 +39,18 @@ export function loadDbBootstrapConfig(): DbBootstrapConfig {
     );
   }
 
-  function requiredString(key: string): string {
-    const value = raw[key];
-    if (typeof value !== "string" || value.trim() === "") {
-      throw new Error(
-        `Missing required DB config "${key}" in "${CONFIG_FILE}".`,
-      );
+  function optionalString(value: unknown, fallback: string): string {
+    if (typeof value === "string" && value.trim() !== "") {
+      return value.trim();
     }
-    return value.trim();
+    return fallback;
   }
 
   return {
-    dbHost: requiredString("dbHost"),
+    dbHost: optionalString(raw.dbHost, "ttt-postgres"),
     dbPort: optionalPort(raw.dbPort, 5432),
-    dbUser: requiredString("dbUser"),
-    dbName: requiredString("dbName"),
+    dbUser: optionalString(raw.dbUser, "ttt"),
+    dbName: optionalString(raw.dbName, "ttt"),
   };
 }
 

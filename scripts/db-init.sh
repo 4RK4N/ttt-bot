@@ -64,26 +64,16 @@ app_count="$(docker compose exec -T ttt-postgres psql -U ttt -d ttt -Atqc "SELEC
 
 run_write_app_config() {
   local config_file="$1"
-  if [[ -f dist/scripts/db-write-app-config.js ]]; then
-    node dist/scripts/db-write-app-config.js "$config_file"
-    return
-  fi
-  npx tsx scripts/db-write-app-config.ts "$config_file"
+  docker compose run --rm --no-deps \
+    -v "${config_file}:/tmp/app-config.json:ro" \
+    ttt-discord-bot node dist/scripts/db-write-app-config.js /tmp/app-config.json
 }
 
 run_node_seed() {
-  if [[ -f dist/scripts/db-seed.js ]]; then
-    if [[ "$FORCE" -eq 1 ]]; then
-      node dist/scripts/db-seed.js --force
-    else
-      node dist/scripts/db-seed.js
-    fi
-    return
-  fi
   if [[ "$FORCE" -eq 1 ]]; then
-    npx tsx scripts/db-seed.ts --force
+    docker compose run --rm --no-deps ttt-discord-bot node dist/scripts/db-seed.js --force
   else
-    npx tsx scripts/db-seed.ts
+    docker compose run --rm --no-deps ttt-discord-bot node dist/scripts/db-seed.js
   fi
 }
 
@@ -173,4 +163,4 @@ docker compose exec -T ttt-postgres psql -U ttt -d ttt -c \
    UNION ALL SELECT 'module_moderation_log', COUNT(*) FROM module_moderation_log
    UNION ALL SELECT 'module_emojis', COUNT(*) FROM module_emojis;"
 
-echo "Done. Start bot and web editor with: ./scripts/build.sh bot web-editor"
+echo "Done. Build and start bot and web editor with: ./scripts/build.sh bot web-editor"
