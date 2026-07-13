@@ -12,8 +12,8 @@ import {
 import type { Message } from "discord.js";
 import {
   NAMESPACE,
+  data,
   targetChannelId,
-  texts,
 } from "../../lib/modules/example-module/config-io.js";
 
 // Optional core imports (uncomment when needed):
@@ -38,11 +38,11 @@ export function isTargetChannel(message: Message): boolean {
 // -----------------------------------------------------------------------------
 
 export function disabledReply(): string {
-  return texts().disabled;
+  return data().disabled;
 }
 
 export function greetingForUser(userId: string): string {
-  return format(texts().greeting, { mention: `<@${userId}>` });
+  return format(data().greeting, { mention: `<@${userId}>` });
 }
 
 // -----------------------------------------------------------------------------

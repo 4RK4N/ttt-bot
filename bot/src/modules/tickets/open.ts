@@ -28,7 +28,7 @@ import { addMembersToThread, collectStaffUserIds } from "./thread-members.js";
 import { lookupOpenTicketThreadId, registerOpenTicket } from "./open-index.js";
 import {
   resolveTicketType,
-  texts,
+  data,
   NAMESPACE,
 } from "../../lib/modules/tickets/config-io.js";
 
@@ -111,7 +111,7 @@ export async function handleOpenTicket(
 ): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-  const t = texts();
+  const t = data();
 
   if (!isModuleEnabled(NAMESPACE)) {
     await interaction.editReply(t.disabled);

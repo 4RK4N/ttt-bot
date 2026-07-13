@@ -1,53 +1,20 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { DATA_DIR } from "./core/texts.js";
+import { initDbPool, loadDbBootstrapConfig } from "./core/db.js";
+import { APP_CONFIG_TABLE } from "./core/moduleTable.js";
+import { getDbDataAll, invalidateTableCache } from "./core/dbData.js";
 
-const CONFIG_FILE = path.join(DATA_DIR, "config.json");
-
-interface RawConfig {
-  discordToken?: string;
-  clientId?: string;
-  guildId?: string;
-  botName?: string;
-  clientSecret?: string;
-  sessionSecret?: string;
-  oauthRedirectUri?: string;
-  webPort?: number | string;
-  internalApiPort?: number | string;
-  internalApiSecret?: string;
-  internalApiBind?: string;
-  botInternalApiUrl?: string;
-}
-
-function loadRaw(): RawConfig {
-  try {
-    return JSON.parse(readFileSync(CONFIG_FILE, "utf8")) as RawConfig;
-  } catch (err) {
-    throw new Error(
-      `Could not read configuration from "${CONFIG_FILE}". ` +
-        'Copy "data/config.example.json" to "data/config.json" and fill in the values. ' +
-        `(${(err as Error).message})`,
-    );
-  }
-}
-
-const raw = loadRaw();
+const CONFIG_FILE_KEYS = new Set([
+  "dbHost",
+  "dbPort",
+  "dbUser",
+  "dbName",
+  "databaseUrl",
+  "_docker",
+]);
 
 function trimmedOrUndefined(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() !== ""
     ? value.trim()
     : undefined;
-}
-
-function required(key: keyof RawConfig): string {
-  const value = trimmedOrUndefined(raw[key]);
-  if (!value) {
-    throw new Error(
-      `Missing required config value "${key}" in "${CONFIG_FILE}". ` +
-        'See "data/config.example.json" for the expected shape.',
-    );
-  }
-  return value;
 }
 
 function optionalPort(value: unknown, fallback: number): number {
@@ -60,14 +27,22 @@ function optionalPort(value: unknown, fallback: number): number {
     : fallback;
 }
 
+function requiredFromRows(rows: Record<string, unknown>, key: string): string {
+  const value = trimmedOrUndefined(rows[key]);
+  if (!value) {
+    throw new Error(
+      `Missing required app config "${key}" in database table "${APP_CONFIG_TABLE}". ` +
+      "Run ./scripts/db-init.sh or ./scripts/db-migrate.sh.",
+    );
+  }
+  return value;
+}
+
 export interface Config {
   discordToken: string;
   clientId: string;
   guildId: string | undefined;
-  // Display name used in the web editor's title (e.g. "<botName> Admin Interface").
   botName: string;
-  // Web editor settings. These are optional here so the bot process starts
-  // without them; the web entrypoint validates the ones it needs (see web/config).
   clientSecret: string | undefined;
   sessionSecret: string | undefined;
   oauthRedirectUri: string | undefined;
@@ -78,23 +53,31 @@ export interface Config {
   botInternalApiUrl: string | undefined;
 }
 
-export const config: Config = {
-  discordToken: required("discordToken"),
-  clientId: required("clientId"),
-  // Optional: when set, slash commands register to this guild instantly (great for dev).
-  guildId: trimmedOrUndefined(raw.guildId),
-  // Bot/display name shown in the web editor title; falls back to "TTT".
-  botName: trimmedOrUndefined(raw.botName) ?? "TTT",
-  // OAuth client secret used by the web editor to exchange the auth code.
-  clientSecret: trimmedOrUndefined(raw.clientSecret),
-  // Secret used to sign the web editor's session cookies.
-  sessionSecret: trimmedOrUndefined(raw.sessionSecret),
-  // Registered Discord OAuth2 redirect URI (must match the Developer Portal).
-  oauthRedirectUri: trimmedOrUndefined(raw.oauthRedirectUri),
-  // Port the web editor listens on.
-  webPort: optionalPort(raw.webPort, 8088),
-  internalApiPort: optionalPort(raw.internalApiPort, 8087),
-  internalApiSecret: trimmedOrUndefined(raw.internalApiSecret),
-  internalApiBind: trimmedOrUndefined(raw.internalApiBind),
-  botInternalApiUrl: trimmedOrUndefined(raw.botInternalApiUrl),
-};
+export let config: Config;
+
+export async function initConfig(): Promise<void> {
+  initDbPool(loadDbBootstrapConfig());
+  const rows = await getDbDataAll(APP_CONFIG_TABLE);
+  config = {
+    discordToken: requiredFromRows(rows, "discordToken"),
+    clientId: requiredFromRows(rows, "clientId"),
+    guildId: trimmedOrUndefined(rows.guildId),
+    botName: trimmedOrUndefined(rows.botName) ?? "TTT",
+    clientSecret: trimmedOrUndefined(rows.clientSecret),
+    sessionSecret: trimmedOrUndefined(rows.sessionSecret),
+    oauthRedirectUri: trimmedOrUndefined(rows.oauthRedirectUri),
+    webPort: optionalPort(rows.webPort, 8088),
+    internalApiPort: optionalPort(rows.internalApiPort, 8087),
+    internalApiSecret: trimmedOrUndefined(rows.internalApiSecret),
+    internalApiBind: trimmedOrUndefined(rows.internalApiBind),
+    botInternalApiUrl: trimmedOrUndefined(rows.botInternalApiUrl),
+  };
+}
+
+export function isAppConfigDbKey(key: string): boolean {
+  return CONFIG_FILE_KEYS.has(key);
+}
+
+export function invalidateAppConfigCache(): void {
+  invalidateTableCache(APP_CONFIG_TABLE);
+}

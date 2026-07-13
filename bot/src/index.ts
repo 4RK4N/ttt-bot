@@ -6,9 +6,16 @@ import {
   Partials,
   type Interaction,
 } from "discord.js";
-import { config } from "../../shared/config.js";
+import { config, initConfig } from "../../shared/config.js";
+import { MODULE_NAMESPACES } from "../../shared/core/moduleTable.js";
+import {
+  refreshStaleModuleCaches,
+  warmAllModuleCaches,
+} from "../../shared/core/texts.js";
 import { loadModules } from "./moduleLoader.js";
 import { startInternalApi } from "./internal-api/server.js";
+
+const MODULE_CACHE_REFRESH_MS = 15_000;
 
 // Generic fallback shown when a command handler throws. Not module-specific, so
 // it stays in code rather than a module's texts.json.
@@ -19,6 +26,16 @@ const COMPONENT_ERROR_MESSAGE =
   "Something went wrong while handling that interaction. Please try again.";
 
 async function main(): Promise<void> {
+  await initConfig();
+  await warmAllModuleCaches([...MODULE_NAMESPACES]);
+
+  const cacheRefreshTimer = setInterval(() => {
+    void refreshStaleModuleCaches([...MODULE_NAMESPACES]).catch((err) => {
+      console.error("Failed to refresh module caches:", err);
+    });
+  }, MODULE_CACHE_REFRESH_MS);
+  cacheRefreshTimer.unref();
+
   // GuildMembers + Partials.GuildMember: member join/leave (incl. uncached removes).
   // GuildModeration: moderation log ban/unban events. GuildMessageReactions:
   // reaction-roles emoji mode. MessageContent and GuildMembers are privileged

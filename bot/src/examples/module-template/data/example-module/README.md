@@ -14,7 +14,7 @@ host — bind-mounted to `/app/data` inside the bot and web-editor containers
    data/example-module/
    ```
 
-   The folder name must match `NAMESPACE` in `types.ts` (`createModuleConfig('example-module', …)`).
+   The folder name must match `NAMESPACE` in `types.ts` (`createModuleData('example-module', …)`).
 
 2. Rename the example files to their runtime names:
 

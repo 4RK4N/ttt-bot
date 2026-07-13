@@ -6,6 +6,24 @@ networks:
   ttt-internal:
 
 services:
+  ttt-postgres:
+    image: postgres:16-alpine
+    container_name: ttt-postgres
+    environment:
+      POSTGRES_USER: ttt
+      POSTGRES_DB: ttt
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - ttt-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ttt -d ttt"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   ttt-discord-bot:
     build:
       context: .
@@ -19,6 +37,10 @@ services:
     pull_policy: build
 
     container_name: ttt-discord-bot
+
+    depends_on:
+      ttt-postgres:
+        condition: service_healthy
 
     volumes:
       - ./data:/app/data
@@ -50,6 +72,8 @@ services:
     container_name: ttt-web-editor
 
     depends_on:
+      ttt-postgres:
+        condition: service_healthy
       ttt-discord-bot:
         condition: service_healthy
 

@@ -17,7 +17,7 @@ vi.mock("../bot/src/lib/modules/tickets/config-io.js", () => ({
           confirmCloseNo: "No",
         }
       : null,
-  texts: () => ({
+  data: () => ({
     disabled: "Disabled",
     categoryUnpublished: "Unpublished",
     threadContextRequired: "Thread required",

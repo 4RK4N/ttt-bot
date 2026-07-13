@@ -7,7 +7,7 @@ import { parseButtonCustomId } from "./parsers.js";
 import { formatEphemeralMessage, replyRoleResult } from "./respond.js";
 import {
   resolveOption,
-  texts,
+  get,
 } from "../../lib/modules/reaction-roles/config-io.js";
 import type { ResolvedRolePanel } from "../../../../shared/modules/reaction-roles/types.js";
 
@@ -30,7 +30,7 @@ export async function handleButtonInteraction(
 ): Promise<void> {
   const parsed = parseButtonCustomId(interaction.customId);
   if (!parsed) {
-    await replyEphemeral(interaction, texts().invalidInteraction);
+    await replyEphemeral(interaction, get("invalidInteraction"));
     return;
   }
 

@@ -13,7 +13,7 @@ import { finalizeTicketClose, resolveOpenerUserId } from "./finalize-close.js";
 import { guardTicketThreadAction } from "./guards.js";
 import { ROLE_ACTION_PREFIX } from "../../lib/modules/tickets/panel.js";
 import { canStaffOrAdmin } from "./permissions.js";
-import { texts } from "../../lib/modules/tickets/config-io.js";
+import { get } from "../../lib/modules/tickets/config-io.js";
 
 interface ParsedRoleActionCustomId {
   threadId: string;
@@ -41,7 +41,7 @@ export async function handleRoleAction(
 ): Promise<void> {
   const parsed = parseRoleActionCustomId(interaction.customId);
   if (!parsed) {
-    await replyEphemeral(interaction, texts().invalidInteraction);
+    await replyEphemeral(interaction, get("invalidInteraction"));
     return;
   }
 

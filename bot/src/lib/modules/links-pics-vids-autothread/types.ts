@@ -1,4 +1,7 @@
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 const DEFAULT_NON_QUALIFYING_DM =
@@ -11,9 +14,7 @@ export interface AutoThreadTexts {
 }
 
 export interface AutoThreadConfig {
-  // Channel IDs where the bot auto-creates a comments thread on qualifying posts.
   channelIds: string[];
-  /** When true, delete non-qualifying posts and DM the author. Default off. */
   deleteNonQualifyingMessages?: boolean;
 }
 
@@ -27,20 +28,25 @@ export const TEXT_DEFAULTS: AutoThreadTexts = {
   nonQualifyingDm: DEFAULT_NON_QUALIFYING_DM,
 };
 
-const module = createModuleConfig(
-  "links-pics-vids-autothread",
+export type AutoThreadModuleData = AutoThreadConfig & AutoThreadTexts;
+
+export const MODULE_DEFAULTS: AutoThreadModuleData = moduleDefaultsFromParts(
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
 );
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+const mod = createModuleData("links-pics-vids-autothread", MODULE_DEFAULTS);
+
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;
 
 export function channelIds(): string[] {
-  return config().channelIds;
+  return get("channelIds");
 }
 
-export function deleteNonQualifyingMessagesEnabled(cfg = config()): boolean {
-  return cfg.deleteNonQualifyingMessages === true;
+export function deleteNonQualifyingMessagesEnabled(
+  moduleData = data(),
+): boolean {
+  return moduleData.deleteNonQualifyingMessages === true;
 }

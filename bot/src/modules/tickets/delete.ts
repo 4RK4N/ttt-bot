@@ -10,14 +10,14 @@ import {
   DELETE_CONFIRM_PREFIX,
 } from "../../lib/modules/tickets/panel.js";
 import { canDeleteTicket } from "./permissions.js";
-import { texts } from "../../lib/modules/tickets/config-io.js";
+import { get } from "../../lib/modules/tickets/config-io.js";
 
 export async function handleDeleteTicket(
   interaction: ButtonInteraction,
 ): Promise<void> {
   const parsed = parseDeleteCustomId(interaction.customId);
   if (!parsed) {
-    await replyEphemeral(interaction, texts().invalidInteraction);
+    await replyEphemeral(interaction, get("invalidInteraction"));
     return;
   }
 
@@ -74,7 +74,7 @@ export async function handleDeleteCancel(
   interaction: ButtonInteraction,
 ): Promise<void> {
   await interaction.update({
-    content: texts().deleteCancelled,
+    content: get("deleteCancelled"),
     components: [],
   });
 }

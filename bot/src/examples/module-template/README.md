@@ -14,7 +14,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
    Copy [`web-plugin.json`](web-plugin.json) → `shared/modules/<name>/` for the web editor.
    **Panel modules:** also copy [`panel-types.ts`](panel-types.ts) → `shared/modules/<name>/types.ts` and
    [`validate.ts`](validate.ts) → `shared/modules/<name>/validate.ts`.
-2. Set namespace via `createModuleConfig('<name>', …)` in `bot/src/lib/modules/<name>/types.ts`
+2. Set namespace via `createModuleData('<name>', …)` in `bot/src/lib/modules/<name>/types.ts`
    (simple) or `shared/modules/<name>/types.ts` (panel — use `panel-types.ts` as starting point).
 3. Copy `data/example-module/` → project **`data/<namespace>/`** (Docker volume). Rename
    `*.example.json` → `config.json` / `texts.json`.
@@ -28,7 +28,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 
 | Location                            | File                | Purpose                                                                  |
 | ----------------------------------- | ------------------- | ------------------------------------------------------------------------ |
-| `bot/src/lib/modules/<name>/`       | `types.ts`          | Simple modules — interfaces, defaults, `config()`, `texts()`             |
+| `bot/src/lib/modules/<name>/`       | `types.ts`          | Simple modules — interfaces, defaults, `get()` / `data()`                |
 | `shared/modules/<name>/`            | `types.ts`          | Panel modules — copy from [`panel-types.ts`](panel-types.ts)             |
 | `bot/src/lib/modules/<name>/`       | `config-io.ts`      | IO boundary — **handlers import from here**, not `types.ts`              |
 | `bot/src/modules/<name>/`           | `handlers.ts`       | Example patterns: guards, config/text reads, interactions                |
@@ -44,15 +44,14 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 
 | Import from        | Use for                                                                   |
 | ------------------ | ------------------------------------------------------------------------- |
-| **`config-io.ts`** | `NAMESPACE`, `config()`, `texts()`, `resolve*()`, `get*Config`, `update*` |
+| **`config-io.ts`** | `NAMESPACE`, `get()`, `data()`, `resolve*()`, `get*Config`, `update*` |
 | **`types.ts`**     | TypeScript types only (`ResolvedExamplePanel`, etc.)                      |
 | **`handlers.ts`**  | Shared handler logic (optional but recommended)                           |
 
 ## How config and texts are read
 
 ```
-data/<namespace>/config.json  ──►  config()  in types.ts  ──►  re-exported by config-io.ts
-data/<namespace>/texts.json   ──►  texts()   in types.ts  ──►  re-exported by config-io.ts
+PostgreSQL `module_*` table  ──►  get() / data()  in types.ts  ──►  re-exported by config-io.ts
 ```
 
 - **Defaults** in `types.ts` are fallbacks; JSON overrides at runtime.
@@ -85,7 +84,7 @@ Reuse these instead of duplicating logic:
 
 | Module                                                                             | Use for                                                           |
 | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts)           | `createModuleConfig`, `resolveKeyedItem`                          |
+| [`shared/core/moduleConfig.ts`](../../../../shared/core/moduleConfig.ts)           | `createModuleData`, `moduleDefaultsFromParts`, `findListItemById` |
 | [`shared/core/texts.ts`](../../../../shared/core/texts.ts)                         | `format`, `isModuleEnabled`, `getConfig`/`getTexts` (via factory) |
 | [`bot/src/lib/core/discordInteractions.ts`](../../lib/core/discordInteractions.ts) | `replyEphemeral`, `memberHasAnyRole`                              |
 | [`bot/src/lib/core/discordRoles.ts`](../../lib/core/discordRoles.ts)               | `tryAssignRole`, `tryRemoveRole`                                  |
@@ -131,14 +130,14 @@ for full examples.
 **Move `data/example-module/` to the Docker data volume** — project-root `data/`
 (`./data:/app/data` in `docker-compose.yml`). Details: [`data/example-module/README.md`](data/example-module/README.md).
 
-The namespace in `createModuleConfig('…')` must match the folder name under `data/`.
+The namespace in `createModuleData('…')` must match the folder name under `data/`.
 
 ## Debugging
 
 During local dev, log loaded config from `init()` (remove before shipping):
 
 ```typescript
-console.log(`[${NAMESPACE}]`, config());
+console.log(`[${NAMESPACE}]`, data());
 ```
 
 Use `console.warn` / `console.error` with a `[${NAMESPACE}]` prefix for misconfiguration and runtime failures — see `index.ts` `initExample`.

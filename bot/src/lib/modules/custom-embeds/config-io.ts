@@ -2,19 +2,23 @@ import { createConfigIo } from "../../core/configIo.js";
 import type { EmbedPanelConfig } from "../../../../../shared/modules/custom-embeds/types.js";
 import {
   CONFIG_DEFAULTS,
+  MODULE_DEFAULTS,
   NAMESPACE,
-  config,
+  get,
+  data,
   resolveEmbedPanel,
-  texts,
 } from "../../../../../shared/modules/custom-embeds/types.js";
 
-const io = createConfigIo<EmbedPanelConfig>(
-  NAMESPACE,
-  "panels",
-  CONFIG_DEFAULTS,
-);
+const io = createConfigIo<EmbedPanelConfig>(NAMESPACE, "panels");
 
 export const updateEmbedPanel = io.updateItem;
 export const getEmbedPanelConfig = io.getItemConfig;
 
-export { NAMESPACE, CONFIG_DEFAULTS, config, texts, resolveEmbedPanel };
+export {
+  NAMESPACE,
+  CONFIG_DEFAULTS,
+  MODULE_DEFAULTS,
+  get,
+  data,
+  resolveEmbedPanel,
+};

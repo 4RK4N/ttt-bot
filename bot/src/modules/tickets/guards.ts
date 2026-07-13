@@ -5,7 +5,7 @@ import { isClosedTicketThread } from "./names.js";
 import {
   NAMESPACE,
   resolveTicketType,
-  texts,
+  data,
 } from "../../lib/modules/tickets/config-io.js";
 import type { ResolvedTicketType } from "../../../../shared/modules/tickets/types.js";
 
@@ -17,7 +17,7 @@ export interface TicketThreadGuardOptions {
 export interface TicketThreadContext {
   ticketType: ResolvedTicketType;
   thread: ThreadChannel;
-  t: ReturnType<typeof texts>;
+  t: ReturnType<typeof data>;
 }
 
 export type TicketThreadGuardResult =
@@ -30,7 +30,7 @@ export async function guardTicketThreadAction(
   expectedThreadId: string,
   options?: TicketThreadGuardOptions,
 ): Promise<TicketThreadGuardResult> {
-  const t = texts();
+  const t = data();
 
   if (!isModuleEnabled(NAMESPACE)) {
     await replyEphemeral(interaction, t.disabled);

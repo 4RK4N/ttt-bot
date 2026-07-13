@@ -1,6 +1,7 @@
 import {
-  createModuleConfig,
-  resolveKeyedItem,
+  createModuleData,
+  findListItemById,
+  moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
 export const NAMESPACE = "reaction-roles";
@@ -28,7 +29,6 @@ export interface RoleOption {
   label: string;
 }
 
-/** Coerces raw config roleOptions to typed options (non-objects dropped). */
 export function normalizeRoleOptions(raw: unknown): RoleOption[] {
   if (!Array.isArray(raw)) return [];
   return raw.filter(
@@ -91,33 +91,41 @@ export const CONFIG_DEFAULTS: ReactionRolesConfig = {
   panels: [],
 };
 
-const module = createModuleConfig(NAMESPACE, CONFIG_DEFAULTS, TEXT_DEFAULTS);
+export type ReactionRolesModuleData = Omit<ReactionRolesConfig, "panels"> &
+  Omit<ReactionRolesTexts, "panels"> & {
+    panels: RolePanelConfig[];
+  };
 
-export const config = module.config;
-export const texts = module.texts;
+export const MODULE_DEFAULTS: ReactionRolesModuleData = moduleDefaultsFromParts(
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+  ["panels"],
+);
+
+const mod = createModuleData(NAMESPACE, MODULE_DEFAULTS);
+
+export const get = mod.get;
+export const data = mod.data;
 
 export function resolvePanel(id: string): ResolvedRolePanel | undefined {
-  return resolveKeyedItem(
-    config().panels,
+  const row = findListItemById(
+    get("panels") as Array<RolePanelConfig & Partial<RolePanelTexts>>,
     id,
-    texts().panels,
-    DEFAULT_PANEL_TEXTS,
-    (row: RolePanelConfig, copy: RolePanelTexts) => ({
-      ...row,
-      ...copy,
-      reactionType: isReactionType(row.reactionType)
-        ? row.reactionType
-        : "button",
-      toggleable: row.toggleable !== false,
-      roleOptions: normalizeRoleOptions(row.roleOptions),
-    }),
   );
+  if (!row) return undefined;
+  return {
+    ...DEFAULT_PANEL_TEXTS,
+    ...row,
+    reactionType: isReactionType(row.reactionType) ? row.reactionType : "button",
+    toggleable: row.toggleable !== false,
+    roleOptions: normalizeRoleOptions(row.roleOptions),
+  } as ResolvedRolePanel;
 }
 
 export function findPanelByMessageId(
   messageId: string,
 ): ResolvedRolePanel | undefined {
-  for (const row of config().panels) {
+  for (const row of get("panels")) {
     if (row.published && row.panelMessageId === messageId) {
       return resolvePanel(row.id);
     }

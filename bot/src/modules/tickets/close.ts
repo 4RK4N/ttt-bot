@@ -9,14 +9,14 @@ import {
   CLOSE_CONFIRM_PREFIX,
 } from "../../lib/modules/tickets/panel.js";
 import { canCloseTicket } from "./permissions.js";
-import { texts } from "../../lib/modules/tickets/config-io.js";
+import { get } from "../../lib/modules/tickets/config-io.js";
 
 export async function handleCloseTicket(
   interaction: ButtonInteraction,
 ): Promise<void> {
   const parsed = parseCloseCustomId(interaction.customId);
   if (!parsed) {
-    await replyEphemeral(interaction, texts().invalidInteraction);
+    await replyEphemeral(interaction, get("invalidInteraction"));
     return;
   }
 
@@ -78,7 +78,7 @@ export async function handleCloseCancel(
   interaction: ButtonInteraction,
 ): Promise<void> {
   await interaction.update({
-    content: texts().closeCancelled,
+    content: get("closeCancelled"),
     components: [],
   });
 }

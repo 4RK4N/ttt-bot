@@ -2,9 +2,9 @@ export {
   NAMESPACE,
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
-  DEFAULT_DELETE_EMOJI,
-  config,
-  texts,
+  MODULE_DEFAULTS,
+  get,
+  data,
   resolveDeleteEmoji,
   resolveDeleteAuthorLastMention,
 } from "./types.js";

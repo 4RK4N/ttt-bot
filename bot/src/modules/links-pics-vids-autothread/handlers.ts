@@ -12,7 +12,7 @@ import {
   NAMESPACE,
   channelIds,
   deleteNonQualifyingMessagesEnabled,
-  texts,
+  data,
 } from "../../lib/modules/links-pics-vids-autothread/config-io.js";
 import { extractSupportedAutoThreadUrls, stripUrls } from "./urls.js";
 
@@ -42,7 +42,7 @@ function formatNonQualifyingDm(
   channelLink: string,
   messageContent: string,
 ): string {
-  return format(texts().nonQualifyingDm, {
+  return format(data().nonQualifyingDm, {
     channel: channelLink,
     message: messageContent,
   });
@@ -119,6 +119,6 @@ export async function handleMessage(message: Message): Promise<void> {
     name,
     logPrefix: `[${NAMESPACE}]`,
     authorUserId: message.author.id,
-    firstMessage: texts().threadFirstMessage,
+    firstMessage: data().threadFirstMessage,
   });
 }

@@ -114,7 +114,7 @@ Every production module follows the same shape:
 | `shared/modules/<name>/`      | `types.ts`        | Panel modules only — shared contract with web validators |
 | `shared/modules/<name>/`      | `validate.ts`     | Row validation for object-lists (panel modules)          |
 | `shared/modules/<name>/`      | `web-plugin.json` | Web editor fields (optional)                             |
-| `bot/src/lib/modules/<name>/` | `types.ts`        | Non-panel modules — defaults, `config()`, `texts()`      |
+| `bot/src/lib/modules/<name>/` | `types.ts`        | Non-panel modules — defaults, `get()` / `data()`         |
 | `bot/src/lib/modules/<name>/` | `config-io.ts`    | IO boundary — **handlers import from here**              |
 | `bot/src/lib/modules/<name>/` | `panel.ts`        | Publish payload + custom IDs (panel modules)             |
 | `bot/src/lib/modules/<name>/` | `publisher.ts`    | Publish/unpublish (panel modules)                        |

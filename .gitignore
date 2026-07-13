@@ -6,6 +6,7 @@ website/dist/
 website/.astro/
 # Runtime config holds secrets (token, OAuth, channel IDs). Keep the *.example.json
 # templates tracked, but never commit the real config.json files.
+postgres-data/
 data/config.json
 data/*/config.json
 data/*/texts.json

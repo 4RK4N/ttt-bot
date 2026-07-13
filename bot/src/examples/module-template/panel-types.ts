@@ -1,15 +1,11 @@
 /**
  * Panel module types — copy to `shared/modules/<name>/types.ts` when creating a panel
  * module. Simple modules keep types in `bot/src/lib/modules/<name>/types.ts` instead.
- *
- * Not compiled in-place (see bot/tsconfig.json exclude) — imports assume destination
- * under shared/modules/<name>/.
- *
- * After copying: uncomment the panel block in `bot/src/lib/modules/<name>/config-io.ts`.
  */
 import {
-  createModuleConfig,
-  resolveKeyedItem,
+  createModuleData,
+  findListItemById,
+  moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
 export const NAMESPACE = "example-module";
@@ -58,18 +54,32 @@ export const TEXT_DEFAULTS: ExamplePanelModuleTexts = {
   panels: {},
 };
 
-const module = createModuleConfig(NAMESPACE, CONFIG_DEFAULTS, TEXT_DEFAULTS);
+export type ExamplePanelModuleData = Omit<
+  ExamplePanelModuleConfig,
+  "panels"
+> &
+  Omit<ExamplePanelModuleTexts, "panels"> & {
+    panels: ExamplePanelConfig[];
+  };
 
-export const config = module.config;
-export const texts = module.texts;
+export const MODULE_DEFAULTS: ExamplePanelModuleData = moduleDefaultsFromParts(
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+  ["panels"],
+);
+
+const mod = createModuleData(NAMESPACE, MODULE_DEFAULTS);
+
+export const get = mod.get;
+export const data = mod.data;
 
 export function resolveExamplePanel(
   id: string,
 ): ResolvedExamplePanel | undefined {
-  return resolveKeyedItem(
-    config().panels,
+  const row = findListItemById(
+    get("panels") as Array<ExamplePanelConfig & Partial<ExamplePanelTexts>>,
     id,
-    texts().panels,
-    DEFAULT_PANEL_TEXTS,
   );
+  if (!row) return undefined;
+  return { ...DEFAULT_PANEL_TEXTS, ...row } as ResolvedExamplePanel;
 }

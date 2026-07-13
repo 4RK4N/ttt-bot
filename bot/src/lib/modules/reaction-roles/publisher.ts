@@ -1,11 +1,15 @@
 import { createPanelPublisher } from "../../core/panelPublisher.js";
-import { getPanelConfig, resolvePanel, updatePanel } from "./config-io.js";
+import {
+  getRolePanelConfig,
+  resolvePanel,
+  updateRolePanel,
+} from "./config-io.js";
 import { publishPanel, type DiscordApiContext } from "./panel.js";
 
 const panelPublisher = createPanelPublisher({
   resolve: resolvePanel,
-  getConfig: getPanelConfig,
-  update: updatePanel,
+  getConfig: getRolePanelConfig,
+  update: updateRolePanel,
   publishPanel,
   entityLabel: "panel",
 });

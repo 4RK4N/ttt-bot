@@ -15,8 +15,7 @@ vi.mock("../shared/core/texts.js", async (importOriginal) => {
 
 vi.mock("../bot/src/lib/modules/pic-repost-commands/config-io.js", () => ({
   NAMESPACE: "pic-repost-commands",
-  config: () => ({ deleteEmoji: "🗑️" }),
-  texts: () => TEXT_DEFAULTS,
+  data: () => ({ ...TEXT_DEFAULTS, deleteEmoji: "🗑️" }),
   resolveDeleteEmoji: () => "🗑️",
 }));
 

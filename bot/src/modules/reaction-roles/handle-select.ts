@@ -12,7 +12,7 @@ import { isOnCooldown, touchCooldown } from "./cooldown.js";
 import { guardPublishedPanel } from "./guards.js";
 import { formatEphemeralMessage } from "./respond.js";
 import { SEL_PREFIX } from "../../lib/modules/reaction-roles/panel.js";
-import { texts } from "../../lib/modules/reaction-roles/config-io.js";
+import { get } from "../../lib/modules/reaction-roles/config-io.js";
 
 function parseSelectCustomId(customId: string): string | null {
   if (!customId.startsWith(SEL_PREFIX)) return null;
@@ -38,7 +38,7 @@ export async function handleSelectInteraction(
 ): Promise<void> {
   const panelId = parseSelectCustomId(interaction.customId);
   if (!panelId) {
-    await replyEphemeral(interaction, texts().invalidInteraction);
+    await replyEphemeral(interaction, get("invalidInteraction"));
     return;
   }
 

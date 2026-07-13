@@ -107,7 +107,7 @@ See bot/src/lib/modules/example-module/publisher.ts and tickets/publisher.ts.
 
 /*
 import { startExampleCommentsThread } from './handlers.js';
-// After posting a message: await startExampleCommentsThread(sent, displayName, caption, texts().threadFirstMessage);
+// After posting a message: await startExampleCommentsThread(sent, displayName, caption, data().threadFirstMessage);
 */
 
 const exampleModule: CommandModule = {

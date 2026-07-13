@@ -2,11 +2,11 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { handleMemberAdd } from "../bot/src/modules/welcome-message/handlers.js";
 
 const welcomeChannelId = vi.fn();
-const texts = vi.fn();
+const moduleData = vi.fn();
 const rulesChannelLink = vi.fn();
 
 vi.mock("../bot/src/lib/modules/welcome-message/config-io.js", () => ({
-  texts: () => texts(),
+  data: () => moduleData(),
   welcomeChannelId: () => welcomeChannelId(),
   rulesChannelLink: (guildId: string) => rulesChannelLink(guildId),
 }));
@@ -37,7 +37,7 @@ function mockMember(channel: unknown) {
 describe("handleMemberAdd", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    texts.mockReturnValue({
+    moduleData.mockReturnValue({
       welcomeContent: "Welcome {mention}",
       rulesMessage: "Rules: {rulesChannel}",
       rulesChannelFallback: "{mention} see {rulesChannel}",

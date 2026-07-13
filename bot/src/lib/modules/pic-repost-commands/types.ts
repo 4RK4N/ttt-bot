@@ -1,4 +1,7 @@
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 export interface PicTexts {
@@ -21,7 +24,6 @@ export const DEFAULT_DELETE_EMOJI = "🗑️";
 export interface PicConfig {
   enabled?: boolean;
   deleteEmoji?: string;
-  /** When true (default), delete author is the last user mention in the caption. */
   deleteAuthorLastMention?: boolean;
 }
 
@@ -40,7 +42,6 @@ export function resolveDeleteAuthorLastMention(cfg: PicConfig): boolean {
   return cfg.deleteAuthorLastMention !== false;
 }
 
-// Code defaults; data/pic-repost-commands/texts.json overrides these.
 export const TEXT_DEFAULTS: PicTexts = {
   disabled: "This command is currently disabled.",
   noImages: "You need to attach at least one image.",
@@ -65,12 +66,15 @@ export const TEXT_DEFAULTS: PicTexts = {
   threadFirstMessage: DEFAULT_THREAD_FIRST_MESSAGE,
 };
 
-const module = createModuleConfig(
-  "pic-repost-commands",
+export type PicModuleData = PicConfig & PicTexts;
+
+export const MODULE_DEFAULTS: PicModuleData = moduleDefaultsFromParts(
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
 );
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+const mod = createModuleData("pic-repost-commands", MODULE_DEFAULTS);
+
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;

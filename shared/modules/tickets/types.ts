@@ -1,7 +1,8 @@
 import { toStringArray } from "../../core/strings.js";
 import {
-  createModuleConfig,
-  resolveKeyedItem,
+  createModuleData,
+  findListItemById,
+  moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
 export const NAMESPACE = "tickets";
@@ -121,23 +122,33 @@ export const CONFIG_DEFAULTS: TicketsConfig = {
   ticketTypes: [],
 };
 
-const module = createModuleConfig(NAMESPACE, CONFIG_DEFAULTS, TEXT_DEFAULTS);
+export type TicketsModuleData = Omit<TicketsConfig, "ticketTypes"> &
+  Omit<TicketsTexts, "types"> & {
+    ticketTypes: TicketTypeConfig[];
+  };
 
-export const config = module.config;
-export const texts = module.texts;
+export const MODULE_DEFAULTS: TicketsModuleData = moduleDefaultsFromParts(
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+  ["types"],
+);
+
+const mod = createModuleData(NAMESPACE, MODULE_DEFAULTS);
+
+export const get = mod.get;
+export const data = mod.data;
 
 export function resolveTicketType(id: string): ResolvedTicketType | undefined {
-  return resolveKeyedItem(
-    config().ticketTypes,
+  const row = findListItemById(
+    get("ticketTypes") as Array<TicketTypeConfig & Partial<TicketTypeTexts>>,
     id,
-    texts().types,
-    DEFAULT_TYPE_TEXTS,
-    (row: TicketTypeConfig, copy: TicketTypeTexts) => ({
-      ...row,
-      ...copy,
-      staffRoleId: row.staffRoleId?.trim() ?? "",
-      deniedRoleIds: toStringArray(row.deniedRoleIds),
-      roleActionRoleId: row.roleActionRoleId?.trim() || undefined,
-    }),
   );
+  if (!row) return undefined;
+  return {
+    ...DEFAULT_TYPE_TEXTS,
+    ...row,
+    staffRoleId: row.staffRoleId?.trim() ?? "",
+    deniedRoleIds: toStringArray(row.deniedRoleIds),
+    roleActionRoleId: row.roleActionRoleId?.trim() || undefined,
+  } as ResolvedTicketType;
 }

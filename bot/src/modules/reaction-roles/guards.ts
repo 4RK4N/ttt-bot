@@ -4,7 +4,7 @@ import { isModuleEnabled } from "../../../../shared/core/texts.js";
 import {
   NAMESPACE,
   resolvePanel,
-  texts,
+  data,
 } from "../../lib/modules/reaction-roles/config-io.js";
 import type {
   ReactionType,
@@ -12,7 +12,7 @@ import type {
 } from "../../../../shared/modules/reaction-roles/types.js";
 
 export type PanelGuardResult =
-  | { ok: true; panel: ResolvedRolePanel; t: ReturnType<typeof texts> }
+  | { ok: true; panel: ResolvedRolePanel; t: ReturnType<typeof data> }
   | { ok: false };
 
 function matchesReactionType(
@@ -32,7 +32,7 @@ export async function guardPublishedPanel(
     requireGuild?: boolean;
   },
 ): Promise<PanelGuardResult> {
-  const t = texts();
+  const t = data();
 
   if (!isModuleEnabled(NAMESPACE)) {
     await replyEphemeral(interaction, t.disabled);

@@ -20,8 +20,7 @@ import {
 } from "../../../../shared/core/limits.js";
 import {
   NAMESPACE,
-  config,
-  texts,
+  data,
   resolveDeleteEmoji,
 } from "../../lib/modules/pic-repost-commands/config-io.js";
 
@@ -39,7 +38,7 @@ export async function executePicRepost(
 ): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-  const t = texts();
+  const t = data();
 
   if (!isModuleEnabled(NAMESPACE)) {
     await interaction.editReply(t.disabled);
@@ -112,7 +111,7 @@ export async function executePicRepost(
   const content = format(t.attribution, {
     message,
     mention: `<@${interaction.user.id}>`,
-    deleteEmoji: resolveDeleteEmoji(config()),
+    deleteEmoji: resolveDeleteEmoji(data()),
   });
 
   if (!interaction.channel || !interaction.channel.isSendable()) {

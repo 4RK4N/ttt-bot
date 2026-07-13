@@ -75,57 +75,82 @@ docker compose version
    cd ttt-bot
    ```
 
-2. Create `data/config.json` from the template and fill in your values:
+2. Bootstrap PostgreSQL and app settings:
 
    ```bash
-   cp data/config.example.json data/config.json
-   nano data/config.json
+   cp data/config.example.json data/config.json   # DB connection only
+   ./scripts/db-init.sh
    ```
 
-All `config.json` and `texts.json` files stay only on the server and are
-git-ignored - never commit them. The `*.example.json` templates are safe to
-commit. See the **Configuration reference** below for every field.
+   `db-init.sh` starts `ttt-postgres`, applies `scripts/db/schema.sql`, prompts
+   for Discord/OAuth/API secrets (stored in the `app_config` table), and seeds
+   module tables from each `data/<module>/*.example.json`.
+
+   For an existing JSON-based install, see **Migrating from JSON** below instead.
+
+Bot secrets and module settings live in **PostgreSQL** (`app_config` and
+`module_*` tables). On disk under `data/` you keep only:
+
+- `data/config.json` — DB host/port/user/name (no password; internal Docker network)
+- Binary assets (welcome card media, fonts)
+- `*.example.json` templates (committed; used for seeding)
+
+Never commit `data/config.json`, `postgres-data/`, or live module JSON (legacy
+`.bak` files after migration). See **Configuration reference** below.
 
 ---
 
 ## Configuration reference
 
-The bot reads all configuration from JSON files under `data/`. Each file has a committed `*.example.json` template;
-copy it to `config.json` or `texts.json` and edit.
+Runtime settings are stored in PostgreSQL as key-value rows (`JSONB` values).
+The web editor reads and writes the database directly; the bot hot-reloads module
+caches when rows change.
 
-### `data/config.json` - core bot + web editor
+### `data/config.json` — database bootstrap only
 
 ```json
 {
-  "discordToken": "your-bot-token",
-  "clientId": "your-application-id",
-  "guildId": "your-server-id-optional",
-  "botName": "TTT",
-  "clientSecret": "oauth2-client-secret-web-editor-only",
-  "sessionSecret": "long-random-string-web-editor-only",
-  "oauthRedirectUri": "https://your-host/callback",
-  "webPort": 8088,
-  "internalApiPort": 8087,
-  "internalApiSecret": "long-random-string-internal-api",
-  "botInternalApiUrl": "http://127.0.0.1:8087",
-  "internalApiBind": "127.0.0.1"
+  "dbHost": "ttt-postgres",
+  "dbPort": 5432,
+  "dbUser": "ttt",
+  "dbName": "ttt"
 }
 ```
 
-| Field               | Required         | Description                                                                                                                                                                                                                      |
-| ------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `discordToken`      | **Yes**          | Bot token from the Developer Portal (Bot -> Reset Token). Keep it secret.                                                                                                                                                        |
-| `clientId`          | **Yes**          | Application (client) ID from General Information.                                                                                                                                                                                |
-| `guildId`           | No               | A server ID for instant, guild-scoped slash command registration during development. Empty = register globally (can take ~1 hour to propagate). Also **required for the web editor** (the admin check runs against this server). |
-| `botName`           | No               | Display name shown in the web editor's title (`<botName> Admin Interface`). Defaults to `TTT`.                                                                                                                                   |
-| `clientSecret`      | Editor only      | OAuth2 client secret (Developer Portal -> OAuth2 -> Client Secret -> Reset).                                                                                                                                                     |
-| `sessionSecret`     | Editor only      | Long random string used to sign the editor's session cookies. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.                                                                      |
-| `oauthRedirectUri`  | Editor only      | OAuth2 redirect URL, added verbatim under Developer Portal -> OAuth2 -> Redirects. Use the editor's public `/callback` URL (https makes the cookie `Secure`). For local dev: `http://localhost:8088/callback`.                   |
-| `webPort`           | No               | Port the editor listens on inside the container. Defaults to `8088`. Caddy proxies to this port (see `docker-compose.yml`), so changing it means updating that label too.                                                        |
-| `internalApiPort`   | No               | Port for the bot's internal publish API. Defaults to `8087`. Not exposed to the public internet — only reachable on the Docker internal network or `127.0.0.1` locally.                                                          |
-| `internalApiSecret` | **Editor + bot** | Shared secret for `X-Internal-Token` on internal API requests. Required when running the web editor (publish/unpublish panels). Generate like `sessionSecret`.                                                                   |
-| `botInternalApiUrl` | **Editor**       | Base URL the web editor uses to reach the bot internal API. Local dev: `http://127.0.0.1:8087`. Docker: `http://ttt-discord-bot:8087` in `config.json`.                                                                          |
-| `internalApiBind`   | No               | Address the bot internal API listens on. Defaults to `127.0.0.1`. Docker: set to `0.0.0.0` so the web-editor container can reach the bot on the internal network.                                                                |
+| Field    | Required | Description |
+| -------- | -------- | ----------- |
+| `dbHost` | **Yes**  | PostgreSQL hostname. Docker: `ttt-postgres`. |
+| `dbPort` | No       | Defaults to `5432`. |
+| `dbUser` | **Yes**  | Must match `POSTGRES_USER` in `docker-compose.yml` (`ttt`). |
+| `dbName` | **Yes**  | Must match `POSTGRES_DB` (`ttt`). |
+
+No password — `ttt-postgres` uses `trust` on the internal Docker network only
+(no host port mapping).
+
+### `app_config` table — bot + web editor secrets
+
+Populated interactively by `./scripts/db-init.sh` (or imported by
+`./scripts/db-migrate.sh` from a legacy root `config.json`).
+
+| Key                 | Required         | Description |
+| ------------------- | ---------------- | ----------- |
+| `discordToken`      | **Yes**          | Bot token from the Developer Portal. |
+| `clientId`          | **Yes**          | Application (client) ID. |
+| `guildId`           | No               | Server ID for guild-scoped slash commands; **required for the web editor**. |
+| `botName`           | No               | Web editor title. Defaults to `TTT`. |
+| `clientSecret`      | Editor only      | OAuth2 client secret. |
+| `sessionSecret`     | Editor only      | Session cookie signing secret. |
+| `oauthRedirectUri`  | Editor only      | OAuth redirect URL (`/callback`). |
+| `webPort`           | No               | Editor port inside the container (default `8088`). |
+| `internalApiPort`   | No               | Bot internal API port (default `8087`). |
+| `internalApiSecret` | **Editor + bot** | `X-Internal-Token` for publish/unpublish. |
+| `botInternalApiUrl` | **Editor**       | Docker: `http://ttt-discord-bot:8087`. |
+| `internalApiBind`   | No               | Docker: `0.0.0.0`. |
+
+Changing `app_config` values requires restarting bot and web editor containers.
+Module settings hot-reload without a restart.
+
+To rotate a secret: update the row in PostgreSQL, or re-run `./scripts/db-init.sh --force`.
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
 `webPort`) plus `guildId`, `internalApiSecret`, and `botInternalApiUrl` are only needed if you run the browser-based editor;
@@ -143,23 +168,39 @@ when checking bot reachability before publish/unpublish.
 
 With Docker Compose, `ttt-discord-bot` runs a healthcheck via
 [`scripts/internal-api-health.mjs`](scripts/internal-api-health.mjs) (reads
-`internalApiSecret` and `internalApiPort` from the mounted `data/config.json`).
+`internalApiSecret` and `internalApiPort` from `app_config` via the DB bootstrap in
+`data/config.json`).
 `ttt-web-editor` waits for `service_healthy` before starting so panel
 publish/unpublish is not attempted while the bot API is still booting.
 
-Every module's `config.json` also accepts an optional `enabled` boolean - the
-master on/off switch exposed as a toggle in the [Web editor](README.md#web-editor).
-Only an explicit `"enabled": false` disables the module; if the key is absent it
-reads as enabled, so existing configs keep working. The bot hot-reloads this, so
-toggling takes effect on the next event without a restart.
+Each module's `enabled` key (in its `module_*` table) is the master on/off switch
+exposed as a toggle in the [Web editor](README.md#web-editor).
+Only an explicit `false` disables the module; if the key is absent it reads as
+enabled. The bot hot-reloads this from PostgreSQL.
 
-### `data/links-pics-vids-autothread/config.json` - auto-threading
+### Module settings (`module_*` tables)
+
+Each module has a dedicated table (e.g. `module_tickets`). Top-level keys from the
+old `config.json` / `texts.json` layout are stored as individual rows. Panel
+modules (tickets, reaction-roles, custom-embeds) store merged list rows — e.g.
+`ticketTypes[]` includes both `channelId` and `panelTitle` in one array.
+
+Configure modules via the [Web editor](README.md#web-editor). Legacy
+`data/<module>/config.json` + `texts.json` files are no longer read at runtime
+after migration (kept as `*.json.bak` backups).
+
+### links-pics-vids-autothread — auto-threading
+
+Settings live in `module_links_pics_vids_autothread` (edit via the [Web editor](README.md#web-editor)).
+Reference keys:
 
 ```json
 {
   "enabled": true,
   "channelIds": ["123", "456"],
-  "deleteNonQualifyingMessages": false
+  "deleteNonQualifyingMessages": false,
+  "threadFirstMessage": "Please comment here in the thread…",
+  "nonQualifyingDm": "Hi! Your message in {channel} was removed…"
 }
 ```
 
@@ -167,59 +208,50 @@ toggling takes effect on the next event without a restart.
 qualifying posts (X/Twitter, Bluesky, Aethy, or Instagram post links; direct
 Discord image/video links; or native image/video attachments).
 Leave it empty (`[]`) to disable the module, or set `"enabled": false` to turn it
-off while keeping the channel list. You can also set both in the
-[Web editor](README.md#web-editor) (a channel picker plus the on/off toggle)
-instead of editing the file. This module needs the privileged **Message Content**
+off while keeping the channel list. This module needs the privileged **Message Content**
 intent (Developer Portal -> Bot -> Privileged Gateway Intents), plus **Create
 Public Threads** and **Send Messages in Threads** in each watched channel.
 
 **`deleteNonQualifyingMessages`** — when `true`, messages without images, videos,
-or supported post links are deleted and the author receives a DM (`nonQualifyingDm`
-in `texts.json`; tokens `{channel}`, `{message}`). Default is `false`. Requires
-**Manage Messages** in watched channels when enabled. If the user's DMs are closed,
-the message is still deleted and a warning is logged.
+or supported post links are deleted and the author receives a DM (`nonQualifyingDm`;
+tokens `{channel}`, `{message}`). Default is `false`. Requires **Manage Messages**
+in watched channels when enabled. If the user's DMs are closed, the message is still
+deleted and a warning is logged.
 
-### `data/links-pics-vids-autothread/texts.json` - auto-threading copy
+`nonQualifyingDm` tokens: `{channel}` (Discord channel link), `{message}` (deleted
+message text). Text over 2000 characters is sent as an embed automatically (max 4096).
+
+### welcome-message — join welcome card
+
+Settings live in `module_welcome_message` (web editor). Reference keys:
 
 ```json
 {
-  "threadFirstMessage": "Please comment here in the thread…",
-  "nonQualifyingDm": "Hi! Your message in {channel} was removed…"
+  "enabled": true,
+  "channelId": "789",
+  "rulesChannelId": "456",
+  "welcomeContent": "Welcome {mention}",
+  "rulesMessage": "…",
+  "rulesChannelFallback": "…"
 }
-```
-
-`nonQualifyingDm` is sent when enforcement deletes a non-qualifying post.
-Tokens: `{channel}` (Discord channel link), `{message}` (deleted message text).
-Text over 2000 characters is sent as an embed automatically (max 4096).
-
-### `data/welcome-message/config.json` - join welcome card
-
-```json
-{ "enabled": true, "channelId": "789", "rulesChannelId": "456" }
 ```
 
 `channelId` is the channel where the welcome card is posted when a member joins.
 Leave it blank (`""`) to disable the module, or set `"enabled": false` to turn it
 off while keeping the channel configured. `rulesChannelId` is the channel linked
 from the rules message via the `{rulesChannel}` token; leave it blank to render
-the token as nothing. You can also set all of these in the
-[Web editor](README.md#web-editor) (channel dropdowns plus the on/off toggle)
-instead of editing the file. This module needs the privileged **Server Members**
-intent (Developer Portal -> Bot -> Privileged Gateway Intents).
+the token as nothing. This module needs the privileged **Server Members** intent
+(Developer Portal -> Bot -> Privileged Gateway Intents).
 
-### `data/tickets/` - ticket panels and private-thread tickets
+Welcome card media/fonts remain on disk under `data/welcome-message/media/`.
 
-Copy the examples and configure via the [Web editor](README.md#web-editor):
+### tickets — ticket panels and private-thread tickets
 
-```bash
-cp data/tickets/config.example.json data/tickets/config.json
-cp data/tickets/texts.example.json data/tickets/texts.json
-```
-
-Each **ticket type** is one category: pick a channel (panel + threads live there),
-staff role, panel copy, and flow messages. **Save**, then click **Publish panel**
-to post the open button in Discord. **Unpublish** disables new tickets (the panel
-stays; clicking the button replies with an ephemeral “not available” message).
+Settings live in `module_tickets` (web editor). Each **ticket type** is one category:
+pick a channel (panel + threads live there), staff role, panel copy, and flow messages.
+**Save**, then click **Publish panel** to post the open button in Discord.
+**Unpublish** disables new tickets (the panel stays; clicking the button replies
+with an ephemeral “not available” message).
 
 Staff role needs **View Channel** + **Manage Threads** on each ticket channel so
 they can see private threads (the bot itself uses **Administrator** from the invite above).
@@ -238,19 +270,12 @@ startup warm; if warm fails, opens still work but staff auto-add may be incomple
 **Unpublish** disables new opens only — the Discord panel message stays until removed
 manually or the type is re-published after deleting the old message.
 
-### `data/reaction-roles/` - embed role panels
+### reaction-roles — embed role panels
 
-Copy the examples and configure via the [Web editor](README.md#web-editor):
-
-```bash
-cp data/reaction-roles/config.example.json data/reaction-roles/config.json
-cp data/reaction-roles/texts.example.json data/reaction-roles/texts.json
-```
-
-Each **panel** is one embed message: pick a channel, interaction type (buttons,
-emoji reactions, or dropdown), role options, and copy. **Save**, then
-**Publish panel** to post to Discord. **Unpublish** stops the bot from handling
-interactions on that panel (the message stays).
+Settings live in `module_reaction_roles` (web editor). Each **panel** is one embed
+message: pick a channel, interaction type (buttons, emoji reactions, or dropdown),
+role options, and copy. **Save**, then **Publish panel** to post to Discord.
+**Unpublish** stops the bot from handling interactions on that panel (the message stays).
 
 - **Toggleable**: when enabled, re-interacting removes roles; when disabled, roles
   are assigned once.
@@ -261,20 +286,14 @@ interactions on that panel (the message stays).
 
 Emoji mode adds reactions to the published message automatically on publish.
 
-### `data/moderation-log/` - event logging
+### moderation-log — event logging
 
-Copy the examples and configure via the [Web editor](README.md#web-editor):
+Settings live in `module_moderation_log` (web editor). Set `channelId` to the
+channel where log embeds are posted. Leave it empty (`""`) to disable the module,
+or set `"enabled": false` to turn it off while keeping the channel configured.
+Each event type has its own boolean toggle:
 
-```bash
-cp data/moderation-log/config.example.json data/moderation-log/config.json
-cp data/moderation-log/texts.example.json data/moderation-log/texts.json
-```
-
-Set `channelId` to the channel where log embeds are posted. Leave it empty (`""`) to
-disable the module, or set `"enabled": false` to turn it off while keeping the channel
-configured. Each event type has its own boolean toggle:
-
-| Config key          | Default | Event                                         |
+| Key                 | Default | Event                                         |
 | ------------------- | ------- | --------------------------------------------- |
 | `logMessageDeleted` | `true`  | A message is deleted (including bulk deletes) |
 | `logMemberLeft`     | `true`  | A member leaves voluntarily                   |
@@ -291,24 +310,17 @@ Member leave/kick detection uses the privileged **Server Members** intent (Devel
 Portal -> Bot -> Privileged Gateway Intents). Deleted-message logs do not require
 **Message Content** — the delete event carries cached content when available.
 
-Text templates in `texts.json` support tokens such as `{author}`, `{channel}`,
-`{mention}`, `{executorId}`, `{messageId}`, and `{userId}`. See
-`data/moderation-log/texts.example.json` for defaults.
+Text template keys (e.g. `messageDeleted`, `memberBanned`) support tokens such as
+`{author}`, `{channel}`, `{mention}`, `{executorId}`, `{messageId}`, and `{userId}`.
+See `data/moderation-log/texts.example.json` for default wording.
 
-### `data/custom-embeds/` - static embed panels
+### custom-embeds — static embed panels
 
-Copy the examples and configure via the [Web editor](README.md#web-editor):
-
-```bash
-cp data/custom-embeds/config.example.json data/custom-embeds/config.json
-cp data/custom-embeds/texts.example.json data/custom-embeds/texts.json
-```
-
-Each **panel** is one embed message: pick a channel, set title/description, and
-optionally author name/icon URL, footer, and a timestamp toggle. **Save**, then
-**Publish panel** to post or update the Discord message. **Unpublish** stops tracking
-the panel (the message stays until removed manually or the panel is re-published
-after deleting the old message).
+Settings live in `module_custom_embeds` (web editor). Each **panel** is one embed
+message: pick a channel, set title/description, and optionally author name/icon URL,
+footer, and a timestamp toggle. **Save**, then **Publish panel** to post or update
+the Discord message. **Unpublish** stops tracking the panel (the message stays until
+removed manually or the panel is re-published after deleting the old message).
 
 - **Description** is required; title, author, and footer are optional.
 - **Author icon URL** must be a valid `http` or `https` URL and requires an author name.
@@ -317,35 +329,67 @@ after deleting the old message).
 
 The bot needs **Send Messages** and **Embed Links** in each target channel.
 
-### `data/pic-repost-commands/config.json` - /pic and /post commands
+### pic-repost-commands — /pic and /post commands
+
+Settings live in `module_pic_repost_commands` (web editor). Reference keys:
 
 ```json
-{ "enabled": true, "deleteEmoji": "🗑️", "deleteAuthorLastMention": true }
+{
+  "enabled": true,
+  "deleteEmoji": "🗑️",
+  "deleteAuthorLastMention": true
+}
 ```
 
 - **`deleteEmoji`** — emoji the post author reacts with to delete their repost (unicode or `<:name:id>`). The bot does not add this reaction; it is shown in the attribution caption via the `{deleteEmoji}` token.
 - **`deleteAuthorLastMention`** — when `true` (default), delete auth uses the **last** user mention in the caption; when `false`, the first mention. Put `{mention}` after `{message}` in the attribution template so mentions inside the caption text are not treated as the author.
 
 This module has no channel setting (the commands work in whatever channel they're
-run), so its `config.json` holds the module toggle and delete emoji. Set `"enabled": false`
-(or flip the toggle in the [Web editor](README.md#web-editor)) to turn off `/pic`
-and `/post`; while off they reply with a short "disabled" notice instead of
-posting.
+run). Set `"enabled": false` (or flip the toggle in the web editor) to turn off `/pic`
+and `/post`; while off they reply with a short "disabled" notice instead of posting.
 
-### `data/emojis/config.json` - /emoji-add and /emoji-copy commands
+### emojis — /emoji-add and /emoji-copy commands
+
+Settings live in `module_emojis` (web editor). Reference keys:
 
 ```json
 { "enabled": true, "emojiRoleId": "" }
 ```
 
 - **`emojiRoleId`** — Discord role ID allowed to use `/emoji-add` and `/emoji-copy`
-  alongside Administrators. Leave empty for admins only. Set in the [Web editor](README.md#web-editor).
+  alongside Administrators. Leave empty for admins only.
 
-User-facing error and success messages are editable in the web editor (`texts.json`).
-Images must be 256 KiB or smaller. Run `npm run deploy` after enabling the module
-so the slash commands appear in Discord.
+User-facing error and success messages are editable in the web editor. Images must be
+256 KiB or smaller. Run `npm run deploy` after enabling the module so the slash
+commands appear in Discord.
 
 The bot needs **Manage Emojis and Stickers** in the server.
+
+---
+
+## Migrating from JSON storage
+
+If you already have a working install with secrets in `data/config.json` and
+module `config.json` / `texts.json` files:
+
+1. `docker compose up -d ttt-postgres`
+2. `./scripts/db-init.sh` — schema only if tables are empty; skip app prompts if
+   you will migrate secrets from the legacy root config
+3. `./scripts/db-migrate.sh --dry-run` — review keys and merge warnings
+4. `./scripts/db-migrate.sh` — backs up `./data/` to `data.backup.<timestamp>/`,
+   imports into PostgreSQL, verifies round-trip, renames JSON → `*.json.bak`,
+   writes slim DB-only `data/config.json`
+5. `./scripts/build.sh bot web-editor` — restart apps
+6. Smoke-test the web editor; keep backups for at least a week
+
+If migration fails, restore from the backup directory printed by the script.
+Use `--force` to overwrite non-empty DB tables.
+
+**Schema updates** after deploy: add SQL under `scripts/db/migrations/`, then
+`./scripts/db-update.sh scripts/db/migrations/00N_description.sql`.
+
+**Backups:** `postgres-data/` holds the database files; run `pg_dump` after a
+successful migrate. `postgres-data/` is git-ignored.
 
 ---
 
@@ -403,9 +447,9 @@ docker compose run --rm ttt-discord-bot npm run deploy
 
 **Module `enabled` toggle vs deploy:** The web editor's per-module **enabled** switch
 only affects runtime behavior (handlers reply "disabled" when off). Deploy registers
-slash commands from code; modules with `enabled: false` in `data/<module>/config.json`
-are **omitted** on deploy so they disappear from Discord. Re-run deploy after toggling
-enabled if you want slash commands to match.
+slash commands from code; modules with `enabled: false` in PostgreSQL are **omitted**
+on deploy so they disappear from Discord. Re-run deploy after toggling enabled if you
+want slash commands to match.
 
 You only need to repeat this when you add or change commands - not on every restart.
 
@@ -543,12 +587,11 @@ docker build -f Dockerfile --target ttt-web-editor -t ttt-web-editor:1.4.1 .
 # Website
 docker build -f website/Dockerfile -t ttt-website:2.0.0 website/
 
-# Register commands (one-off). The -v mount provides data/config.json.
+# Register commands (one-off). The -v mount provides data/config.json (DB bootstrap).
 docker run --rm -v "$(pwd)/data:/app/data" ttt-discord-bot npm run deploy
 
 # Run in the background with auto-restart.
-# The -v mount provides data/config.json and makes edits to module texts/assets
-# in ./data persist (and survive rebuilds).
+# The -v mount provides data/config.json and on-disk module assets (e.g. welcome media).
 docker run -d --name ttt-discord-bot \
   -v "$(pwd)/data:/app/data" --restart unless-stopped ttt-discord-bot
 
@@ -562,30 +605,18 @@ docker logs -f ttt-discord-bot
 
 - **Commands don't appear**: make sure you ran the deploy step. Global commands
   are slow to propagate - set `guildId` for instant updates during setup.
-- **"Missing required config value"** on start: `data/config.json` is missing or
-  a value is blank. Confirm `discordToken` and `clientId` are filled in.
+- **"Missing required config value"** on start: run `./scripts/db-init.sh` or
+  check `app_config` in PostgreSQL (`discordToken`, `clientId`, etc.).
+- **Web editor missing OAuth fields**: same — populate `app_config` via
+  `db-init.sh` or update rows directly.
 - **Bot is online but `/pic` fails to post**: the bot needs **Send Messages** and
   **Attach Files** permissions in that channel. Re-check the channel's permission
   overrides for the bot's role.
-- **Web editor "Failed to save changes" (`EACCES` in `ttt-web-editor` logs)**: the
-  editor container runs as the non-root `node` user (uid 1000) but can't write to
-  the bind-mounted `./data`. Make the host data dir owned by that uid once:
-
-  ```bash
-  sudo chown -R 1000:1000 ./data
-  ```
-
-  (Confirm the image's uid with `docker run --rm ttt-discord-bot id node` if unsure.)
-
-  Caveat: with `./data` owned by uid 1000, your own user can no longer edit those
-  files directly. Prefer the web editor for changes. If you must hand-edit a file,
-  use `sudo` and then re-chown it back to 1000 afterwards (nano's save can rewrite
-  it as root):
-
-  ```bash
-  sudo nano ./data/welcome-message/config.json
-  sudo chown 1000:1000 ./data/welcome-message/config.json
-  ```
+- **Web editor save errors**: module settings are stored in PostgreSQL, not
+  JSON files under `./data`. Ensure `ttt-postgres` is healthy and schema is applied.
+  Legacy note: if `./data` was chowned to uid 1000 for the old JSON editor, you
+  can revert to your own user — containers only need read access to
+  `data/config.json` and media assets.
 
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The
   bot reports this back to the user privately.

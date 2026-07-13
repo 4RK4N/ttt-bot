@@ -4,7 +4,7 @@ import { trySendDm } from "../../lib/core/discordDm.js";
 import { renderWelcomeCard } from "./card.js";
 import {
   rulesChannelLink,
-  texts,
+  data,
   welcomeChannelId,
 } from "../../lib/modules/welcome-message/config-io.js";
 
@@ -21,7 +21,7 @@ export async function handleMemberAdd(member: GuildMember): Promise<void> {
   }
 
   const mention = `<@${member.id}>`;
-  const t = texts();
+  const t = data();
   const welcomeContent = format(t.welcomeContent, { mention });
 
   let files: AttachmentBuilder[] | undefined;

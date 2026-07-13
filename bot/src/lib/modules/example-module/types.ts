@@ -1,33 +1,20 @@
 /**
- * Module types, defaults, and config/text accessors.
+ * Module types, defaults, and DB-backed accessors.
  *
- * This is the single source of truth for:
- * - TypeScript interfaces matching data/<namespace>/config.json and texts.json
- * - Code defaults (used when files are missing or malformed)
- * - `config()` and `texts()` — cached, hot-reloading reads
- *
- * Handlers should import via config-io.ts, not directly from here (see config-io.ts).
- *
- * Web editor writes call invalidateModuleCache() — config() / texts() pick up changes
- * without restart.
+ * Handlers should import via config-io.ts, not directly from here.
  */
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
-
-// =============================================================================
-// SIMPLE MODULE (default — delete panel section below if unused)
-// =============================================================================
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 
 export interface ExampleConfig {
-  /** Master on/off; also toggled in web editor. Only explicit `false` disables. */
   enabled?: boolean;
-  /** Discord channel snowflake. Empty string = feature idle (see targetChannelId()). */
   channelId: string;
 }
 
 export interface ExampleTexts {
-  /** Shown when the module is disabled via config.enabled or web toggle. */
   disabled: string;
-  /** Supports {mention} — substitute with format() from core/texts.js. */
   greeting: string;
 }
 
@@ -41,23 +28,20 @@ export const TEXT_DEFAULTS: ExampleTexts = {
   greeting: "Hello {mention}!",
 };
 
-const module = createModuleConfig(
-  "example-module",
+export type ExampleModuleData = ExampleConfig & ExampleTexts;
+
+export const MODULE_DEFAULTS: ExampleModuleData = moduleDefaultsFromParts(
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
 );
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+const mod = createModuleData("example-module", MODULE_DEFAULTS);
 
-/** Normalized config helper — prefer small named accessors over raw config() in handlers. */
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;
+
 export function targetChannelId(): string | undefined {
-  const id = config().channelId.trim();
+  const id = get("channelId").trim();
   return id === "" ? undefined : id;
 }
-
-// --- Panel module (optional) --------------------------------------------------
-// Copy bot/src/examples/module-template/panel-types.ts → shared/modules/<name>/types.ts
-// Copy validate.ts → shared/modules/<name>/validate.ts; wire store.ts + publishRegistry.ts
-// Uncomment panel block in config-io.ts; implement panel.ts + publisher.ts

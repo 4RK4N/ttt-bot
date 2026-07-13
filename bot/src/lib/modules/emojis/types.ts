@@ -1,4 +1,7 @@
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 
 export interface EmojisConfig {
   enabled?: boolean;
@@ -45,13 +48,20 @@ export const TEXT_DEFAULTS: EmojisTexts = {
   addedSuccess: "Added {emoji} to this server.",
 };
 
-const module = createModuleConfig("emojis", CONFIG_DEFAULTS, TEXT_DEFAULTS);
+export type EmojisModuleData = EmojisConfig & EmojisTexts;
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+export const MODULE_DEFAULTS: EmojisModuleData = moduleDefaultsFromParts(
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+);
+
+const mod = createModuleData("emojis", MODULE_DEFAULTS);
+
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;
 
 export function emojiRoleId(): string | undefined {
-  const id = config().emojiRoleId?.trim();
+  const id = get("emojiRoleId")?.trim();
   return id === "" ? undefined : id;
 }

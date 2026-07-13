@@ -1,10 +1,8 @@
-import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { getDbDataAll, invalidateTableCache } from "./dbData.js";
+import { getDbPool } from "./db.js";
+import { moduleTableName } from "./moduleTable.js";
 
-// Runtime-writable data directory, resolved from the process working directory
-// (not import.meta.url) so it is stable across `tsx` dev, compiled `dist/` prod,
-// and Docker, and lives outside the build output so edits survive rebuilds.
-// A future web editor writes the same files.
 export const DATA_DIR = path.resolve(process.cwd(), "data");
 
 /** Resolves a path inside a module's data folder: data/<namespace>/<segments>. */
@@ -50,76 +48,84 @@ export function format(
   );
 }
 
-interface CacheEntry {
-  mtimeMs: number;
-  value: unknown;
+const syncCache = new Map<string, Record<string, unknown>>();
+const syncCacheStamps = new Map<string, number>();
+
+async function loadTableStampMs(table: string): Promise<number> {
+  const result = await getDbPool().query<{ max: Date | null }>(
+    `SELECT MAX(updated_at) AS max FROM ${table}`,
+  );
+  const max = result.rows[0]?.max;
+  return max ? max.getTime() : 0;
 }
 
-const cache = new Map<string, CacheEntry>();
-
-/** Shallow-merges file overrides over defaults (one level deep is enough here). */
 function merge<T extends object>(defaults: T, overrides: Partial<T>): T {
   return { ...defaults, ...overrides };
 }
 
-/**
- * Loads a JSON file layered over the supplied code defaults. Re-reads only when
- * the file's mtime changes, so a future web editor's (or hand) edits take effect
- * on the next call without a restart.
- *
- * Fails gracefully: on a missing file, parse error, or any other failure it
- * logs a warning and returns the defaults, so the bot never breaks on bad data.
- */
-function loadJson<T extends object>(file: string, defaults: T): T {
-  let mtimeMs: number;
-  try {
-    mtimeMs = statSync(file).mtimeMs;
-  } catch {
-    // No file yet: fall back to defaults silently (expected before seeding).
-    return defaults;
-  }
-
-  const cached = cache.get(file);
-  if (cached && cached.mtimeMs === mtimeMs) {
-    return cached.value as T;
-  }
-
-  try {
-    const parsed = JSON.parse(readFileSync(file, "utf8")) as Partial<T>;
-    const value = merge(defaults, parsed);
-    cache.set(file, { mtimeMs, value });
-    return value;
-  } catch (err) {
-    console.warn(`[data] Failed to read "${file}"; using defaults.`, err);
-    return defaults;
-  }
+function cachedData<T extends object>(
+  defaults: T,
+  rows: Record<string, unknown>,
+): T {
+  return merge(defaults, rows as Partial<T>);
 }
 
-/** Clears cached reads for a module's config.json and texts.json after a write. */
+/** Clears cached reads for a module after a write. */
 export function invalidateModuleCache(namespace: string): void {
-  cache.delete(moduleDataPath(namespace, "config.json"));
-  cache.delete(moduleDataPath(namespace, "texts.json"));
+  syncCache.delete(namespace);
+  syncCacheStamps.delete(namespace);
+  invalidateTableCache(moduleTableName(namespace));
 }
 
-/** Loads a module's editable texts from data/<namespace>/texts.json. */
-export function getTexts<T extends object>(namespace: string, defaults: T): T {
-  return loadJson(moduleDataPath(namespace, "texts.json"), defaults);
+export function getModuleRowsSync(namespace: string): Record<string, unknown> {
+  const cached = syncCache.get(namespace);
+  if (!cached) {
+    throw new Error(
+      `Module "${namespace}" cache is cold. Call warmModuleCache() during startup.`,
+    );
+  }
+  return { ...cached };
 }
 
-/** Loads a module's runtime settings from data/<namespace>/config.json. */
-export function getConfig<T extends object>(namespace: string, defaults: T): T {
-  return loadJson(moduleDataPath(namespace, "config.json"), defaults);
-}
-
-/**
- * Master on/off switch for a module, read from config.json's `enabled` key.
- * Only an explicit `false` disables; a missing key (or any other value) means
- * enabled, so existing modules without the key keep working. Hot-reloads with
- * the rest of the config, so the web editor's toggle takes effect without a restart.
- */
-export function isModuleEnabled(namespace: string): boolean {
-  return (
-    getConfig(namespace, { enabled: true } as { enabled?: boolean }).enabled !==
-    false
+export function getModuleDataSync<T extends object>(
+  namespace: string,
+  defaults: T,
+): T {
+  const cached = syncCache.get(namespace);
+  if (cached) {
+    return cachedData(defaults, cached);
+  }
+  throw new Error(
+    `Module "${namespace}" cache is cold. Call warmModuleCache() during startup.`,
   );
+}
+
+export async function warmModuleCache(namespace: string): Promise<void> {
+  const table = moduleTableName(namespace);
+  syncCache.set(namespace, await getDbDataAll(table));
+  syncCacheStamps.set(namespace, await loadTableStampMs(table));
+}
+
+export async function warmAllModuleCaches(namespaces: string[]): Promise<void> {
+  await Promise.all(namespaces.map((ns) => warmModuleCache(ns)));
+}
+
+/** Reloads module sync caches when another process updates the DB. */
+export async function refreshStaleModuleCaches(
+  namespaces: string[],
+): Promise<void> {
+  await Promise.all(
+    namespaces.map(async (namespace) => {
+      const table = moduleTableName(namespace);
+      const stampMs = await loadTableStampMs(table);
+      if (syncCacheStamps.get(namespace) === stampMs) return;
+      await warmModuleCache(namespace);
+    }),
+  );
+}
+
+export function isModuleEnabled(namespace: string): boolean {
+  const cached = syncCache.get(namespace);
+  if (!cached) return true;
+  return cached.enabled !== false;
 }

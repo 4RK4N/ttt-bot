@@ -21,7 +21,7 @@ Copy the reference template — it is **not loaded by the bot** (only `bot/src/m
 
    Use kebab-case for `<name>` (e.g. `my-feature`). Delete unused files (`panel.ts`, `validate.ts` for simple modules).
 
-2. **Set the namespace** — `createModuleConfig('<name>', …)` must match the data folder:
+2. **Set the namespace** — `createModuleData('<name>', …)` must match the data folder:
    - **Simple modules:** `bot/src/lib/modules/<name>/types.ts`
    - **Panel modules:** `shared/modules/<name>/types.ts` (copy from [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts))
 

@@ -1,4 +1,7 @@
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 
 export interface ModLogTexts {
   messageDeleted: string;
@@ -44,17 +47,20 @@ export const CONFIG_DEFAULTS: ModLogConfig = {
   logMemberUnbanned: true,
 };
 
-const module = createModuleConfig(
-  "moderation-log",
+export type ModLogModuleData = ModLogConfig & ModLogTexts;
+
+export const MODULE_DEFAULTS: ModLogModuleData = moduleDefaultsFromParts(
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
 );
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+const mod = createModuleData("moderation-log", MODULE_DEFAULTS);
+
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;
 
 export function logChannelId(): string | undefined {
-  const id = config().channelId.trim();
+  const id = get("channelId").trim();
   return id === "" ? undefined : id;
 }

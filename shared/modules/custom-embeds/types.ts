@@ -1,6 +1,7 @@
 import {
-  createModuleConfig,
-  resolveKeyedItem,
+  createModuleData,
+  findListItemById,
+  moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
 export const NAMESPACE = "custom-embeds";
@@ -49,21 +50,31 @@ export const CONFIG_DEFAULTS: CustomEmbedsConfig = {
   panels: [],
 };
 
-const module = createModuleConfig(NAMESPACE, CONFIG_DEFAULTS, TEXT_DEFAULTS);
+export type CustomEmbedsModuleData = Omit<CustomEmbedsConfig, "panels"> &
+  Omit<CustomEmbedsTexts, "panels"> & {
+    panels: EmbedPanelConfig[];
+  };
 
-export const config = module.config;
-export const texts = module.texts;
+export const MODULE_DEFAULTS: CustomEmbedsModuleData = moduleDefaultsFromParts(
+  CONFIG_DEFAULTS,
+  TEXT_DEFAULTS,
+  ["panels"],
+);
+
+const mod = createModuleData(NAMESPACE, MODULE_DEFAULTS);
+
+export const get = mod.get;
+export const data = mod.data;
 
 export function resolveEmbedPanel(id: string): ResolvedEmbedPanel | undefined {
-  return resolveKeyedItem(
-    config().panels,
+  const row = findListItemById(
+    get("panels") as Array<EmbedPanelConfig & Partial<EmbedPanelTexts>>,
     id,
-    texts().panels,
-    DEFAULT_PANEL_TEXTS,
-    (row: EmbedPanelConfig, copy: EmbedPanelTexts) => ({
-      ...row,
-      ...copy,
-      showTimestamp: row.showTimestamp === true,
-    }),
   );
+  if (!row) return undefined;
+  return {
+    ...DEFAULT_PANEL_TEXTS,
+    ...row,
+    showTimestamp: row.showTimestamp === true,
+  } as ResolvedEmbedPanel;
 }

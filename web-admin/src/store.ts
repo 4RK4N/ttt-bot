@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import {
   DISCORD_MESSAGE_CONTENT_MAX,
   MAX_PANEL_OPTIONS,
@@ -9,20 +8,17 @@ import {
   assertSnowflakesInArray,
 } from "../../shared/core/discordIds.js";
 import { slugify, toStringArray } from "../../shared/core/strings.js";
+import { setDbDataMany } from "../../shared/core/dbData.js";
+import { moduleTableName } from "../../shared/core/moduleTable.js";
 import {
+  getModuleRowsSync,
   invalidateModuleCache,
-  moduleDataPath,
+  warmModuleCache,
 } from "../../shared/core/texts.js";
-import { writeJsonAtomic } from "../../shared/core/jsonWrite.js";
 import { validateEmbedPanelRow } from "../../shared/modules/custom-embeds/validate.js";
 import { validateRolePanelRow } from "../../shared/modules/reaction-roles/validate.js";
 import { validateTicketTypeRow } from "../../shared/modules/tickets/validate.js";
-import type {
-  WebPlugin,
-  WebPluginField,
-  WebPluginSubField,
-  WebFieldStore,
-} from "./plugins.js";
+import type { WebPlugin, WebPluginField, WebPluginSubField } from "./plugins.js";
 import {
   isBooleanField,
   isBooleanSubField,
@@ -34,11 +30,6 @@ import {
 
 export type FieldValue =
   string | string[] | boolean | Record<string, unknown>[];
-
-const STORE_FILES: Record<WebFieldStore, string> = {
-  texts: "texts.json",
-  config: "config.json",
-};
 
 const MAX_OPTION_LIST = MAX_PANEL_OPTIONS;
 
@@ -88,24 +79,16 @@ function validateDiscordIdField(
   }
 }
 
-function readDataJson(
-  namespace: string,
-  store: WebFieldStore,
-): Record<string, unknown> {
-  const file = moduleDataPath(namespace, STORE_FILES[store]);
+function readModuleRows(namespace: string): Record<string, unknown> {
   try {
-    return JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+    return getModuleRowsSync(namespace);
   } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") {
-      return {};
-    }
     console.warn(
-      `[web] Failed to read "${file}"; refusing to use corrupt or unreadable data.`,
+      `[web] Failed to read module "${namespace}" from database.`,
       err,
     );
     throw new DataReadError(
-      `Cannot read ${STORE_FILES[store]} for "${namespace}": file is missing, unreadable, or corrupt. Fix it on disk before saving.`,
+      `Cannot read module "${namespace}" from the database. Run ./scripts/db-init.sh or ./scripts/db-migrate.sh.`,
     );
   }
 }
@@ -283,17 +266,11 @@ function validateSubValue(
 
 function readObjectListValues(
   field: WebPluginField,
-  configData: Record<string, unknown>,
-  textsData: Record<string, unknown>,
+  moduleData: Record<string, unknown>,
 ): Record<string, unknown>[] {
-  const rows = Array.isArray(configData[field.key])
-    ? (configData[field.key] as unknown[])
+  const rows = Array.isArray(moduleData[field.key])
+    ? (moduleData[field.key] as unknown[])
     : [];
-  const textsKey = field.textsKey ?? "types";
-  const textsMap =
-    typeof textsData[textsKey] === "object" && textsData[textsKey] !== null
-      ? (textsData[textsKey] as Record<string, Record<string, unknown>>)
-      : {};
 
   return rows
     .filter(
@@ -302,55 +279,43 @@ function readObjectListValues(
     )
     .map((row) => {
       const id = typeof row.id === "string" ? row.id : "";
-      const textRow = textsMap[id] ?? {};
       const merged: Record<string, unknown> = {
         id,
         published: row.published === true,
       };
 
       for (const sub of field.itemFields ?? []) {
-        const store = sub.store ?? "config";
-        const source = store === "texts" ? textRow : row;
-        merged[sub.key] = readSubValue(sub, source[sub.key]);
+        merged[sub.key] = readSubValue(sub, row[sub.key]);
       }
       return merged;
     });
 }
 
 export function readEnabled(namespace: string): boolean {
-  return readDataJson(namespace, "config").enabled !== false;
+  return readModuleRows(namespace).enabled !== false;
 }
 
 export async function writeEnabled(
   namespace: string,
   enabled: boolean,
 ): Promise<boolean> {
-  const existing = readDataJson(namespace, "config");
-  const merged = { ...existing, enabled };
-  await writeJsonAtomic(moduleDataPath(namespace, STORE_FILES.config), merged);
+  const table = moduleTableName(namespace);
+  await setDbDataMany(table, { enabled });
   invalidateModuleCache(namespace);
+  await warmModuleCache(namespace);
   return enabled;
 }
 
 export function readValues(plugin: WebPlugin): Record<string, FieldValue> {
-  const parsedByStore: Partial<Record<WebFieldStore, Record<string, unknown>>> =
-    {};
-  function parsed(store: WebFieldStore): Record<string, unknown> {
-    return (parsedByStore[store] ??= readDataJson(plugin.namespace, store));
-  }
-
+  const moduleData = readModuleRows(plugin.namespace);
   const values: Record<string, FieldValue> = {};
   for (const field of plugin.fields) {
     if (isObjectListField(field)) {
-      values[field.key] = readObjectListValues(
-        field,
-        parsed("config"),
-        parsed("texts"),
-      );
+      values[field.key] = readObjectListValues(field, moduleData);
       continue;
     }
 
-    const current = parsed(field.store)[field.key];
+    const current = moduleData[field.key];
     if (isMultiField(field)) {
       values[field.key] = toStringArray(current);
     } else if (isBooleanField(field)) {
@@ -362,7 +327,7 @@ export function readValues(plugin: WebPlugin): Record<string, FieldValue> {
   return values;
 }
 
-export class ValidationError extends Error {}
+export class ValidationError extends Error { }
 
 export async function writeValues(
   plugin: WebPlugin,
@@ -377,13 +342,8 @@ export async function writeValues(
   const fieldsByKey = new Map(plugin.fields.map((f) => [f.key, f]));
   const incoming = input as Record<string, unknown>;
 
-  const configExisting = readDataJson(plugin.namespace, "config");
-  const textsExisting = readDataJson(plugin.namespace, "texts");
-
-  const configOut = { ...configExisting };
-  const textsOut = { ...textsExisting };
-  let configTouched = false;
-  let textsTouched = false;
+  const moduleExisting = readModuleRows(plugin.namespace);
+  const patch: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(incoming)) {
     const field = fieldsByKey.get(key);
@@ -400,8 +360,8 @@ export async function writeValues(
         );
       }
 
-      const existingRows = Array.isArray(configExisting[field.key])
-        ? (configExisting[field.key] as Record<string, unknown>[])
+      const existingRows = Array.isArray(moduleExisting[field.key])
+        ? (moduleExisting[field.key] as Record<string, unknown>[])
         : [];
       const existingById = new Map(
         existingRows
@@ -409,10 +369,8 @@ export async function writeValues(
           .map((r) => [r.id as string, r]),
       );
 
-      const textsKey = field.textsKey ?? "types";
       const usedIds = new Set<string>();
-      const newConfigRows: Record<string, unknown>[] = [];
-      const newTextsMap: Record<string, Record<string, unknown>> = {};
+      const mergedRows: Record<string, unknown>[] = [];
 
       for (const rawRow of value) {
         if (typeof rawRow !== "object" || rawRow === null) {
@@ -431,7 +389,7 @@ export async function writeValues(
             typeof row.panelTitle === "string" && row.panelTitle.trim() !== ""
               ? row.panelTitle
               : typeof row.openButtonLabel === "string" &&
-                  row.openButtonLabel.trim() !== ""
+                row.openButtonLabel.trim() !== ""
                 ? row.openButtonLabel
                 : (field.itemLabel ?? "item");
           id = uniqueId(slugify(label), usedIds);
@@ -447,7 +405,6 @@ export async function writeValues(
           panelMessageId:
             typeof prev?.panelMessageId === "string" ? prev.panelMessageId : "",
         };
-
         const textRow: Record<string, unknown> = {};
 
         for (const sub of field.itemFields ?? []) {
@@ -499,14 +456,10 @@ export async function writeValues(
           }
         }
 
-        newConfigRows.push(configRow);
-        newTextsMap[id] = textRow;
+        mergedRows.push({ ...configRow, ...textRow });
       }
 
-      configOut[field.key] = newConfigRows;
-      textsOut[textsKey] = newTextsMap;
-      configTouched = true;
-      textsTouched = true;
+      patch[field.key] = mergedRows;
       continue;
     }
 
@@ -534,29 +487,13 @@ export async function writeValues(
     }
 
     validateDiscordIdField(field.type, normalized, `Field "${key}"`);
-
-    if (field.store === "config") {
-      configOut[field.key] = normalized;
-      configTouched = true;
-    } else {
-      textsOut[field.key] = normalized;
-      textsTouched = true;
-    }
+    patch[field.key] = normalized;
   }
 
-  if (configTouched) {
-    await writeJsonAtomic(
-      moduleDataPath(plugin.namespace, STORE_FILES.config),
-      configOut,
-    );
+  if (Object.keys(patch).length > 0) {
+    await setDbDataMany(moduleTableName(plugin.namespace), patch);
     invalidateModuleCache(plugin.namespace);
-  }
-  if (textsTouched) {
-    await writeJsonAtomic(
-      moduleDataPath(plugin.namespace, STORE_FILES.texts),
-      textsOut,
-    );
-    invalidateModuleCache(plugin.namespace);
+    await warmModuleCache(plugin.namespace);
   }
 
   return readValues(plugin);

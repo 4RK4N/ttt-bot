@@ -1,9 +1,14 @@
-import { readFileSync } from "node:fs";
+import { withTransaction } from "../../../../shared/core/db.js";
 import {
+  getDbDataFromClient,
+  setDbData,
+} from "../../../../shared/core/dbData.js";
+import { moduleTableName } from "../../../../shared/core/moduleTable.js";
+import {
+  getModuleRowsSync,
   invalidateModuleCache,
-  moduleDataPath,
+  warmModuleCache,
 } from "../../../../shared/core/texts.js";
-import { writeJsonAtomic } from "../../../../shared/core/jsonWrite.js";
 
 export interface ConfigIo<T extends { id: string }> {
   updateItem: (id: string, patch: Partial<T>) => Promise<T | undefined>;
@@ -13,19 +18,11 @@ export interface ConfigIo<T extends { id: string }> {
 export function createConfigIo<T extends { id: string }>(
   namespace: string,
   listKey: string,
-  defaults: object,
 ): ConfigIo<T> {
-  function readRawConfig(): Record<string, unknown> {
-    const file = moduleDataPath(namespace, "config.json");
-    try {
-      return { ...defaults, ...JSON.parse(readFileSync(file, "utf8")) };
-    } catch {
-      return { ...(defaults as Record<string, unknown>) };
-    }
-  }
+  const table = moduleTableName(namespace);
 
   function readList(): T[] {
-    const raw = readRawConfig()[listKey];
+    const raw = getModuleRowsSync(namespace)[listKey];
     return Array.isArray(raw) ? (raw as T[]) : [];
   }
 
@@ -33,20 +30,25 @@ export function createConfigIo<T extends { id: string }>(
     id: string,
     patch: Partial<T>,
   ): Promise<T | undefined> {
-    const current = readRawConfig();
-    const list = readList();
-    const index = list.findIndex((item) => item.id === id);
-    if (index === -1) return undefined;
+    let updated: T | undefined;
 
-    const updated = { ...list[index], ...patch };
-    const nextList = list.slice();
-    nextList[index] = updated;
+    await withTransaction(async (client) => {
+      const current = await getDbDataFromClient(client, table, listKey);
+      const list = Array.isArray(current) ? (current as T[]) : [];
+      const index = list.findIndex((item) => item.id === id);
+      if (index === -1) return;
 
-    await writeJsonAtomic(moduleDataPath(namespace, "config.json"), {
-      ...current,
-      [listKey]: nextList,
+      updated = { ...list[index], ...patch };
+      const nextList = list.slice();
+      nextList[index] = updated;
+
+      await setDbData(table, listKey, nextList, client);
     });
-    invalidateModuleCache(namespace);
+
+    if (updated) {
+      invalidateModuleCache(namespace);
+      await warmModuleCache(namespace);
+    }
 
     return updated;
   }

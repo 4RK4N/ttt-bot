@@ -2,8 +2,9 @@ export {
   NAMESPACE,
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
-  config,
-  texts,
+  MODULE_DEFAULTS,
+  get,
+  data,
   channelIds,
   deleteNonQualifyingMessagesEnabled,
 } from "./types.js";

@@ -21,7 +21,7 @@ import { fetchBuffer } from "../../lib/core/download.js";
 import {
   NAMESPACE,
   emojiRoleId,
-  texts,
+  data,
 } from "../../lib/modules/emojis/config-io.js";
 import type { EmojisTexts } from "../../lib/modules/emojis/types.js";
 import { canEmojiOrAdmin } from "./permissions.js";
@@ -94,7 +94,7 @@ function resolveMember(
 async function guardInteraction(
   interaction: ChatInputCommandInteraction,
 ): Promise<EmojisTexts | null> {
-  const t = texts();
+  const t = data();
 
   if (!isModuleEnabled(NAMESPACE)) {
     await interaction.editReply(t.disabled);

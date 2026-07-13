@@ -2,29 +2,27 @@ import { createConfigIo } from "../../core/configIo.js";
 import type { RolePanelConfig } from "../../../../../shared/modules/reaction-roles/types.js";
 import {
   CONFIG_DEFAULTS,
+  MODULE_DEFAULTS,
   NAMESPACE,
-  config,
   findPanelByMessageId,
+  get,
+  data,
   resolveOption,
   resolvePanel,
-  texts,
 } from "../../../../../shared/modules/reaction-roles/types.js";
 
-const io = createConfigIo<RolePanelConfig>(
-  NAMESPACE,
-  "panels",
-  CONFIG_DEFAULTS,
-);
+const io = createConfigIo<RolePanelConfig>(NAMESPACE, "panels");
 
-export const updatePanel = io.updateItem;
-export const getPanelConfig = io.getItemConfig;
+export const updateRolePanel = io.updateItem;
+export const getRolePanelConfig = io.getItemConfig;
 
 export {
   NAMESPACE,
   CONFIG_DEFAULTS,
-  config,
-  texts,
-  resolvePanel,
+  MODULE_DEFAULTS,
   findPanelByMessageId,
+  get,
+  data,
   resolveOption,
+  resolvePanel,
 };

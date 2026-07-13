@@ -22,9 +22,9 @@ import {
 } from "./embeds.js";
 import {
   NAMESPACE,
-  config,
+  get,
+  data,
   logChannelId,
-  texts,
 } from "../../lib/modules/moderation-log/config-io.js";
 import { registerSafeHandler } from "../../lib/core/discordEvents.js";
 import { sleep } from "../../lib/core/sleep.js";
@@ -67,7 +67,7 @@ async function handleMessageDelete(
   bulkChannel?: TextBasedChannel,
 ): Promise<void> {
   if (!isModuleEnabled(NAMESPACE)) return;
-  if (!config().logMessageDeleted) return;
+  if (!get("logMessageDeleted")) return;
 
   const logChannel = logChannelId();
   if (!logChannel) return;
@@ -77,7 +77,7 @@ async function handleMessageDelete(
     return;
   if (sourceChannel.id === logChannel) return;
 
-  const t = texts();
+  const t = data();
   const resolvedAuthor = resolveDeleteAuthor(t, message.author ?? null);
   const content = message.content ?? null;
   const timestamp = message.createdAt ?? new Date();
@@ -115,12 +115,12 @@ async function handleGuildBanAdd(ban: GuildBan): Promise<void> {
 
   markRecentBan(ban.user.id);
 
-  if (!config().logMemberBanned) return;
+  if (!get("logMemberBanned")) return;
   if (!logChannelId()) return;
 
   const audit = await findRecentBan(ban.guild, ban.user.id);
   const embed = buildMemberBannedEmbed(
-    texts(),
+    data(),
     ban.user,
     new Date(),
     audit?.executorId ?? null,
@@ -130,12 +130,12 @@ async function handleGuildBanAdd(ban: GuildBan): Promise<void> {
 
 async function handleGuildBanRemove(ban: GuildBan): Promise<void> {
   if (!isModuleEnabled(NAMESPACE)) return;
-  if (!config().logMemberUnbanned) return;
+  if (!get("logMemberUnbanned")) return;
   if (!logChannelId()) return;
 
   const audit = await findRecentUnban(ban.guild, ban.user.id);
   const embed = buildMemberUnbannedEmbed(
-    texts(),
+    data(),
     ban.user,
     new Date(),
     audit?.executorId ?? null,
@@ -180,8 +180,8 @@ async function handleGuildMemberRemove(
   if (!resolved) return;
 
   const { guild, user } = resolved;
-  const cfg = config();
-  const t = texts();
+  const cfg = data();
+  const t = cfg;
   const timestamp = new Date();
 
   if (cfg.logMemberKicked) {

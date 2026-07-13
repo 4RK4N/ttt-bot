@@ -9,7 +9,7 @@ import { ensureFullReaction } from "../../lib/core/reactionContext.js";
 import { reactionsMatch } from "../../../../shared/core/discordEmoji.js";
 import { isModuleEnabled } from "../../../../shared/core/texts.js";
 import {
-  config,
+  data,
   NAMESPACE,
   resolveDeleteAuthorLastMention,
   resolveDeleteEmoji,
@@ -32,7 +32,7 @@ async function handleDeleteReaction(
   const { message } = ctx;
   const messageFetched = !reaction.message.partial;
 
-  const cfg = config();
+  const cfg = data();
   if (
     !reactionsMatch(
       resolveDeleteEmoji(cfg),

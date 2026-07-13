@@ -1,4 +1,7 @@
-import { createModuleConfig } from "../../../../../shared/core/moduleConfig.js";
+import {
+  createModuleData,
+  moduleDefaultsFromParts,
+} from "../../../../../shared/core/moduleConfig.js";
 
 export interface WelcomeTexts {
   rulesMessage: string;
@@ -18,8 +21,6 @@ export const CONFIG_DEFAULTS: WelcomeConfig = {
   rulesChannelId: "",
 };
 
-// Code defaults; data/welcome-message/texts.json overrides these (editable source
-// of truth). The discord.com channel link renders as a clickable channel mention.
 export const TEXT_DEFAULTS: WelcomeTexts = {
   rulesMessage: [
     "🇬🇧 English",
@@ -37,24 +38,27 @@ export const TEXT_DEFAULTS: WelcomeTexts = {
     "{mention} please read and accept the rules in {rulesChannel} to fully unlock the server.",
 };
 
-const module = createModuleConfig(
-  "welcome-message",
+export type WelcomeModuleData = WelcomeConfig & WelcomeTexts;
+
+export const MODULE_DEFAULTS: WelcomeModuleData = moduleDefaultsFromParts(
   CONFIG_DEFAULTS,
   TEXT_DEFAULTS,
 );
 
-export const NAMESPACE = module.NAMESPACE;
-export const config = module.config;
-export const texts = module.texts;
+const mod = createModuleData("welcome-message", MODULE_DEFAULTS);
+
+export const NAMESPACE = mod.NAMESPACE;
+export const get = mod.get;
+export const data = mod.data;
 
 export function welcomeChannelId(): string | undefined {
-  const id = config().channelId.trim();
+  const id = get("channelId").trim();
   return id === "" ? undefined : id;
 }
 
 /** Clickable Discord channel link for {rulesChannel}, or empty when unset. */
 export function rulesChannelLink(guildId: string): string {
-  const id = config().rulesChannelId.trim();
+  const id = get("rulesChannelId").trim();
   if (id === "") return "";
   return `https://discord.com/channels/${guildId}/${id}`;
 }

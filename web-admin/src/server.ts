@@ -3,6 +3,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { initConfig } from "../../shared/config.js";
+import { MODULE_NAMESPACES } from "../../shared/core/moduleTable.js";
+import { warmAllModuleCaches } from "../../shared/core/texts.js";
 import { loadWebConfig } from "./config.js";
 import {
   ensureCsrfToken,
@@ -24,6 +27,9 @@ import type { AppEnv } from "./env.js";
 type Env = AppEnv;
 
 async function main(): Promise<void> {
+  await initConfig();
+  await warmAllModuleCaches([...MODULE_NAMESPACES]);
+
   const cfg = loadWebConfig();
   const plugins = await loadWebPlugins();
   const byNamespace = new Map<string, WebPlugin>(
