@@ -102,7 +102,9 @@ Never commit `data/config.json` or `data/ttt.db`. See **Configuration reference*
 **Schema updates:** write a `.sql` file (e.g. next to `schema.sql`), then
 `./scripts/db/db-update.sh scripts/db/002_description.sql`.
 
-**Backups:** run `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` periodically (read-only dump; bot can stay up).
+**Backups:** run `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` periodically (exec into the running bot; read-only).
+
+**Migrations / init:** `db-init.sh` and `db-update.sh` stop the bot briefly when it is running (Turso write lock), apply SQL in a one-off container, then restart.
 
 ---
 

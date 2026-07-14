@@ -7,6 +7,9 @@ DB_PATH="data/ttt.db"
 DB_CLI="dist/scripts/db/cli.js"
 SERVICE="ttt-discord-bot"
 
+# shellcheck source=bot-node.sh
+source "$(dirname "$0")/bot-node.sh"
+
 usage() {
   cat >&2 <<EOF
 Usage: $0 <migration.sql>
@@ -38,5 +41,5 @@ if [[ ! -f "$DB_PATH" ]]; then
 fi
 
 echo "Applying $migration to $DB_PATH ..."
-docker compose run --rm --no-deps "$SERVICE" node "$DB_CLI" apply-sql "$DB_PATH" "$migration"
+bot_node_write "$DB_CLI" apply-sql "$DB_PATH" "$migration"
 echo "Done."
