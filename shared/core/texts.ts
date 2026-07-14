@@ -3,7 +3,7 @@ import { RESERVED_MODULE_KEYS } from "./dbData.js";
 import { getDbDataAll } from "./dbData.js";
 import { moduleTableName } from "./moduleTable.js";
 
-export const DATA_DIR = path.resolve(process.cwd(), "data");
+const DATA_DIR = path.resolve(process.cwd(), "data");
 
 /** Resolves a path inside a module's data folder: data/<namespace>/<segments>. */
 export function moduleDataPath(

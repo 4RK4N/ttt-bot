@@ -6,6 +6,16 @@ import {
   type InteractionReplyOptions,
   type MessageComponentInteraction,
 } from "discord.js";
+import { isModuleEnabled } from "../../../../shared/core/texts.js";
+
+/** Discord API: unknown message (already deleted). */
+export function isDiscordUnknownMessage(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { code?: number }).code === 10008
+  );
+}
 
 type EphemeralReply =
   string | (Omit<InteractionReplyOptions, "flags"> & { content: string });
@@ -53,4 +63,15 @@ export function canConfiguredRoleOrAdmin(
   const id = roleId?.trim();
   if (!id) return false;
   return member.roles.cache.has(id);
+}
+
+/** After deferReply: if module is disabled, editReply with message and return false. */
+export async function guardEnabledSlash(
+  interaction: ChatInputCommandInteraction,
+  namespace: string,
+  disabledMessage: string,
+): Promise<boolean> {
+  if (isModuleEnabled(namespace)) return true;
+  await interaction.editReply(disabledMessage);
+  return false;
 }

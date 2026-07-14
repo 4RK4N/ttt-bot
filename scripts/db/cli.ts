@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { connect } from "@tursodatabase/database";
+import { APP_CONFIG_SECRET_KEYS } from "../../shared/config.js";
 import {
   closeDb,
   getDb,
@@ -28,7 +29,7 @@ Commands:
   apply-sql <db-path> <file>          Apply a SQL file to a Turso database
   count-app-config <db-path>          Print app_config row count (stdout)
   table-counts <db-path>              Print row counts for app_config and module tables
-  dump-db <db-path>                   Dump database as INSERT statements to stdout
+  dump-db [--include-secrets] <db-path>   Dump database as INSERT statements to stdout
 `);
   process.exit(1);
 }
@@ -121,7 +122,7 @@ async function tableCounts(dbPath: string): Promise<void> {
   }
 }
 
-async function dumpDb(dbPath: string): Promise<void> {
+async function dumpDb(dbPath: string, includeSecrets: boolean): Promise<void> {
   const resolved = path.resolve(dbPath);
   const db = await connect(resolved, {
     readonly: true,
@@ -139,6 +140,9 @@ async function dumpDb(dbPath: string): Promise<void> {
     const lines: string[] = [
       `-- Turso dump of ${resolved}`,
       `-- Generated at ${new Date().toISOString()}`,
+      includeSecrets
+        ? "-- WARNING: contains app_config secrets (generated with --include-secrets)."
+        : "-- app_config secret keys are redacted; use --include-secrets for full backup.",
       "",
     ];
 
@@ -156,8 +160,16 @@ async function dumpDb(dbPath: string): Promise<void> {
         value: string;
       }>;
       for (const row of rows) {
+        let value = String(row.value);
+        if (
+          !includeSecrets &&
+          name === APP_CONFIG_TABLE &&
+          APP_CONFIG_SECRET_KEYS.has(row.key)
+        ) {
+          value = "-- REDACTED --";
+        }
         lines.push(
-          `INSERT INTO ${name}(key,value) VALUES(${sqlStringLiteral(row.key)},${sqlStringLiteral(String(row.value))}) ` +
+          `INSERT INTO ${name}(key,value) VALUES(${sqlStringLiteral(row.key)},${sqlStringLiteral(value)}) ` +
           `ON CONFLICT(key) DO UPDATE SET value=excluded.value;`,
         );
       }
@@ -207,12 +219,18 @@ async function main(): Promise<void> {
       return;
     }
     case "dump-db": {
-      const dbPath = rest[0];
+      let includeSecrets = false;
+      const args = [...rest];
+      if (args[0] === "--include-secrets") {
+        includeSecrets = true;
+        args.shift();
+      }
+      const dbPath = args[0];
       if (!dbPath) {
-        console.error("Usage: db/cli.ts dump-db <db-path>");
+        console.error("Usage: db/cli.ts dump-db [--include-secrets] <db-path>");
         process.exit(1);
       }
-      await dumpDb(dbPath);
+      await dumpDb(dbPath, includeSecrets);
       return;
     }
     default:

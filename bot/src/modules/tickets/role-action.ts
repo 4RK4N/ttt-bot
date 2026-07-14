@@ -11,30 +11,9 @@ import {
 } from "../../lib/core/discordRoles.js";
 import { finalizeTicketClose, resolveOpenerUserId } from "./finalize-close.js";
 import { guardTicketThreadAction } from "./guards.js";
-import { ROLE_ACTION_PREFIX } from "../../lib/modules/tickets/panel.js";
-import { canStaffOrAdmin } from "./permissions.js";
+import { parseRoleActionCustomId } from "./parsers.js";
+import { canConfiguredRoleOrAdmin } from "../../lib/core/discordInteractions.js";
 import { get } from "../../lib/modules/tickets/config-io.js";
-
-interface ParsedRoleActionCustomId {
-  threadId: string;
-  typeId: string;
-  openerUserId?: string;
-}
-
-function parseRoleActionCustomId(
-  customId: string,
-): ParsedRoleActionCustomId | null {
-  if (!customId.startsWith(ROLE_ACTION_PREFIX)) return null;
-
-  const segments = customId.slice(ROLE_ACTION_PREFIX.length).split(":");
-  if (segments.length < 3) return null;
-
-  return {
-    threadId: segments[0],
-    typeId: segments[1],
-    openerUserId: segments[2],
-  };
-}
 
 export async function handleRoleAction(
   interaction: ButtonInteraction,
@@ -61,7 +40,7 @@ export async function handleRoleAction(
   }
 
   const member = interaction.member as GuildMember | null;
-  if (!member || !canStaffOrAdmin(member, ticketType.staffRoleId)) {
+  if (!member || !canConfiguredRoleOrAdmin(member, ticketType.staffRoleId)) {
     await replyEphemeral(interaction, t.noPermission);
     return;
   }

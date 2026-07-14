@@ -1,6 +1,6 @@
 import {
+  createListResolver,
   createModuleData,
-  findListItemById,
 } from "../../core/moduleConfig.js";
 
 export const NAMESPACE = "custom-embeds";
@@ -51,14 +51,22 @@ export const get = mod.get;
 export const data = mod.data;
 
 export function resolveEmbedPanel(id: string): ResolvedEmbedPanel | undefined {
-  const row = findListItemById(
-    get("panels") as Array<EmbedPanelConfig & Partial<EmbedPanelTexts>>,
-    id,
-  );
-  if (!row) return undefined;
-  return {
-    ...DEFAULT_PANEL_TEXTS,
-    ...row,
-    showTimestamp: row.showTimestamp === true,
-  } as ResolvedEmbedPanel;
+  return resolveEmbedPanelById(id);
 }
+
+const resolveEmbedPanelById = createListResolver<
+  EmbedPanelConfig,
+  EmbedPanelTexts,
+  ResolvedEmbedPanel,
+  CustomEmbedsModuleData
+>({
+  get,
+  listKey: "panels",
+  defaultTexts: DEFAULT_PANEL_TEXTS,
+  normalize: (row) =>
+    ({
+      ...DEFAULT_PANEL_TEXTS,
+      ...row,
+      showTimestamp: row.showTimestamp === true,
+    }) as ResolvedEmbedPanel,
+});

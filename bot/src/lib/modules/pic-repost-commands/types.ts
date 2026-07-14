@@ -1,7 +1,4 @@
-import {
-  createModuleData,
-  moduleDefaultsFromParts,
-} from "../../../../../shared/core/moduleConfig.js";
+import { defineSimpleModule } from "../../../../../shared/core/moduleConfig.js";
 import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 export interface PicTexts {
@@ -68,13 +65,13 @@ export const TEXT_DEFAULTS: PicTexts = {
 
 export type PicModuleData = PicConfig & PicTexts;
 
-export const MODULE_DEFAULTS: PicModuleData = moduleDefaultsFromParts(
-  CONFIG_DEFAULTS,
-  TEXT_DEFAULTS,
-);
+const mod = defineSimpleModule({
+  namespace: "pic-repost-commands",
+  configDefaults: CONFIG_DEFAULTS,
+  textDefaults: TEXT_DEFAULTS,
+});
 
-const mod = createModuleData("pic-repost-commands", MODULE_DEFAULTS);
-
+export const MODULE_DEFAULTS = mod.MODULE_DEFAULTS;
 export const NAMESPACE = mod.NAMESPACE;
 export const get = mod.get;
 export const data = mod.data;

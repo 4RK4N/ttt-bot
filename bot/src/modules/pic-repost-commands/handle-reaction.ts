@@ -6,6 +6,8 @@ import {
   type User,
 } from "discord.js";
 import { ensureFullReaction } from "../../lib/core/reactionContext.js";
+import { isDiscordUnknownMessage } from "../../lib/core/discordInteractions.js";
+import { registerSafeHandler } from "../../lib/core/discordEvents.js";
 import { reactionsMatch } from "../../../../shared/core/discordEmoji.js";
 import { isModuleEnabled } from "../../../../shared/core/texts.js";
 import {
@@ -69,8 +71,7 @@ async function handleDeleteReaction(
     });
     await message.delete();
   } catch (err) {
-    const code = (err as { code?: number }).code;
-    if (code === 10008) return;
+    if (isDiscordUnknownMessage(err)) return;
     console.error(
       `[${NAMESPACE}] Failed to delete post message=${message.id}:`,
       err,
@@ -79,11 +80,10 @@ async function handleDeleteReaction(
 }
 
 export function registerDeleteReactionHandler(client: Client): void {
-  client.on(Events.MessageReactionAdd, async (reaction, user) => {
-    try {
-      await handleDeleteReaction(reaction, user, client.user?.id);
-    } catch (err) {
-      console.error(`[${NAMESPACE}] MessageReactionAdd error:`, err);
-    }
-  });
+  registerSafeHandler(
+    client,
+    Events.MessageReactionAdd,
+    (reaction, user) => handleDeleteReaction(reaction, user, client.user?.id),
+    `[${NAMESPACE}]`,
+  );
 }

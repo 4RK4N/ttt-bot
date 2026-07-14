@@ -1,6 +1,6 @@
 import {
+  createListResolver,
   createModuleData,
-  findListItemById,
   moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
@@ -102,19 +102,27 @@ export const get = mod.get;
 export const data = mod.data;
 
 export function resolvePanel(id: string): ResolvedRolePanel | undefined {
-  const row = findListItemById(
-    get("panels") as Array<RolePanelConfig & Partial<RolePanelTexts>>,
-    id,
-  );
-  if (!row) return undefined;
-  return {
-    ...DEFAULT_PANEL_TEXTS,
-    ...row,
-    reactionType: isReactionType(row.reactionType) ? row.reactionType : "button",
-    toggleable: row.toggleable !== false,
-    roleOptions: normalizeRoleOptions(row.roleOptions),
-  } as ResolvedRolePanel;
+  return resolvePanelById(id);
 }
+
+const resolvePanelById = createListResolver<
+  RolePanelConfig,
+  RolePanelTexts,
+  ResolvedRolePanel,
+  ReactionRolesModuleData
+>({
+  get,
+  listKey: "panels",
+  defaultTexts: DEFAULT_PANEL_TEXTS,
+  normalize: (row) =>
+    ({
+      ...DEFAULT_PANEL_TEXTS,
+      ...row,
+      reactionType: isReactionType(row.reactionType) ? row.reactionType : "button",
+      toggleable: row.toggleable !== false,
+      roleOptions: normalizeRoleOptions(row.roleOptions),
+    }) as ResolvedRolePanel,
+});
 
 export function findPanelByMessageId(
   messageId: string,

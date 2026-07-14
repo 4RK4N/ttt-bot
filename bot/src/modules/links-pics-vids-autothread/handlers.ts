@@ -2,6 +2,7 @@ import { GuildMember, PermissionFlagsBits, type Message } from "discord.js";
 import { channelUrl } from "../../../../shared/core/limits.js";
 import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
 import { buildTextOrEmbedPayload } from "../../lib/core/embedBuilder.js";
+import { isDiscordUnknownMessage } from "../../lib/core/discordInteractions.js";
 import { trySendDm } from "../../lib/core/discordDm.js";
 import {
   buildThreadName,
@@ -76,8 +77,7 @@ async function deleteNonQualifyingMessage(message: Message): Promise<void> {
   try {
     await message.delete();
   } catch (err) {
-    const code = (err as { code?: number }).code;
-    if (code === 10008) return;
+    if (isDiscordUnknownMessage(err)) return;
     console.error(
       `[${NAMESPACE}] Failed to delete non-qualifying message=${message.id}:`,
       err,

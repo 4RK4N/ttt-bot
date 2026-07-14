@@ -9,7 +9,8 @@ import {
   buildThreadName,
   startAndPopulateCommentsThread,
 } from "../../lib/core/threads.js";
-import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
+import { format } from "../../../../shared/core/texts.js";
+import { guardEnabledSlash } from "../../lib/core/discordInteractions.js";
 import { resolveDisplayName } from "../../lib/core/memberDisplayNames.js";
 import { fetchBuffer } from "../../lib/core/download.js";
 import { isImageAttachment } from "../../../../shared/core/attachments.js";
@@ -40,10 +41,7 @@ export async function executePicRepost(
 
   const t = data();
 
-  if (!isModuleEnabled(NAMESPACE)) {
-    await interaction.editReply(t.disabled);
-    return;
-  }
+  if (!(await guardEnabledSlash(interaction, NAMESPACE, t.disabled))) return;
 
   const message = interaction.options.getString("message", true);
 

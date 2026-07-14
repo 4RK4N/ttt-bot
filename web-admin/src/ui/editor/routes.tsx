@@ -412,11 +412,14 @@ export function registerHtmxRoutes(
         />,
       );
     } catch (err) {
+      console.error(
+        `[web] publish failed ${namespace}/${itemId}:`,
+        err,
+      );
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
-      const message =
-        err instanceof Error ? err.message : publishClientError(true);
+      const message = publishClientError(true);
       return c.html(
         <ModulePanel
           {...panelProps(mod, ctx, expanded, { ok: false, message })}
@@ -462,11 +465,14 @@ export function registerHtmxRoutes(
         />,
       );
     } catch (err) {
+      console.error(
+        `[web] unpublish failed ${namespace}/${itemId}:`,
+        err,
+      );
       const csrfToken = await ensureCsrfToken(c, deps.cfg);
       const ctx = await loadEditorContext(deps.cfg, csrfToken);
       const mod = buildEditorModule(plugin);
-      const message =
-        err instanceof Error ? err.message : publishClientError(false);
+      const message = publishClientError(false);
       return c.html(
         <ModulePanel
           {...panelProps(mod, ctx, expanded, { ok: false, message })}

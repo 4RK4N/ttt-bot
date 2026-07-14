@@ -11,7 +11,6 @@ import type {
   SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
 import { isModuleEnabled } from "../../shared/core/texts.js";
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MODULES_DIR = join(__dirname, "modules");
 
@@ -90,7 +89,7 @@ export async function loadModules(
   if (!existsSync(MODULES_DIR)) {
     throw new Error(
       `[moduleLoader] Modules directory not found at "${MODULES_DIR}". ` +
-        "Expected bot/src/modules/ (dev) or dist/bot/src/modules/ (compiled).",
+      "Expected bot/src/modules/ (dev) or dist/bot/src/modules/ (compiled).",
     );
   }
 
@@ -174,7 +173,7 @@ export async function loadModules(
   ) {
     throw new Error(
       `[moduleLoader] No modules loaded from "${MODULES_DIR}". ` +
-        "Each folder needs commands, init, or componentRoutes.",
+      "Each folder needs commands, init, or componentRoutes.",
     );
   }
 

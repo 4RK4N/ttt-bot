@@ -1,4 +1,4 @@
-import { BTN_PREFIX } from "../../lib/modules/reaction-roles/panel.js";
+import { BTN_PREFIX, SEL_PREFIX } from "../../lib/modules/reaction-roles/panel.js";
 
 export function parseButtonCustomId(
   customId: string,
@@ -11,4 +11,10 @@ export function parseButtonCustomId(
   const optionId = rest.slice(sep + 1);
   if (!panelId || !optionId) return null;
   return { panelId, optionId };
+}
+
+export function parseSelectCustomId(customId: string): string | null {
+  if (!customId.startsWith(SEL_PREFIX)) return null;
+  const panelId = customId.slice(SEL_PREFIX.length);
+  return panelId || null;
 }

@@ -4,7 +4,7 @@ import { initConfig } from "../../shared/config.js";
 import { MODULE_NAMESPACES } from "../../shared/core/moduleTable.js";
 import { reloadAllModuleStores } from "../../shared/core/texts.js";
 import { startWeb } from "../../web-admin/src/server.js";
-import { publishHandlersByNamespace } from "./internal-api/publishRegistry.js";
+import { publishHandlersByNamespace } from "./publish/publishRegistry.js";
 import { startBot } from "./index.js";
 
 async function main(): Promise<void> {

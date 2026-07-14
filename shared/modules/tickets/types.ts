@@ -1,7 +1,7 @@
 import { toStringArray } from "../../core/strings.js";
 import {
+  createListResolver,
   createModuleData,
-  findListItemById,
   moduleDefaultsFromParts,
 } from "../../core/moduleConfig.js";
 
@@ -133,16 +133,24 @@ export const get = mod.get;
 export const data = mod.data;
 
 export function resolveTicketType(id: string): ResolvedTicketType | undefined {
-  const row = findListItemById(
-    get("ticketTypes") as Array<TicketTypeConfig & Partial<TicketTypeTexts>>,
-    id,
-  );
-  if (!row) return undefined;
-  return {
-    ...DEFAULT_TYPE_TEXTS,
-    ...row,
-    staffRoleId: row.staffRoleId?.trim() ?? "",
-    deniedRoleIds: toStringArray(row.deniedRoleIds),
-    roleActionRoleId: row.roleActionRoleId?.trim() || undefined,
-  } as ResolvedTicketType;
+  return resolveTicketTypeById(id);
 }
+
+const resolveTicketTypeById = createListResolver<
+  TicketTypeConfig,
+  TicketTypeTexts,
+  ResolvedTicketType,
+  TicketsModuleData
+>({
+  get,
+  listKey: "ticketTypes",
+  defaultTexts: DEFAULT_TYPE_TEXTS,
+  normalize: (row) =>
+    ({
+      ...DEFAULT_TYPE_TEXTS,
+      ...row,
+      staffRoleId: row.staffRoleId?.trim() ?? "",
+      deniedRoleIds: toStringArray(row.deniedRoleIds),
+      roleActionRoleId: row.roleActionRoleId?.trim() || undefined,
+    }) as ResolvedTicketType,
+});

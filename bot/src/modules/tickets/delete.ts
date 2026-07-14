@@ -5,6 +5,7 @@ import { guardTicketThreadAction } from "./guards.js";
 import { clearOpenTicketByThreadId } from "./open-index.js";
 import { isClosedTicketThread } from "./names.js";
 import { parseDeleteCustomId } from "./parsers.js";
+import { handleTicketCancel } from "./cancel-ui.js";
 import {
   buildConfirmRow,
   DELETE_CONFIRM_PREFIX,
@@ -73,8 +74,5 @@ export async function handleDeleteTicket(
 export async function handleDeleteCancel(
   interaction: ButtonInteraction,
 ): Promise<void> {
-  await interaction.update({
-    content: get("deleteCancelled"),
-    components: [],
-  });
+  await handleTicketCancel(interaction, get("deleteCancelled"));
 }

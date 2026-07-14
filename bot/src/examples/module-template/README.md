@@ -21,7 +21,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 4. Wire `bot/src/modules/<name>/index.ts` — enable `commands`, `init`, and/or `componentRoutes` as needed.
 5. **Panel modules only:** uncomment panel block in `config-io.ts`; implement `panel.ts` + `publisher.ts`;
    wire `validate.ts` in `web-admin/src/store.ts`; register namespace in
-   `bot/src/internal-api/publishRegistry.ts`.
+   `bot/src/publish/publishRegistry.ts`.
 6. Run `npm run deploy` after adding or changing slash commands.
 
 ## File map
@@ -53,7 +53,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 Turso `module_*` table  ──►  get() / data()  in types.ts  ──►  re-exported by config-io.ts
 ```
 
-- **Defaults** in `types.ts` (`MODULE_DEFAULTS`) are fallbacks for `./scripts/db/db-init.sh` — mirror each key as an `INSERT` in `shared/modules/<name>/seed.sql` (values as JSON strings). Update both when defaults change.
+- **Defaults** in `types.ts` use `defineSimpleModule()` for simple modules; keep `MODULE_DEFAULTS` and `seed.sql` `INSERT` rows in sync manually.
 - Reads use an **in-process store** in `shared/core/texts.ts` — reloaded on startup and after DB writes.
 - **`isModuleEnabled(NAMESPACE)`** checks `config.enabled !== false` (web editor toggle).
 - **Panel list patches** use `createConfigIo` at runtime (publish flow).
@@ -62,8 +62,8 @@ Turso `module_*` table  ──►  get() / data()  in types.ts  ──►  re-ex
 
 | Module kind | `config-io.ts` role                                                          |
 | ----------- | ---------------------------------------------------------------------------- |
-| **Simple**  | Re-export `config`, `texts`, `NAMESPACE`, helpers (`targetChannelId`, …)     |
-| **Panel**   | `createConfigIo` → `get*Config` / `update*` + re-export reads and `resolve*` |
+| **Simple**  | `export * from "./types.js"` — IO boundary only                              |
+| **Panel**   | `export * from shared/types` + `createConfigIo` update/get exports           |
 
 After publish, patch config rows:
 

@@ -1,7 +1,4 @@
-import {
-  createModuleData,
-  moduleDefaultsFromParts,
-} from "../../../../../shared/core/moduleConfig.js";
+import { defineSimpleModule } from "../../../../../shared/core/moduleConfig.js";
 import { DEFAULT_THREAD_FIRST_MESSAGE } from "../../core/threads.js";
 
 const DEFAULT_NON_QUALIFYING_DM =
@@ -30,13 +27,13 @@ export const TEXT_DEFAULTS: AutoThreadTexts = {
 
 export type AutoThreadModuleData = AutoThreadConfig & AutoThreadTexts;
 
-export const MODULE_DEFAULTS: AutoThreadModuleData = moduleDefaultsFromParts(
-  CONFIG_DEFAULTS,
-  TEXT_DEFAULTS,
-);
+const mod = defineSimpleModule({
+  namespace: "links-pics-vids-autothread",
+  configDefaults: CONFIG_DEFAULTS,
+  textDefaults: TEXT_DEFAULTS,
+});
 
-const mod = createModuleData("links-pics-vids-autothread", MODULE_DEFAULTS);
-
+export const MODULE_DEFAULTS = mod.MODULE_DEFAULTS;
 export const NAMESPACE = mod.NAMESPACE;
 export const get = mod.get;
 export const data = mod.data;

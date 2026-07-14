@@ -129,7 +129,7 @@ Every production module follows the same shape:
 For the web editor, add `editorConfig` to `shared/modules/<name>/seed.sql` (see existing modules).
 Panel modules also copy `panel-types.ts` and `validate.ts` from the template into `shared/modules/<name>/`.
 The loader picks up any folder with `index.ts` automatically.
-Panel modules also register the namespace in `bot/src/internal-api/publishRegistry.ts` and validators in
+Panel modules also register the namespace in `bot/src/publish/publishRegistry.ts` and validators in
 `web-admin/src/store.ts`.
 
 Shared contract helpers: `shared/core/moduleConfig.ts`, `panelFields.ts`, `strings.ts`, `texts.ts`.

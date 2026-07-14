@@ -1,7 +1,7 @@
 import { DiscordAPIError } from "discord.js";
 import { describe, expect, it, vi } from "vitest";
 import { DISCORD_EMOJI_MAX_BYTES } from "../shared/core/limits.js";
-import { canEmojiOrAdmin } from "../bot/src/modules/emojis/permissions.js";
+import { canConfiguredRoleOrAdmin } from "../bot/src/lib/core/discordInteractions.js";
 import {
   mapCreateError,
   validateName,
@@ -113,9 +113,9 @@ describe("emoji permission gate", () => {
     const member = {
       permissions: { has: () => false },
       roles: { cache: { has: () => false } },
-    } as Parameters<typeof canEmojiOrAdmin>[0];
+    } as Parameters<typeof canConfiguredRoleOrAdmin>[0];
 
-    expect(canEmojiOrAdmin(member, "111111111111111111")).toBe(false);
+    expect(canConfiguredRoleOrAdmin(member, "111111111111111111")).toBe(false);
   });
 });
 

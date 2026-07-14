@@ -1,6 +1,6 @@
 import {
-  createModuleData,
-  moduleDefaultsFromParts,
+  defineSimpleModule,
+  optionalConfigString,
 } from "../../../../../shared/core/moduleConfig.js";
 
 export interface WelcomeTexts {
@@ -40,20 +40,19 @@ export const TEXT_DEFAULTS: WelcomeTexts = {
 
 export type WelcomeModuleData = WelcomeConfig & WelcomeTexts;
 
-export const MODULE_DEFAULTS: WelcomeModuleData = moduleDefaultsFromParts(
-  CONFIG_DEFAULTS,
-  TEXT_DEFAULTS,
-);
+const mod = defineSimpleModule({
+  namespace: "welcome-message",
+  configDefaults: CONFIG_DEFAULTS,
+  textDefaults: TEXT_DEFAULTS,
+});
 
-const mod = createModuleData("welcome-message", MODULE_DEFAULTS);
-
+export const MODULE_DEFAULTS = mod.MODULE_DEFAULTS;
 export const NAMESPACE = mod.NAMESPACE;
 export const get = mod.get;
 export const data = mod.data;
 
 export function welcomeChannelId(): string | undefined {
-  const id = get("channelId").trim();
-  return id === "" ? undefined : id;
+  return optionalConfigString(get("channelId"));
 }
 
 /** Clickable Discord channel link for {rulesChannel}, or empty when unset. */

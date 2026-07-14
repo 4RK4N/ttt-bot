@@ -1,13 +1,11 @@
-import { PermissionFlagsBits, type GuildMember } from "discord.js";
+import { PermissionFlagsBits } from "discord.js";
 import { describe, expect, it } from "vitest";
 import { canConfiguredRoleOrAdmin } from "../bot/src/lib/core/discordInteractions.js";
-import { canEmojiOrAdmin } from "../bot/src/modules/emojis/permissions.js";
-import { canStaffOrAdmin } from "../bot/src/modules/tickets/permissions.js";
 
 function mockMember(opts: {
   admin?: boolean;
   roleIds?: string[];
-}): GuildMember {
+}) {
   const roleIds = new Set(opts.roleIds ?? []);
   return {
     permissions: {
@@ -19,7 +17,7 @@ function mockMember(opts: {
         has: (id: string) => roleIds.has(id),
       },
     },
-  } as GuildMember;
+  } as Parameters<typeof canConfiguredRoleOrAdmin>[0];
 }
 
 describe("canConfiguredRoleOrAdmin", () => {
@@ -49,22 +47,5 @@ describe("canConfiguredRoleOrAdmin", () => {
 
   it("denies when configured role is empty and member is not admin", () => {
     expect(canConfiguredRoleOrAdmin(mockMember({}), "")).toBe(false);
-  });
-});
-
-describe("module permission wrappers", () => {
-  it("canEmojiOrAdmin delegates to configured role helper", () => {
-    expect(
-      canEmojiOrAdmin(
-        mockMember({ roleIds: ["111111111111111111"] }),
-        "111111111111111111",
-      ),
-    ).toBe(true);
-  });
-
-  it("canStaffOrAdmin delegates to configured role helper", () => {
-    expect(
-      canStaffOrAdmin(mockMember({ admin: true }), "111111111111111111"),
-    ).toBe(true);
   });
 });

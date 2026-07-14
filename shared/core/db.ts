@@ -5,8 +5,6 @@ import { connect, type Database } from "@tursodatabase/database";
 const DATA_DIR = path.resolve(process.cwd(), "data");
 const CONFIG_FILE = path.join(DATA_DIR, "config.json");
 
-export type DbHandle = Database;
-
 export interface DbBootstrapConfig {
   dbPath: string;
 }

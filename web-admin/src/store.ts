@@ -29,6 +29,45 @@ export type FieldValue =
 
 const MAX_OPTION_LIST = MAX_PANEL_OPTIONS;
 
+type PanelRowValidator = (
+  configRow: Record<string, unknown>,
+  textRow: Record<string, unknown>,
+) => void;
+
+const PANEL_ROW_VALIDATORS: Record<
+  string,
+  Record<string, PanelRowValidator>
+> = {
+  "custom-embeds": {
+    panels: validateEmbedPanelRow,
+  },
+  "reaction-roles": {
+    panels: validateRolePanelRow,
+  },
+  tickets: {
+    ticketTypes: validateTicketTypeRow,
+  },
+};
+
+function runPanelRowValidator(
+  namespace: string,
+  fieldKey: string,
+  configRow: Record<string, unknown>,
+  textRow: Record<string, unknown>,
+  itemLabel: string,
+  fallbackMessage: string,
+): void {
+  const validator = PANEL_ROW_VALIDATORS[namespace]?.[fieldKey];
+  if (!validator) return;
+  try {
+    validator(configRow, textRow);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : fallbackMessage;
+    throw new ValidationError(`${itemLabel}: ${message}`);
+  }
+}
+
 function validateSlugId(id: string, label: string): void {
   try {
     assertSlugId(id, label);
@@ -462,41 +501,14 @@ export async function writeValues(
 
         applyClearWhenHidden(field, configRow, textRow);
 
-        if (plugin.namespace === "custom-embeds" && field.key === "panels") {
-          try {
-            validateEmbedPanelRow(configRow, textRow);
-          } catch (err) {
-            const message =
-              err instanceof Error
-                ? err.message
-                : "Invalid embed panel configuration.";
-            throw new ValidationError(`${key}[${id}]: ${message}`);
-          }
-        }
-
-        if (plugin.namespace === "reaction-roles" && field.key === "panels") {
-          try {
-            validateRolePanelRow(configRow, textRow);
-          } catch (err) {
-            const message =
-              err instanceof Error
-                ? err.message
-                : "Invalid panel configuration.";
-            throw new ValidationError(`${key}[${id}]: ${message}`);
-          }
-        }
-
-        if (plugin.namespace === "tickets" && field.key === "ticketTypes") {
-          try {
-            validateTicketTypeRow(configRow, textRow);
-          } catch (err) {
-            const message =
-              err instanceof Error
-                ? err.message
-                : "Invalid ticket type configuration.";
-            throw new ValidationError(`${key}[${id}]: ${message}`);
-          }
-        }
+        runPanelRowValidator(
+          plugin.namespace,
+          field.key,
+          configRow,
+          textRow,
+          `${key}[${id}]`,
+          "Invalid panel configuration.",
+        );
 
         mergedRows.push({ ...configRow, ...textRow });
       }

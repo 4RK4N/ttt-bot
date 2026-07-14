@@ -2,8 +2,6 @@ import { initDb, loadDbBootstrapConfig } from "./core/db.js";
 import { APP_CONFIG_TABLE } from "./core/moduleTable.js";
 import { getDbDataAll } from "./core/dbData.js";
 
-const CONFIG_FILE_KEYS = new Set(["dbPath", "_docker"]);
-
 function trimmedOrUndefined(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() !== ""
     ? value.trim()
@@ -42,6 +40,13 @@ export interface Config {
   webPort: number;
 }
 
+/** Keys in app_config that must not appear in default SQL dumps. */
+export const APP_CONFIG_SECRET_KEYS = new Set([
+  "discordToken",
+  "clientSecret",
+  "sessionSecret",
+]);
+
 export let config: Config;
 
 export async function initConfig(): Promise<void> {
@@ -57,8 +62,4 @@ export async function initConfig(): Promise<void> {
     oauthRedirectUri: trimmedOrUndefined(rows.oauthRedirectUri),
     webPort: optionalPort(rows.webPort, 8088),
   };
-}
-
-export function isAppConfigDbKey(key: string): boolean {
-  return CONFIG_FILE_KEYS.has(key);
 }

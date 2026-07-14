@@ -15,7 +15,7 @@ Apply an incremental SQL migration to data/ttt.db.
 Stops the bot if it is running, applies SQL, then restarts.
 
 Example:
-  $0 scripts/db/migrations/001_drop_updated_at.sql
+  $0 scripts/db/migrations/001_example.sql
 
 Requires a built bot image: ./scripts/build.sh bot
 EOF

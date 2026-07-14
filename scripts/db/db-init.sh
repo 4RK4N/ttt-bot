@@ -4,11 +4,12 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 DB_PATH="data/ttt.db"
+DB_CLI="dist/scripts/db/cli.js"
+SERVICE="ttt-discord-bot"
+
 CONFIG_FILE="data/config.json"
 EXAMPLE_CONFIG="data/config.example.json"
 SCHEMA="scripts/db/schema.sql"
-DB_CLI="dist/scripts/db/cli.js"
-SERVICE="ttt-discord-bot"
 
 FORCE=0
 SEED_MODULES=1

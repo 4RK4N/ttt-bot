@@ -102,7 +102,7 @@ Never commit `data/config.json` or `data/ttt.db`. See **Configuration reference*
 **Schema updates:** write a `.sql` file under `scripts/db/migrations/`, then
 `./scripts/db/db-update.sh scripts/db/migrations/001_example.sql` (stops the bot if running, applies SQL, restarts).
 
-**Backups:** with the bot running, `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` (read-only exec into the container).
+**Backups:** with the bot running, `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` (read-only exec into the container). Default dumps **redact** `discordToken`, `clientSecret`, and `sessionSecret` in `app_config`. For a credential-bearing backup (treat like the DB file), exec with `--include-secrets`: `docker compose exec -T ttt-discord-bot node dist/scripts/db/cli.js dump-db --include-secrets data/ttt.db > backups/full.sql`.
 
 **First-time init:** `./scripts/db/db-init.sh` (stops the bot if running, applies schema/seeds, prompts for secrets, restarts if it was up).
 
@@ -158,6 +158,12 @@ See [Web editor](README.md#web-editor).
 **Health check:** `GET /health` on the web port returns `{"ok":true}` when the
 combined app is up. Docker Compose runs
 [`scripts/web-health.mjs`](scripts/web-health.mjs) against that endpoint.
+
+**Deployment security notes:**
+- The web editor listens on `0.0.0.0` inside the container — expose it only via reverse proxy and firewall.
+- `./scripts/db/db-init.sh` passes secrets as Docker `-e` env vars (visible via `docker inspect`); treat host/container env as sensitive.
+- Admin role checks are cached for 3 seconds on read-only editor requests; mutating HTMX requests always re-check live Discord roles.
+- Run `npm audit` when updating dependencies on the server; apply patch-level bumps as part of deploys.
 
 Each module's `enabled` key (in its `module_*` table) is the master on/off switch
 exposed as a toggle in the [Web editor](README.md#web-editor).

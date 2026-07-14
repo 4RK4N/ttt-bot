@@ -132,10 +132,3 @@ export async function setDbDataMany(
     await notifyModuleWrite(table);
   }
 }
-
-export async function tableIsEmpty(table: string): Promise<boolean> {
-  assertSafeTableName(table);
-  const stmt = await getDb().prepare(`SELECT COUNT(*) AS count FROM ${table}`);
-  const row = (await stmt.get()) as { count: number };
-  return row.count === 0;
-}

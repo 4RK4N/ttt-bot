@@ -97,7 +97,7 @@ const componentRoutes: ComponentRoute[] = [
 // =============================================================================
 
 /*
-Register in bot/src/internal-api/publishRegistry.ts after uncommenting publisher.ts.
+Register in bot/src/publish/publishRegistry.ts after uncommenting publisher.ts.
 See bot/src/lib/modules/example-module/publisher.ts and tickets/publisher.ts.
 */
 

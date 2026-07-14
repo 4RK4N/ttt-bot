@@ -4,8 +4,8 @@
  * Handlers should import via config-io.ts, not directly from here.
  */
 import {
-  createModuleData,
-  moduleDefaultsFromParts,
+  defineSimpleModule,
+  optionalConfigString,
 } from "../../../../../shared/core/moduleConfig.js";
 
 export interface ExampleConfig {
@@ -30,18 +30,17 @@ export const TEXT_DEFAULTS: ExampleTexts = {
 
 export type ExampleModuleData = ExampleConfig & ExampleTexts;
 
-export const MODULE_DEFAULTS: ExampleModuleData = moduleDefaultsFromParts(
-  CONFIG_DEFAULTS,
-  TEXT_DEFAULTS,
-);
+const mod = defineSimpleModule({
+  namespace: "example-module",
+  configDefaults: CONFIG_DEFAULTS,
+  textDefaults: TEXT_DEFAULTS,
+});
 
-const mod = createModuleData("example-module", MODULE_DEFAULTS);
-
+export const MODULE_DEFAULTS = mod.MODULE_DEFAULTS;
 export const NAMESPACE = mod.NAMESPACE;
 export const get = mod.get;
 export const data = mod.data;
 
 export function targetChannelId(): string | undefined {
-  const id = get("channelId").trim();
-  return id === "" ? undefined : id;
+  return optionalConfigString(get("channelId"));
 }

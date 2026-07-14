@@ -3,6 +3,7 @@ import {
   CLOSE_PREFIX,
   DELETE_CONFIRM_PREFIX,
   DELETE_PREFIX,
+  ROLE_ACTION_PREFIX,
 } from "../../lib/modules/tickets/panel.js";
 
 export interface ParsedCloseCustomId {
@@ -14,6 +15,12 @@ export interface ParsedCloseCustomId {
 export interface ParsedDeleteCustomId {
   threadId: string;
   typeId: string;
+}
+
+export interface ParsedRoleActionCustomId {
+  threadId: string;
+  typeId: string;
+  openerUserId?: string;
 }
 
 export function parseCloseCustomId(
@@ -44,4 +51,19 @@ export function parseDeleteCustomId(
   if (segments.length < 2) return null;
 
   return { threadId: segments[0], typeId: segments.slice(1).join(":") };
+}
+
+export function parseRoleActionCustomId(
+  customId: string,
+): ParsedRoleActionCustomId | null {
+  if (!customId.startsWith(ROLE_ACTION_PREFIX)) return null;
+
+  const segments = customId.slice(ROLE_ACTION_PREFIX.length).split(":");
+  if (segments.length < 3) return null;
+
+  return {
+    threadId: segments[0],
+    typeId: segments[1],
+    openerUserId: segments[2],
+  };
 }

@@ -6,6 +6,7 @@ import {
   type User,
 } from "discord.js";
 import { ensureFullReaction } from "../../lib/core/reactionContext.js";
+import { registerSafeHandler } from "../../lib/core/discordEvents.js";
 import { isModuleEnabled } from "../../../../shared/core/texts.js";
 import { isOnCooldown, touchCooldown } from "./cooldown.js";
 import { matchOptionByReaction } from "../../lib/modules/reaction-roles/panel.js";
@@ -78,19 +79,16 @@ async function handleReaction(
 }
 
 export function registerReactionHandlers(client: Client): void {
-  client.on(Events.MessageReactionAdd, async (reaction, user) => {
-    try {
-      await handleReaction(reaction, user, true);
-    } catch (err) {
-      console.error("[reaction-roles] MessageReactionAdd error:", err);
-    }
-  });
-
-  client.on(Events.MessageReactionRemove, async (reaction, user) => {
-    try {
-      await handleReaction(reaction, user, false);
-    } catch (err) {
-      console.error("[reaction-roles] MessageReactionRemove error:", err);
-    }
-  });
+  registerSafeHandler(
+    client,
+    Events.MessageReactionAdd,
+    (reaction, user) => handleReaction(reaction, user, true),
+    "[reaction-roles]",
+  );
+  registerSafeHandler(
+    client,
+    Events.MessageReactionRemove,
+    (reaction, user) => handleReaction(reaction, user, false),
+    "[reaction-roles]",
+  );
 }

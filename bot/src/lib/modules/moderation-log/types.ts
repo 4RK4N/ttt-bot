@@ -1,6 +1,6 @@
 import {
-  createModuleData,
-  moduleDefaultsFromParts,
+  defineSimpleModule,
+  optionalConfigString,
 } from "../../../../../shared/core/moduleConfig.js";
 
 export interface ModLogTexts {
@@ -49,18 +49,17 @@ export const CONFIG_DEFAULTS: ModLogConfig = {
 
 export type ModLogModuleData = ModLogConfig & ModLogTexts;
 
-export const MODULE_DEFAULTS: ModLogModuleData = moduleDefaultsFromParts(
-  CONFIG_DEFAULTS,
-  TEXT_DEFAULTS,
-);
+const mod = defineSimpleModule({
+  namespace: "moderation-log",
+  configDefaults: CONFIG_DEFAULTS,
+  textDefaults: TEXT_DEFAULTS,
+});
 
-const mod = createModuleData("moderation-log", MODULE_DEFAULTS);
-
+export const MODULE_DEFAULTS = mod.MODULE_DEFAULTS;
 export const NAMESPACE = mod.NAMESPACE;
 export const get = mod.get;
 export const data = mod.data;
 
 export function logChannelId(): string | undefined {
-  const id = get("channelId").trim();
-  return id === "" ? undefined : id;
+  return optionalConfigString(get("channelId"));
 }

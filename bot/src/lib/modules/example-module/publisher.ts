@@ -3,7 +3,7 @@
  *
  * Uncomment when panel types live in shared/modules/<name>/types.ts and config-io.ts
  * exports resolve* / get*Config / update*. Register exports in
- * bot/src/internal-api/publishRegistry.ts.
+ * bot/src/publish/publishRegistry.ts.
  */
 /*
 import { createPanelPublisher } from '../../core/panelPublisher.js';

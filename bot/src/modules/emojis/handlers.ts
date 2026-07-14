@@ -18,13 +18,13 @@ import { isImageAttachment } from "../../../../shared/core/attachments.js";
 import { DISCORD_EMOJI_MAX_BYTES } from "../../../../shared/core/limits.js";
 import { format, isModuleEnabled } from "../../../../shared/core/texts.js";
 import { fetchBuffer } from "../../lib/core/download.js";
+import { canConfiguredRoleOrAdmin } from "../../lib/core/discordInteractions.js";
 import {
   NAMESPACE,
   emojiRoleId,
   data,
 } from "../../lib/modules/emojis/config-io.js";
 import type { EmojisTexts } from "../../lib/modules/emojis/types.js";
-import { canEmojiOrAdmin } from "./permissions.js";
 
 type CreateErrorKey = keyof Pick<
   EmojisTexts,
@@ -113,7 +113,7 @@ async function guardInteraction(
   }
 
   const roleId = emojiRoleId();
-  if (!canEmojiOrAdmin(member, roleId)) {
+  if (!canConfiguredRoleOrAdmin(member, roleId)) {
     await interaction.editReply(t.noPermission);
     return null;
   }

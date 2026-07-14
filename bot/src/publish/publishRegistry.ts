@@ -28,9 +28,3 @@ export const publishHandlersByNamespace: Record<string, PublishHandlers> = {
     unpublish: unpublishRolePanel,
   },
 };
-
-export function getPublishHandlers(
-  namespace: string,
-): PublishHandlers | undefined {
-  return publishHandlersByNamespace[namespace];
-}
