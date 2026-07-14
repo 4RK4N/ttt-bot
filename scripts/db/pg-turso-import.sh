@@ -43,8 +43,6 @@ fi
 dump_abs="$(cd "$(dirname "$dump")" && pwd)/$(basename "$dump")"
 
 echo "Importing $dump into $DB_PATH ..."
-echo "Clearing stale WAL (if any) ..."
-rm -f data/ttt.db-wal data/ttt.db-shm
 
 docker compose run --rm --no-deps \
   -v "${dump_abs}:/app/import.dump:ro" \
