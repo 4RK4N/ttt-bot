@@ -26,12 +26,11 @@ First-time Turso setup:
   --all-modules  Apply all module seeds (default)
   --no-modules   Skip module seed.sql files
 
+Stops the bot if it is running, then restarts when finished.
+
 Requires a built bot image: ./scripts/build.sh bot
 EOF
 }
-
-# shellcheck source=bot-node.sh
-source "$(dirname "$0")/bot-node.sh"
 
 prompt_secret() {
   local label="$1"
@@ -52,6 +51,10 @@ prompt_value() {
     read -rp "${label}: " value
     printf '%s' "$value"
   fi
+}
+
+run_bot_node() {
+  docker compose run --rm --no-deps -T "$SERVICE" node "$@"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -84,31 +87,34 @@ else
   echo "Creating $DB_PATH ..."
 fi
 
-apply_schema_and_seeds() {
-  echo "Applying base schema..."
-  bot_node_run "$DB_CLI" apply-sql "$DB_PATH" "$SCHEMA"
+stopped=0
+if docker compose ps --status running -q "$SERVICE" 2>/dev/null | grep -q .; then
+  echo "Stopping $SERVICE ..."
+  docker compose stop "$SERVICE"
+  stopped=1
+fi
 
-  if [[ "$SEED_MODULES" -eq 1 ]]; then
-    local seed_count=0
-    for seed in shared/modules/*/seed.sql; do
-      [[ -f "$seed" ]] || continue
-      echo "Applying $seed ..."
-      bot_node_run "$DB_CLI" apply-sql "$DB_PATH" "$seed"
-      seed_count=$((seed_count + 1))
-    done
-    if [[ "$seed_count" -eq 0 ]]; then
-      echo "No shared/modules/*/seed.sql files in bot image. Rebuild: ./scripts/build.sh bot" >&2
-      exit 1
-    fi
-    echo "Applied $seed_count module seed(s)."
-  else
-    echo "Skipping module seeds (--no-modules)."
+echo "Applying base schema..."
+run_bot_node "$DB_CLI" apply-sql "$DB_PATH" "$SCHEMA"
+
+if [[ "$SEED_MODULES" -eq 1 ]]; then
+  seed_count=0
+  for seed in shared/modules/*/seed.sql; do
+    [[ -f "$seed" ]] || continue
+    echo "Applying $seed ..."
+    run_bot_node "$DB_CLI" apply-sql "$DB_PATH" "$seed"
+    seed_count=$((seed_count + 1))
+  done
+  if [[ "$seed_count" -eq 0 ]]; then
+    echo "No shared/modules/*/seed.sql files in bot image. Rebuild: ./scripts/build.sh bot" >&2
+    exit 1
   fi
-}
+  echo "Applied $seed_count module seed(s)."
+else
+  echo "Skipping module seeds (--no-modules)."
+fi
 
-bot_node_write_session apply_schema_and_seeds
-
-app_count="$(bot_node "$DB_CLI" count-app-config "$DB_PATH" | tail -n1)"
+app_count="$(run_bot_node "$DB_CLI" count-app-config "$DB_PATH" | tail -n1)"
 
 if [[ "$app_count" == "0" || "$FORCE" -eq 1 ]]; then
   echo "Configure app settings (stored in app_config):"
@@ -133,7 +139,7 @@ if [[ "$app_count" == "0" || "$FORCE" -eq 1 ]]; then
 
   web_port="$(prompt_value "Web editor port" "8088")"
 
-  bot_node_write_env \
+  docker compose run --rm --no-deps -T \
     -e "TTT_DISCORD_TOKEN=${discord_token}" \
     -e "TTT_CLIENT_ID=${client_id}" \
     -e "TTT_GUILD_ID=${guild_id}" \
@@ -142,7 +148,7 @@ if [[ "$app_count" == "0" || "$FORCE" -eq 1 ]]; then
     -e "TTT_SESSION_SECRET=${session_secret}" \
     -e "TTT_OAUTH_REDIRECT_URI=${oauth_redirect}" \
     -e "TTT_WEB_PORT=${web_port}" \
-    "$DB_CLI" write-app-config
+    "$SERVICE" node "$DB_CLI" write-app-config
 
   echo "app_config populated."
 else
@@ -150,6 +156,11 @@ else
 fi
 
 echo "Table summary:"
-bot_node "$DB_CLI" table-counts "$DB_PATH"
+run_bot_node "$DB_CLI" table-counts "$DB_PATH"
+
+if [[ $stopped -eq 1 ]]; then
+  echo "Restarting $SERVICE ..."
+  docker compose up -d "$SERVICE"
+fi
 
 echo "Done. Build and start the combined app with: ./scripts/build.sh bot"

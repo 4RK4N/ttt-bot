@@ -98,7 +98,7 @@ data/
 ```
 
 Module settings and copy live in Turso (`module_*` tables), edited via the web editor.
-Each module ships code defaults in `types.ts` and a one-time `seed.sql`; `./scripts/db/db-init.sh` applies seeds on fresh installs.
+Each module ships code defaults in `types.ts` (`MODULE_DEFAULTS`) and a one-time `seed.sql`; **keep them aligned manually** — every default key in TS needs a matching `INSERT` in seed (JSON-encoded values). `editorConfig` is only in `seed.sql`. `./scripts/db/db-init.sh` applies seeds on fresh installs.
 Slash command names/descriptions stay in code — run `npm run deploy` after changes.
 
 Channel and role fields in the web editor are validated as Discord IDs (numeric snowflakes) on save.

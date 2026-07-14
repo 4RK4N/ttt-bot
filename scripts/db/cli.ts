@@ -14,7 +14,11 @@ import {
   MODULE_NAMESPACES,
   moduleTableName,
 } from "../../shared/core/moduleTable.js";
-import { sqlStringLiteral } from "./sqlLiteral.js";
+
+/** Escape a string as a single-quoted SQL literal (`''` for embedded quotes). */
+function sqlStringLiteral(value: string): string {
+  return `'${value.replace(/'/g, "''")}'`;
+}
 
 function usage(): never {
   console.error(`Usage: db/cli.ts <command>

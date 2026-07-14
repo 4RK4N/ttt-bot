@@ -24,14 +24,14 @@ Copy the reference template — it is **not loaded by the bot** (only `bot/src/m
    - **Simple modules:** `bot/src/lib/modules/<name>/types.ts`
    - **Panel modules:** `shared/modules/<name>/types.ts` (copy from [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts))
 
-3. **Register the module table** — add the namespace to `MODULE_NAMESPACES` in `shared/core/moduleTable.ts`, add `shared/modules/<name>/seed.sql` (run `npm run generate-seed-sql` after editing `editorConfig` in an existing seed), then `./scripts/db/db-update.sh <file.sql>` for incremental changes on a live DB.
+3. **Register the module table** — add the namespace to `MODULE_NAMESPACES` in `shared/core/moduleTable.ts`, add `shared/modules/<name>/seed.sql`, then `./scripts/db/db-update.sh <file.sql>` for incremental changes on a live DB. **Keep `MODULE_DEFAULTS` in `types.ts` and the matching `INSERT` rows in `seed.sql` in sync manually** (same keys/values; `editorConfig` lives only in `seed.sql`).
 
 4. **Wire `index.ts`** — export a `CommandModule` with at least one of:
    - `init(client)` — event listeners
    - `commands[]` — slash commands (then `npm run deploy`)
    - `componentRoutes[]` — buttons/selects by `customId` prefix
 
-5. **Web editor (optional)** — add an `editorConfig` row in `seed.sql` (title, description, fields). Regenerate with `npm run generate-seed-sql` when defaults change; edit `editorConfig` directly in `seed.sql` when changing editor fields.
+5. **Web editor (optional)** — add an `editorConfig` row in `seed.sql` (title, description, fields). When you change code defaults in `types.ts`, update the corresponding `INSERT` rows in `seed.sql` too.
 
 6. **Panel modules only** — copy [`panel-types.ts`](bot/src/examples/module-template/panel-types.ts) and [`validate.ts`](bot/src/examples/module-template/validate.ts) to `shared/modules/<name>/`; bot lib `panel.ts` / `publisher.ts`; wire validate in `web-admin/src/store.ts`; register namespace in `bot/src/internal-api/publishRegistry.ts`.
 

@@ -10,7 +10,7 @@ Optional on-disk assets for modules that need files (e.g. welcome card media und
 
 1. Add `MODULE_DEFAULTS` in the module's `types.ts`.
 2. Register the namespace in `shared/core/moduleTable.ts`.
-3. Add `shared/modules/<name>/seed.sql` (`npm run generate-seed-sql` for default rows).
+3. Add `shared/modules/<name>/seed.sql` (table DDL, `editorConfig`, and one `INSERT` per `MODULE_DEFAULTS` key — keep in sync with step 1).
 4. Create `data/<namespace>/` only if the module needs binary assets on disk.
 
 The namespace in `createModuleData('…')` must match the table slug (e.g. `welcome-message`

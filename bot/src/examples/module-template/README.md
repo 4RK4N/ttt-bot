@@ -16,7 +16,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
    [`validate.ts`](validate.ts) → `shared/modules/<name>/validate.ts`.
 2. Set namespace via `createModuleData('<name>', …)` in `bot/src/lib/modules/<name>/types.ts`
    (simple) or `shared/modules/<name>/types.ts` (panel — use `panel-types.ts` as starting point).
-3. Register in `moduleTable.ts`, add `shared/modules/<name>/seed.sql` (`npm run generate-seed-sql`);
+3. Register in `moduleTable.ts`, add `shared/modules/<name>/seed.sql` (DDL + `editorConfig` + `INSERT`s for each key in `MODULE_DEFAULTS` — **keep TS defaults and seed rows in sync by hand**);
    run `./scripts/db/db-init.sh` on fresh installs.
 4. Wire `bot/src/modules/<name>/index.ts` — enable `commands`, `init`, and/or `componentRoutes` as needed.
 5. **Panel modules only:** uncomment panel block in `config-io.ts`; implement `panel.ts` + `publisher.ts`;
@@ -53,7 +53,7 @@ Also see [MODULES.md](../../../../MODULES.md) (catalog + data layout) and
 Turso `module_*` table  ──►  get() / data()  in types.ts  ──►  re-exported by config-io.ts
 ```
 
-- **Defaults** in `types.ts` are fallbacks and seed values for `./scripts/db/db-init.sh`.
+- **Defaults** in `types.ts` (`MODULE_DEFAULTS`) are fallbacks for `./scripts/db/db-init.sh` — mirror each key as an `INSERT` in `shared/modules/<name>/seed.sql` (values as JSON strings). Update both when defaults change.
 - Reads use an **in-process store** in `shared/core/texts.ts` — reloaded on startup and after DB writes.
 - **`isModuleEnabled(NAMESPACE)`** checks `config.enabled !== false` (web editor toggle).
 - **Panel list patches** use `createConfigIo` at runtime (publish flow).

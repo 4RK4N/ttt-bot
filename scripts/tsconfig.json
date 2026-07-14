@@ -9,9 +9,7 @@
   },
   "include": [
     "deploy-commands.ts",
-    "db/cli.ts",
-    "db/sqlLiteral.ts",
-    "db/generate-seed-sql.ts"
+    "db/cli.ts"
   ],
   "references": [
     {

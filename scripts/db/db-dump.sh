@@ -7,20 +7,18 @@ DB_PATH="data/ttt.db"
 DB_CLI="dist/scripts/db/cli.js"
 SERVICE="ttt-discord-bot"
 
-# shellcheck source=bot-node.sh
-source "$(dirname "$0")/bot-node.sh"
-
 usage() {
   cat >&2 <<EOF
 Usage: $0 <output.sql>
 
 Dump data/ttt.db to a plain SQL file (CREATE TABLE + INSERT statements).
-Uses a read-only Turso connection; exec into the running bot when it is up.
+Requires ttt-discord-bot to be running (uses docker compose exec).
 
 Example:
   $0 backups/ttt-$(date +%F).sql
 
-Requires a built bot image: ./scripts/build.sh bot
+If the bot is stopped:
+  docker compose up -d $SERVICE
 EOF
 }
 
@@ -46,16 +44,21 @@ if [[ ! -f "$DB_PATH" ]]; then
   exit 1
 fi
 
+if ! docker compose ps --status running -q "$SERVICE" 2>/dev/null | grep -q .; then
+  echo "$SERVICE is not running. Start it first: docker compose up -d $SERVICE" >&2
+  exit 1
+fi
+
 out_dir="$(dirname "$output")"
 if [[ "$out_dir" != "." && ! -d "$out_dir" ]]; then
   mkdir -p "$out_dir"
 fi
 
 echo "Dumping $DB_PATH to $output ..."
-bot_node "$DB_CLI" dump-db "$DB_PATH" > "$output"
+docker compose exec -T "$SERVICE" node "$DB_CLI" dump-db "$DB_PATH" > "$output"
 
 if ! grep -q '^-- Turso dump of ' "$output"; then
-  echo "Dump output is invalid (stdout was polluted — rebuild first: ./scripts/build.sh bot)." >&2
+  echo "Dump output is invalid." >&2
   rm -f "$output"
   exit 1
 fi

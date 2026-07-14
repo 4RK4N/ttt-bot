@@ -99,12 +99,12 @@ Bot secrets and module settings live in **Turso** (`data/ttt.db`: `app_config` a
 
 Never commit `data/config.json` or `data/ttt.db`. See **Configuration reference** below.
 
-**Schema updates:** write a `.sql` file (e.g. next to `schema.sql`), then
-`./scripts/db/db-update.sh scripts/db/002_description.sql`.
+**Schema updates:** write a `.sql` file under `scripts/db/migrations/`, then
+`./scripts/db/db-update.sh scripts/db/migrations/001_example.sql` (stops the bot if running, applies SQL, restarts).
 
-**Backups:** run `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` periodically (exec into the running bot; read-only). Dumps use `key` + `value` columns only (no `updated_at`).
+**Backups:** with the bot running, `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` (read-only exec into the container).
 
-**Migrations / init:** `db-init.sh` and `db-update.sh` stop the bot briefly when it is running (Turso write lock), apply SQL in a one-off container, then restart. Existing DBs from before the cache simplification: `./scripts/db/db-update.sh scripts/db/migrations/001_drop_updated_at.sql` once, then rebuild and restart.
+**First-time init:** `./scripts/db/db-init.sh` (stops the bot if running, applies schema/seeds, prompts for secrets, restarts if it was up).
 
 ---
 
