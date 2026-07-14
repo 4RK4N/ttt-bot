@@ -17,7 +17,7 @@ Usage: $0 <migration.sql>
 Apply an incremental SQL migration to data/ttt.db inside ttt-discord-bot.
 
 Example:
-  $0 scripts/db/002_description.sql
+  $0 scripts/db/migrations/001_drop_updated_at.sql
 
 Requires a built bot image: ./scripts/build.sh bot
 EOF
@@ -41,5 +41,6 @@ if [[ ! -f "$DB_PATH" ]]; then
 fi
 
 echo "Applying $migration to $DB_PATH ..."
-bot_node_write "$DB_CLI" apply-sql "$DB_PATH" "$migration"
+migration_abs="$(cd "$(dirname "$migration")" && pwd)/$(basename "$migration")"
+bot_node_write_sql "$migration_abs" "$DB_CLI" apply-sql "$DB_PATH" /app/migration.sql
 echo "Done."

@@ -83,6 +83,24 @@ bot_node_write() {
   return $rc
 }
 
+# Apply a host SQL file mounted read-only (for db-update migrations on the server).
+bot_node_write_sql() {
+  local host_sql="$1"
+  shift
+  local container_sql="/app/migration.sql"
+
+  bot_node_write_begin
+  local -a cmd=(docker compose run --rm --no-deps -T)
+  if _compose_run_supports_no_build; then
+    cmd+=(--no-build)
+  fi
+  cmd+=(-v "${host_sql}:${container_sql}:ro" "$SERVICE" node "$@")
+  "${cmd[@]}"
+  local rc=$?
+  bot_node_write_end
+  return $rc
+}
+
 # write-app-config with TTT_* env vars (-e flags before node args).
 bot_node_write_env() {
   local -a env_flags=()

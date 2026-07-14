@@ -24,6 +24,7 @@ COPY --from=build /app/dist/bot ./dist/bot
 COPY --from=build /app/dist/web-admin ./dist/web-admin
 COPY --from=build /app/dist/scripts ./dist/scripts
 COPY scripts/db/schema.sql ./scripts/db/schema.sql
+COPY scripts/db/migrations ./scripts/db/migrations
 COPY shared/modules ./shared/modules
 COPY scripts/web-health.mjs ./scripts/web-health.mjs
 USER node
