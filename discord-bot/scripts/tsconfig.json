@@ -1,8 +1,8 @@
 {
-  "extends": "../discord-bot/tsconfig.base.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "../discord-bot/dist/scripts",
+    "outDir": "../dist/scripts",
     "composite": true,
     "declaration": true,
     "declarationMap": true
@@ -13,10 +13,10 @@
   ],
   "references": [
     {
-      "path": "../discord-bot/shared"
+      "path": "../shared"
     },
     {
-      "path": "../discord-bot/bot"
+      "path": "../bot"
     }
   ]
 }

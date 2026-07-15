@@ -3,7 +3,7 @@ import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..", "discord-bot");
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const adminCss = join(
   root,

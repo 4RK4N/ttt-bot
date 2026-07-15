@@ -25,7 +25,7 @@ Copy the reference template — it is **not loaded by the bot** (only `discord-b
    - **Simple modules:** `bot/src/lib/modules/<name>/types.ts`
    - **Panel modules:** `shared/modules/<name>/types.ts` (copy from [`example/shared/modules/example-module/types.ts`](discord-bot/example/shared/modules/example-module/types.ts))
 
-3. **Register the module table** — add the namespace to `MODULE_NAMESPACES` in `shared/core/moduleTable.ts`, add `shared/modules/<name>/seed.sql` (adapt [`example/shared/modules/example-module/seed.sql`](discord-bot/example/shared/modules/example-module/seed.sql)), then `./scripts/db/db-update.sh <file.sql>` for incremental changes on a live DB. **Keep `MODULE_DEFAULTS` in `types.ts` and the matching `INSERT` rows in `seed.sql` in sync manually** (same keys/values; `editorConfig` lives only in `seed.sql`).
+3. **Register the module table** — add the namespace to `MODULE_NAMESPACES` in `shared/core/moduleTable.ts`, add `shared/modules/<name>/seed.sql` (adapt [`example/shared/modules/example-module/seed.sql`](discord-bot/example/shared/modules/example-module/seed.sql)), then `./discord-bot/scripts/db/db-update.sh <file.sql>` for incremental changes on a live DB. **Keep `MODULE_DEFAULTS` in `types.ts` and the matching `INSERT` rows in `seed.sql` in sync manually** (same keys/values; `editorConfig` lives only in `seed.sql`).
 
 4. **Wire `index.ts`** — export a `CommandModule` with at least one of:
    - `init(client)` — event listeners
@@ -65,12 +65,11 @@ Runtime settings and copy live in Turso (`data/ttt.db`). Edit via the web editor
 ## Project layout
 
 ```
-discord-bot/      bot package (bot/, shared/, web-admin/, tests/, example/)
+discord-bot/      bot/, shared/, web-admin/, scripts/, tests/, example/
   Dockerfile      single bot+editor image target (node:24-slim)
   MODULES.md      module catalog
 website/          Astro public site (see INSTALL.md § Part 7)
 data/             config.json, ttt.db, binary assets (welcome media)
-scripts/          build.sh, db-init/update/dump, deploy-commands, web-health
 ```
 
 ## Web editor
@@ -97,7 +96,7 @@ With Docker: `./scripts/build.sh bot` for deploy (see [INSTALL.md § Part 4](INS
 2. `cd discord-bot && npm install`
 3. [Developer Portal](https://discord.com/developers/applications): bot token + client ID; invite with Administrator (see [INSTALL.md](INSTALL.md))
 4. `cp data/config.example.json data/config.json` — DB path only (from repo root)
-5. `./scripts/db/db-init.sh` — schema, app secrets (`app_config`), module defaults (see [INSTALL.md](INSTALL.md))
+5. `./discord-bot/scripts/db/db-init.sh` — schema, app secrets (`app_config`), module defaults (see [INSTALL.md](INSTALL.md))
 
 ## Deploy slash commands
 

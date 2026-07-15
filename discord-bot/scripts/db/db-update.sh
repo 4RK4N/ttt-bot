@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../../.."
 
 DB_PATH="data/ttt.db"
 DB_CLI="dist/scripts/db/cli.js"
@@ -15,7 +15,7 @@ Apply an incremental SQL migration to data/ttt.db.
 Stops the bot if it is running, applies SQL, then restarts.
 
 Example:
-  $0 scripts/db/migrations/001_example.sql
+  $0 discord-bot/scripts/db/migrations/001_example.sql
 
 Requires a built bot image: ./scripts/build.sh bot
 EOF
@@ -34,7 +34,7 @@ if [[ -z "$migration" || ! -f "$migration" ]]; then
 fi
 
 if [[ ! -f "$DB_PATH" ]]; then
-  echo "$DB_PATH not found. Run ./scripts/db/db-init.sh first." >&2
+  echo "$DB_PATH not found. Run ./discord-bot/scripts/db/db-init.sh first." >&2
   exit 1
 fi
 

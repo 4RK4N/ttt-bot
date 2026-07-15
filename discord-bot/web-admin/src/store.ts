@@ -136,7 +136,7 @@ function readModuleRows(namespace: string): Record<string, unknown> {
       err,
     );
     throw new DataReadError(
-      `Cannot read module "${namespace}" from the database. Run ./scripts/db/db-init.sh.`,
+      `Cannot read module "${namespace}" from the database. Run ./discord-bot/scripts/db/db-init.sh.`,
     );
   }
 }

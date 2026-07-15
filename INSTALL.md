@@ -79,10 +79,10 @@ docker compose version
 
    ```bash
    cp data/config.example.json data/config.json   # DB path only
-   ./scripts/db/db-init.sh
+   ./discord-bot/scripts/db/db-init.sh
    ```
 
-   `scripts/db/db-init.sh` creates `data/ttt.db`, applies `scripts/db/schema.sql` and
+   `discord-bot/scripts/db/db-init.sh` creates `data/ttt.db`, applies `discord-bot/scripts/db/schema.sql` and
    per-module `seed.sql` files, prompts for Discord/OAuth secrets (stored in the
    `app_config` table), and seeds module tables from code defaults (`MODULE_DEFAULTS`
    in each module's `types.ts`). Node steps run inside the `ttt-discord-bot` container —
@@ -99,12 +99,12 @@ Bot secrets and module settings live in **Turso** (`data/ttt.db`: `app_config` a
 
 Never commit `data/config.json` or `data/ttt.db`. See **Configuration reference** below.
 
-**Schema updates:** write a `.sql` file under `scripts/db/migrations/`, then
-`./scripts/db/db-update.sh scripts/db/migrations/001_example.sql` (stops the bot if running, applies SQL, restarts).
+**Schema updates:** write a `.sql` file under `discord-bot/scripts/db/migrations/`, then
+`./discord-bot/scripts/db/db-update.sh discord-bot/scripts/db/migrations/001_example.sql` (stops the bot if running, applies SQL, restarts).
 
-**Backups:** with the bot running, `./scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` (read-only exec into the container). Default dumps **redact** `discordToken`, `clientSecret`, and `sessionSecret` in `app_config`. For a credential-bearing backup (treat like the DB file): `./scripts/db/db-dump.sh --include-secrets backups/full.sql` (or `docker compose exec -T ttt-discord-bot node dist/scripts/db/cli.js dump-db --include-secrets data/ttt.db > backups/full.sql`).
+**Backups:** with the bot running, `./discord-bot/scripts/db/db-dump.sh backups/ttt-YYYY-MM-DD.sql` (read-only exec into the container). Default dumps **redact** `discordToken`, `clientSecret`, and `sessionSecret` in `app_config`. For a credential-bearing backup (treat like the DB file): `./discord-bot/scripts/db/db-dump.sh --include-secrets backups/full.sql` (or `docker compose exec -T ttt-discord-bot node dist/scripts/db/cli.js dump-db --include-secrets data/ttt.db > backups/full.sql`).
 
-**First-time init:** `./scripts/db/db-init.sh` (stops the bot if running, applies schema/seeds, prompts for secrets, restarts if it was up).
+**First-time init:** `./discord-bot/scripts/db/db-init.sh` (stops the bot if running, applies schema/seeds, prompts for secrets, restarts if it was up).
 
 ---
 
@@ -128,7 +128,7 @@ store (`discord-bot/shared/core/texts.ts`) that reloads automatically when rows 
 
 ### `app_config` table — bot + web editor secrets
 
-Populated interactively by `./scripts/db/db-init.sh`.
+Populated interactively by `./discord-bot/scripts/db/db-init.sh`.
 
 | Key                 | Required         | Description |
 | ------------------- | ---------------- | ----------- |
@@ -144,7 +144,7 @@ Populated interactively by `./scripts/db/db-init.sh`.
 Changing `app_config` values requires restarting the bot container.
 Module settings hot-reload without a restart.
 
-To rotate a secret: update the row in Turso, or re-run `./scripts/db/db-init.sh --force`.
+To rotate a secret: update the row in Turso, or re-run `./discord-bot/scripts/db/db-init.sh --force`.
 
 The four editor fields (`clientSecret`, `sessionSecret`, `oauthRedirectUri`,
 `webPort`) plus `guildId` are only needed if you run the browser-based editor;
@@ -157,11 +157,11 @@ See [Web editor](README.md#web-editor).
 
 **Health check:** `GET /health` on the web port returns `{"ok":true}` when the
 combined app is up. Docker Compose runs
-[`scripts/web-health.mjs`](scripts/web-health.mjs) against that endpoint.
+[`discord-bot/scripts/web-health.mjs`](discord-bot/scripts/web-health.mjs) against that endpoint.
 
 **Deployment security notes:**
 - The web editor listens on `0.0.0.0` inside the container — expose it only via reverse proxy and firewall.
-- `./scripts/db/db-init.sh` passes secrets as Docker `-e` env vars (visible via `docker inspect`); treat host/container env as sensitive.
+- `./discord-bot/scripts/db/db-init.sh` passes secrets as Docker `-e` env vars (visible via `docker inspect`); treat host/container env as sensitive.
 - Admin role checks are cached for 3 seconds on read-only editor requests; mutating HTMX requests always re-check live Discord roles.
 - Run `npm audit` when updating dependencies on the server; apply patch-level bumps as part of deploys.
 
@@ -566,15 +566,15 @@ docker logs -f ttt-discord-bot
 
 - **Commands don't appear**: make sure you ran the deploy step. Global commands
   are slow to propagate - set `guildId` for instant updates during setup.
-- **"Missing required config value"** on start: run `./scripts/db/db-init.sh` or
+- **"Missing required config value"** on start: run `./discord-bot/scripts/db/db-init.sh` or
   check `app_config` in Turso (`discordToken`, `clientId`, etc.).
 - **Web editor missing OAuth fields**: same — populate `app_config` via
-  `scripts/db/db-init.sh` or update rows directly.
+  `discord-bot/scripts/db/db-init.sh` or update rows directly.
 - **Bot is online but `/pic` fails to post**: the bot needs **Send Messages** and
   **Attach Files** permissions in that channel. Re-check the channel's permission
   overrides for the bot's role.
 - **Web editor save errors**: ensure `data/ttt.db` exists and is writable.
-  During `./scripts/db/db-init.sh`, `data/` may need to be writable
+  During `./discord-bot/scripts/db/db-init.sh`, `data/` may need to be writable
   by UID 1000; afterward containers need read/write access to `data/ttt.db`.
 
 - **Large images fail**: Discord caps uploads (10 MB on unboosted servers). The

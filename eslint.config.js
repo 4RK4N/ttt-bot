@@ -19,7 +19,7 @@ export default tseslint.config(
     ],
   },
   {
-    files: ["scripts/**/*.js"],
+    files: ["discord-bot/scripts/**/*.mjs"],
     languageOptions: {
       globals: globals.node,
     },
@@ -29,7 +29,7 @@ export default tseslint.config(
       "discord-bot/bot/**/*.ts",
       "discord-bot/shared/**/*.ts",
       "discord-bot/web-admin/**/*.ts",
-      "scripts/**/*.ts",
+      "discord-bot/scripts/**/*.ts",
     ],
     languageOptions: {
       parserOptions: {
@@ -39,12 +39,6 @@ export default tseslint.config(
     },
     rules: {
       "@typescript-eslint/no-floating-promises": "error",
-    },
-  },
-  {
-    files: ["scripts/**/*.mjs"],
-    languageOptions: {
-      globals: globals.node,
     },
   },
   {

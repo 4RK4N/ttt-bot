@@ -29,7 +29,7 @@ example/
 2. Set namespace via `createModuleData('<name>', …)` in `bot/src/lib/modules/<name>/types.ts`
    (simple) or `shared/modules/<name>/types.ts` (panel — use `example/shared/.../types.ts` as starting point).
 3. Register in `moduleTable.ts`, add `shared/modules/<name>/seed.sql` (DDL + `editorConfig` + `INSERT`s for each key in `MODULE_DEFAULTS` — **keep TS defaults and seed rows in sync by hand**);
-   run `./scripts/db/db-init.sh` on fresh installs.
+   run `./discord-bot/scripts/db/db-init.sh` on fresh installs.
 4. Wire `bot/src/modules/<name>/index.ts` — enable `commands`, `init`, and/or `componentRoutes` as needed.
 5. **Panel modules only:** uncomment panel block in `config-io.ts`; implement `panel.ts` + `publisher.ts`;
    add the namespace to `shared/core/panelModuleRegistry.ts` (publish handlers and web-admin row validation).
