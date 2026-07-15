@@ -1,9 +1,13 @@
 import { REST, Routes } from "discord.js";
+import { closeDb } from "#shared/core/db.js";
+import { MODULE_NAMESPACES } from "#shared/core/moduleTable.js";
+import { reloadAllModuleStores } from "#shared/core/texts.js";
 import { config, initConfig } from "#shared/config.js";
 import { loadModules } from "../bot/src/moduleLoader.js";
 
 async function main(): Promise<void> {
-  await initConfig();
+  await initConfig({ readonly: true });
+  await reloadAllModuleStores([...MODULE_NAMESPACES]);
   const { commandData } = await loadModules({ skipDisabledCommands: true });
 
   if (commandData.length === 0) {
@@ -30,7 +34,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error("Failed to deploy commands:", err);
-  process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error("Failed to deploy commands:", err);
+    process.exit(1);
+  })
+  .finally(() => closeDb());

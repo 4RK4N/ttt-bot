@@ -49,8 +49,13 @@ export const APP_CONFIG_SECRET_KEYS = new Set([
 
 export let config: Config;
 
-export async function initConfig(): Promise<void> {
-  await initDb(loadDbBootstrapConfig());
+export async function initConfig(options?: {
+  readonly?: boolean;
+}): Promise<void> {
+  await initDb(
+    loadDbBootstrapConfig(),
+    options?.readonly ? { readonly: true } : undefined,
+  );
   const rows = await getDbDataAll(APP_CONFIG_TABLE);
   config = {
     discordToken: requiredFromRows(rows, "discordToken"),

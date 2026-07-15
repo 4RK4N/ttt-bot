@@ -9,6 +9,12 @@ export interface DbBootstrapConfig {
   dbPath: string;
 }
 
+export interface InitDbOptions {
+  /** Open without a write lock — safe while the bot holds the DB (deploy, dump). */
+  readonly?: boolean;
+  fileMustExist?: boolean;
+}
+
 let db: Database | null = null;
 
 export function loadDbBootstrapConfig(): DbBootstrapConfig {
@@ -21,8 +27,8 @@ export function loadDbBootstrapConfig(): DbBootstrapConfig {
   } catch (err) {
     throw new Error(
       `Could not read DB bootstrap config from "${CONFIG_FILE}". ` +
-        'Copy "data/config.example.json" to "data/config.json". ' +
-        `(${(err as Error).message})`,
+      'Copy "data/config.example.json" to "data/config.json". ' +
+      `(${(err as Error).message})`,
     );
   }
 
@@ -36,9 +42,14 @@ export function loadDbBootstrapConfig(): DbBootstrapConfig {
 
 export async function initDb(
   bootstrap: DbBootstrapConfig = loadDbBootstrapConfig(),
+  options?: InitDbOptions,
 ): Promise<Database> {
   if (db) return db;
-  db = await connect(bootstrap.dbPath);
+  const connectOptions =
+    options?.readonly === true
+      ? { readonly: true, fileMustExist: options.fileMustExist ?? true }
+      : undefined;
+  db = await connect(bootstrap.dbPath, connectOptions);
   return db;
 }
 
