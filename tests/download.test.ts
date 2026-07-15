@@ -1,10 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-vi.mock("@shared/core/fetchWithTimeout.js", () => ({
+vi.mock("#shared/core/fetchWithTimeout.js", () => ({
   fetchWithTimeout: vi.fn(),
 }));
 
-import { fetchWithTimeout } from "@shared/core/fetchWithTimeout.js";
+import { fetchWithTimeout } from "#shared/core/fetchWithTimeout.js";
 import { fetchBuffer } from "../bot/src/lib/core/download.js";
 
 describe("fetchBuffer", () => {

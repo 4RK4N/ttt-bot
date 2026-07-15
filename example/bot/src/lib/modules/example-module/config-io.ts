@@ -12,8 +12,8 @@ import { createConfigIo } from '../../core/configIo.js';
 import {
   NAMESPACE,
   type ExamplePanelConfig,
-} from '@shared/modules/<name>/types.js';
-export * from '@shared/modules/<name>/types.js';
+} from '#shared/modules/<name>/types.js';
+export * from '#shared/modules/<name>/types.js';
 
 const io = createConfigIo<ExamplePanelConfig>(NAMESPACE, 'panels');
 export const updateExamplePanel = io.updateItem;

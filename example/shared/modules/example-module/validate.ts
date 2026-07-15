@@ -4,7 +4,7 @@
  *
  * Not compiled in-place — this tree is a copy template only.
  */
-import { parsePanelBaseFields } from "@shared/core/panelFields.js";
+import { parsePanelBaseFields } from "#shared/core/panelFields.js";
 
 interface ExamplePanelLike {
   panelTitle: string;

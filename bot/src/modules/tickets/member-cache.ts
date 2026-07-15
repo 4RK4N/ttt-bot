@@ -4,7 +4,7 @@ import {
   type Client,
   type GuildMember,
 } from "discord.js";
-import { config } from "@shared/config.js";
+import { config } from "#shared/config.js";
 import {
   removeMemberDisplayName,
   setMemberDisplayName,

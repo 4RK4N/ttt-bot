@@ -5,7 +5,7 @@ import {
   publishDiscordMessage,
   type DiscordApiContext,
 } from "../../core/panelPublish.js";
-import { validateTicketType } from "@shared/modules/tickets/validate.js";
+import { validateTicketType } from "#shared/modules/tickets/validate.js";
 import { resolveTicketType } from "./config-io.js";
 
 export type { DiscordApiContext };

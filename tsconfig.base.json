@@ -11,7 +11,9 @@
     "sourceMap": true,
     "declaration": false,
     "paths": {
-      "@shared/*": ["./shared/*"]
+      "#shared/*": [
+        "./shared/*"
+      ]
     }
   }
 }

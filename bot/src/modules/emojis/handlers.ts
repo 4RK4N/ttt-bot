@@ -12,11 +12,11 @@ import {
   isCustomEmojiMarkup,
   isValidGuildEmojiName,
   parseEmoji,
-} from "@shared/core/discordEmoji.js";
-import { isSupportedEmojiImageBuffer } from "@shared/core/imageBuffer.js";
-import { isImageAttachment } from "@shared/core/attachments.js";
-import { DISCORD_EMOJI_MAX_BYTES } from "@shared/core/limits.js";
-import { format, isModuleEnabled } from "@shared/core/texts.js";
+} from "#shared/core/discordEmoji.js";
+import { isSupportedEmojiImageBuffer } from "#shared/core/imageBuffer.js";
+import { isImageAttachment } from "#shared/core/attachments.js";
+import { DISCORD_EMOJI_MAX_BYTES } from "#shared/core/limits.js";
+import { format, isModuleEnabled } from "#shared/core/texts.js";
 import { fetchBuffer } from "../../lib/core/download.js";
 import { canConfiguredRoleOrAdmin } from "../../lib/core/discordInteractions.js";
 import {

@@ -1,6 +1,6 @@
 import { Events, type Client } from "discord.js";
 import type { CommandModule } from "../../moduleLoader.js";
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 import { registerSafeHandler } from "../../lib/core/discordEvents.js";
 import {
   NAMESPACE,

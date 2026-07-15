@@ -3,7 +3,7 @@ import { MessageFlags } from "discord.js";
 
 const isModuleEnabled = vi.fn(() => true);
 
-vi.mock("@shared/core/texts.js", () => ({
+vi.mock("#shared/core/texts.js", () => ({
   format: (template: string, vars: Record<string, string>) =>
     template.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? ""),
   isModuleEnabled: (...args: unknown[]) => isModuleEnabled(...args),

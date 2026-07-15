@@ -10,7 +10,7 @@ import type {
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MODULES_DIR = join(__dirname, "modules");
 

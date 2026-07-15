@@ -10,7 +10,7 @@ import { applyEmojiToButton } from "../../core/buttonEmoji.js";
 import {
   parseEmoji,
   reactionsMatch,
-} from "@shared/core/discordEmoji.js";
+} from "#shared/core/discordEmoji.js";
 import { syncBotMessageReactions } from "../../core/discordReactions.js";
 import {
   publishDiscordMessage,
@@ -19,9 +19,9 @@ import {
 import type {
   ResolvedRolePanel,
   RoleOption,
-} from "@shared/modules/reaction-roles/types.js";
+} from "#shared/modules/reaction-roles/types.js";
 import { resolvePanel } from "./config-io.js";
-import { validateRolePanel } from "@shared/modules/reaction-roles/validate.js";
+import { validateRolePanel } from "#shared/modules/reaction-roles/validate.js";
 
 export type { DiscordApiContext };
 

@@ -1,6 +1,6 @@
 import type { GuildMember, MessageComponentInteraction } from "discord.js";
 import { replyEphemeral } from "../../lib/core/discordInteractions.js";
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 import { isOnCooldown, touchCooldown } from "./cooldown.js";
 import {
   NAMESPACE,
@@ -10,7 +10,7 @@ import {
 import type {
   ReactionType,
   ResolvedRolePanel,
-} from "@shared/modules/reaction-roles/types.js";
+} from "#shared/modules/reaction-roles/types.js";
 
 export type PanelGuardResult =
   | { ok: true; panel: ResolvedRolePanel; t: ReturnType<typeof data> }

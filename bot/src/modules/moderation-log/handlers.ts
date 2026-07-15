@@ -10,7 +10,7 @@ import {
   type TextBasedChannel,
   type TextChannel,
 } from "discord.js";
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 import { findRecentBan, findRecentKick, findRecentUnban } from "./audit.js";
 import {
   buildMemberBannedEmbed,

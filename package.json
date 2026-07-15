@@ -4,7 +4,7 @@
   "description": "Custom Discord bot for Tiny Temptation Tubs (TTT) with an extensible module system.",
   "type": "module",
   "imports": {
-    "@shared/*": "./dist/shared/*"
+    "#shared/*": "./dist/shared/*"
   },
   "main": "dist/bot/src/app.js",
   "engines": {

@@ -1,5 +1,5 @@
-import type { PublishHandlers } from "@shared/core/panelPublishBridge.js";
-import { PANEL_MODULE_NAMESPACES } from "@shared/core/panelModuleRegistry.js";
+import type { PublishHandlers } from "#shared/core/panelPublishBridge.js";
+import { PANEL_MODULE_NAMESPACES } from "#shared/core/panelModuleRegistry.js";
 import {
   publishEmbedPanel,
   unpublishEmbedPanel,

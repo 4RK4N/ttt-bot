@@ -4,7 +4,7 @@ import type {
   MessageReaction,
   PartialMessageReaction,
 } from "discord.js";
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 
 export interface FullReactionContext {
   reaction: MessageReaction;

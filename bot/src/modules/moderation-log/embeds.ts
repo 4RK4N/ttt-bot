@@ -1,6 +1,6 @@
 import type { EmbedBuilder } from "discord.js";
 import { buildEmbed } from "../../lib/core/embedBuilder.js";
-import { format } from "@shared/core/texts.js";
+import { format } from "#shared/core/texts.js";
 import type { ModLogTexts } from "../../lib/modules/moderation-log/config-io.js";
 
 const MAX_CONTENT_LENGTH = 1_000;

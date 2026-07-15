@@ -12,7 +12,7 @@ import {
   resolveOption,
   get,
 } from "../../lib/modules/reaction-roles/config-io.js";
-import type { ResolvedRolePanel } from "@shared/modules/reaction-roles/types.js";
+import type { ResolvedRolePanel } from "#shared/modules/reaction-roles/types.js";
 
 async function replySuccess(
   interaction: ButtonInteraction,

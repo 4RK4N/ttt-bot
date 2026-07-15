@@ -39,7 +39,7 @@ vi.mock("@napi-rs/canvas", () => ({
   })),
 }));
 
-vi.mock("@shared/core/texts.js", () => ({
+vi.mock("#shared/core/texts.js", () => ({
   moduleDataPath: (...parts: string[]) => parts.join("/"),
 }));
 

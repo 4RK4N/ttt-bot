@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@shared/core/texts.js", () => ({
+vi.mock("#shared/core/texts.js", () => ({
   isModuleEnabled: vi.fn(() => true),
 }));
 
-import { isModuleEnabled } from "@shared/core/texts.js";
+import { isModuleEnabled } from "#shared/core/texts.js";
 import {
   ensureFullReaction,
   guardReactionEvent,

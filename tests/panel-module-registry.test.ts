@@ -3,7 +3,7 @@ import {
   PANEL_MODULE_NAMESPACES,
   PANEL_MODULE_REGISTRY,
   panelListField,
-} from "@shared/core/panelModuleRegistry.js";
+} from "#shared/core/panelModuleRegistry.js";
 
 describe("panelModuleRegistry", () => {
   it("lists all panel modules with list fields", () => {

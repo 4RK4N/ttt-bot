@@ -8,7 +8,7 @@ import {
 import { guardReactionEvent } from "../../lib/core/reactionContext.js";
 import { isDiscordUnknownMessage } from "../../lib/core/discordInteractions.js";
 import { registerSafeHandler } from "../../lib/core/discordEvents.js";
-import { reactionsMatch } from "@shared/core/discordEmoji.js";
+import { reactionsMatch } from "#shared/core/discordEmoji.js";
 import {
   data,
   NAMESPACE,

@@ -10,8 +10,8 @@ import {
   type TextChannel,
   type ThreadChannel,
 } from "discord.js";
-import { channelThreadUrl } from "@shared/core/limits.js";
-import { format, isModuleEnabled } from "@shared/core/texts.js";
+import { channelThreadUrl } from "#shared/core/limits.js";
+import { format, isModuleEnabled } from "#shared/core/texts.js";
 import { sleep } from "../../lib/core/sleep.js";
 import { buildTextOrEmbedPayload } from "../../lib/core/embedBuilder.js";
 import {

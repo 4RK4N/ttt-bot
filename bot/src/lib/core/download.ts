@@ -1,4 +1,4 @@
-import { fetchWithTimeout } from "@shared/core/fetchWithTimeout.js";
+import { fetchWithTimeout } from "#shared/core/fetchWithTimeout.js";
 
 const ALLOWED_FETCH_HOSTS = new Set([
   "cdn.discordapp.com",

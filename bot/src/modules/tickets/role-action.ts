@@ -7,7 +7,7 @@ import {
   canConfiguredRoleOrAdmin,
   replyEphemeral,
 } from "../../lib/core/discordInteractions.js";
-import { format } from "@shared/core/texts.js";
+import { format } from "#shared/core/texts.js";
 import {
   tryAssignRole,
   roleChangeErrorMessage,
