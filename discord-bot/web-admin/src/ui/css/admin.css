@@ -96,17 +96,28 @@ body {
 }
 
 /*
- * daisyUI .fieldset sets min-width: min-content, so long textarea lines expand
- * the panel past the viewport. Beat that rule and allow grid children to shrink.
+ * daisyUI .fieldset uses min-width: min-content and .textarea uses
+ * width: clamp(3rem, 20rem, 100%). Long lines then expand the grid track and
+ * the whole panel scrolls sideways. Lock the track and force full-width shrink.
  */
+.module-panel,
+.module-panel form {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .module-panel fieldset.fieldset {
   min-width: 0;
   max-width: 100%;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  overflow-x: clip;
 }
 
 .module-panel textarea.input,
 .module-panel textarea.textarea {
   min-height: 110px;
-  min-width: 0;
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
 }

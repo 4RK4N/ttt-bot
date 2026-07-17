@@ -23,7 +23,7 @@ export function TextareaField({ f, value, name, disabled }: SubFieldProps) {
   return (
     <FieldWrap label={f.label} help={f.help} disabled={disabled}>
       <textarea
-        class="textarea textarea-bordered w-full min-w-0 max-w-full"
+        class="textarea textarea-bordered w-full"
         id={id}
         name={name}
         rows={4}

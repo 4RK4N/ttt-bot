@@ -68,7 +68,7 @@ export function EditorLayout({
               </div>
             </header>
             <main
-              class="container mx-auto max-w-7xl min-w-0 flex-1 p-4"
+              class="container mx-auto max-w-7xl flex-1 p-4"
               id="module-content"
             >
               {panel}

@@ -14,18 +14,18 @@ export function ModulePanel({ mod, ctx, expanded, status }: PanelProps) {
 
   return (
     <section
-      class="module-panel min-w-0 max-w-full"
+      class="module-panel"
       data-ns={mod.namespace}
       id={`htmx-panel-${mod.namespace}`}
     >
-      <form id={`panel-form-${mod.namespace}`} class="min-w-0 max-w-full">
+      <form id={`panel-form-${mod.namespace}`}>
         <input type="hidden" name="_csrf" value={ctx.csrfToken} />
         <div class="mb-3 flex items-center justify-between gap-3">
           <h2 class="text-2xl font-semibold">{mod.title}</h2>
           <EnabledToggle namespace={mod.namespace} enabled={mod.enabled} />
         </div>
         {mod.description ? (
-          <p class="mb-3 max-w-full text-base-content/60">{mod.description}</p>
+          <p class="mb-3 text-base-content/60">{mod.description}</p>
         ) : null}
         {mod.fields.map((f) => (
           <Field
