@@ -31,7 +31,7 @@ export function textInputMaxLength(
 
 export function Help({ text }: { text?: string }) {
   if (!text) return null;
-  return <p class="label">{text}</p>;
+  return <p class="label whitespace-normal">{text}</p>;
 }
 
 export function FieldWrap({
