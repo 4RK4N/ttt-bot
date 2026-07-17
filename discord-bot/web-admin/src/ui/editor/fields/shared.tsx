@@ -31,7 +31,7 @@ export function textInputMaxLength(
 
 export function Help({ text }: { text?: string }) {
   if (!text) return null;
-  return <p class="label">{text}</p>;
+  return <p class="label max-w-full">{text}</p>;
 }
 
 export function FieldWrap({
@@ -47,7 +47,7 @@ export function FieldWrap({
 }) {
   return (
     <fieldset
-      class={`fieldset field mb-4 w-full${disabled ? " disabled" : ""}`}
+      class={`fieldset field mb-4 w-full min-w-0 max-w-full${disabled ? " disabled" : ""}`}
     >
       <legend class="fieldset-legend">{label}</legend>
       <Help text={help} />

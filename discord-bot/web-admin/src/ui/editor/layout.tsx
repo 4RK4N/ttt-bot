@@ -38,7 +38,7 @@ export function EditorLayout({
             tabindex={-1}
             aria-label="Module menu"
           />
-          <div class="drawer-content flex min-h-screen flex-col bg-base-100">
+          <div class="drawer-content flex min-h-screen min-w-0 flex-col bg-base-100">
             <header class="navbar sticky top-0 z-30 border-b border-base-300 bg-base-200 px-2">
               <div class="flex-none md:hidden">
                 <button
@@ -68,7 +68,7 @@ export function EditorLayout({
               </div>
             </header>
             <main
-              class="container mx-auto max-w-7xl flex-1 p-4"
+              class="container mx-auto max-w-7xl min-w-0 flex-1 p-4"
               id="module-content"
             >
               {panel}

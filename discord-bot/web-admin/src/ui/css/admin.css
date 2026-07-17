@@ -4,6 +4,10 @@
   themes: dark --default --prefersdark;
 }
 
+body {
+  hyphens: auto;
+}
+
 /* Extend built-in dark theme — inherits base palette; override brand primary only. */
 @plugin "daisyui/theme" {
   name: "dark";
@@ -91,7 +95,18 @@
   pointer-events: none;
 }
 
+/*
+ * daisyUI .fieldset sets min-width: min-content, so long textarea lines expand
+ * the panel past the viewport. Beat that rule and allow grid children to shrink.
+ */
+.module-panel fieldset.fieldset {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .module-panel textarea.input,
 .module-panel textarea.textarea {
   min-height: 110px;
+  min-width: 0;
+  max-width: 100%;
 }

@@ -101,7 +101,7 @@ export function RoleMultiField({
                 checked={selected.includes(role.id)}
                 disabled={disabled}
               />
-              <span class="min-w-0 break-words">{role.name}</span>
+              <span class="min-w-0">{role.name}</span>
             </label>
           ))
         )}
@@ -117,7 +117,7 @@ export function RoleMultiField({
                 checked
                 disabled={disabled}
               />
-              <span class="min-w-0 break-words">{sid} (not found)</span>
+              <span class="min-w-0">{sid} (not found)</span>
             </label>
           ))}
       </div>

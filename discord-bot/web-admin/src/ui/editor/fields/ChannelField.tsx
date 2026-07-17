@@ -109,7 +109,7 @@ export function ChannelMultiField({
                 checked={selected.includes(ch.id)}
                 disabled={disabled}
               />
-              <span class="min-w-0 break-words">#{ch.name}</span>
+              <span class="min-w-0">#{ch.name}</span>
             </label>
           ))
         )}
@@ -125,7 +125,7 @@ export function ChannelMultiField({
                 checked
                 disabled={disabled}
               />
-              <span class="min-w-0 break-words">{sid} (not found)</span>
+              <span class="min-w-0">{sid} (not found)</span>
             </label>
           ))}
       </div>
